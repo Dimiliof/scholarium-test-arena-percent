@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,6 +6,7 @@ import { subjects } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -132,6 +132,20 @@ const Index = () => {
             Δημιουργία Λογαριασμού
           </Button>
         </div>
+      </div>
+      
+      <div className="flex justify-center mb-8">
+        <Link to="/add-content">
+          <Button className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-plus">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" x2="12" y1="18" y2="12"/>
+              <line x1="9" x2="15" y1="15" y2="15"/>
+            </svg>
+            Προσθήκη Υλικού
+          </Button>
+        </Link>
       </div>
       
       <Footer />

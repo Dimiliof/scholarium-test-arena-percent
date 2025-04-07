@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Check, X, RefreshCw, Home } from 'lucide-react';
+import { Check, X, RefreshCw, Home, ChevronLeft } from 'lucide-react';
 import { QuizQuestion } from '@/lib/subjectsData';
 import { Subject } from '@/lib/subjectsData';
 

@@ -1,11 +1,28 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useToast } from "@/hooks/use-toast";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    toast({
+      title: "Λειτουργία σε εξέλιξη",
+      description: "Η λειτουργία εισόδου θα είναι διαθέσιμη σύντομα.",
+    });
+  };
+
+  const handleRegister = () => {
+    toast({
+      title: "Λειτουργία σε εξέλιξη",
+      description: "Η λειτουργία εγγραφής θα είναι διαθέσιμη σύντομα.",
+    });
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -20,13 +37,13 @@ const Header = () => {
           <Link to="/" className="text-gray-700 hover:text-primary transition-colors font-medium">
             Αρχική
           </Link>
-          <Link to="/about" className="text-gray-700 hover:text-primary transition-colors font-medium">
-            Σχετικά
+          <Link to="/school-registration" className="text-gray-700 hover:text-primary transition-colors font-medium">
+            Εγγραφή Σχολείου
           </Link>
-          <Button variant="outline" className="ml-4">
+          <Button variant="outline" className="ml-4" onClick={handleLogin}>
             Είσοδος
           </Button>
-          <Button>
+          <Button onClick={handleRegister}>
             Εγγραφή
           </Button>
         </nav>
@@ -56,17 +73,17 @@ const Header = () => {
               Αρχική
             </Link>
             <Link 
-              to="/about" 
+              to="/school-registration" 
               className="text-gray-700 hover:text-primary transition-colors font-medium py-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              Σχετικά
+              Εγγραφή Σχολείου
             </Link>
             <div className="pt-2 flex flex-col space-y-2">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" onClick={handleLogin}>
                 Είσοδος
               </Button>
-              <Button className="w-full">
+              <Button className="w-full" onClick={handleRegister}>
                 Εγγραφή
               </Button>
             </div>

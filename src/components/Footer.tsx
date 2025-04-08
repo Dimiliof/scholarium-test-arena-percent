@@ -1,7 +1,18 @@
+
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 const Footer = () => {
+  const { toast } = useToast();
+
+  const handleComingSoon = (feature: string) => {
+    toast({
+      title: "Λειτουργία σε εξέλιξη",
+      description: `Η σελίδα ${feature} θα είναι διαθέσιμη σύντομα.`,
+    });
+  };
+
   return (
     <footer className="bg-gray-100 pt-12 pb-8">
       <div className="container mx-auto px-4">
@@ -31,17 +42,17 @@ const Footer = () => {
           <div>
             <h3 className="font-bold text-lg mb-4">Χρήσιμοι Σύνδεσμοι</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/about" className="text-gray-600 hover:text-primary">Σχετικά με εμάς</Link></li>
-              <li><Link to="/contact" className="text-gray-600 hover:text-primary">Επικοινωνία</Link></li>
-              <li><Link to="/terms" className="text-gray-600 hover:text-primary">Όροι Χρήσης</Link></li>
-              <li><Link to="/privacy" className="text-gray-600 hover:text-primary">Πολιτική Απορρήτου</Link></li>
+              <li><a onClick={() => handleComingSoon("Σχετικά με εμάς")} className="text-gray-600 hover:text-primary cursor-pointer">Σχετικά με εμάς</a></li>
+              <li><a onClick={() => handleComingSoon("Επικοινωνία")} className="text-gray-600 hover:text-primary cursor-pointer">Επικοινωνία</a></li>
+              <li><a onClick={() => handleComingSoon("Όροι Χρήσης")} className="text-gray-600 hover:text-primary cursor-pointer">Όροι Χρήσης</a></li>
+              <li><a onClick={() => handleComingSoon("Πολιτική Απορρήτου")} className="text-gray-600 hover:text-primary cursor-pointer">Πολιτική Απορρήτου</a></li>
             </ul>
           </div>
           
           <div>
             <h3 className="font-bold text-lg mb-4">Επικοινωνία</h3>
             <ul className="space-y-2 text-sm">
-              <li className="text-gray-600">Email: dimitris.liofis@atsoglou.gr</li>
+              <li className="text-gray-600">Email: <a href="mailto:dimitris.liofis@atsoglou.gr" className="text-primary hover:underline">dimitris.liofis@atsoglou.gr</a></li>
               <li className="text-gray-600">Τηλέφωνο: +30 210 1234567</li>
             </ul>
           </div>

@@ -1,4 +1,6 @@
+
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SubjectCard from '@/components/SubjectCard';
@@ -8,13 +10,38 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
   const filteredSubjects = subjects.filter(subject => 
     subject.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleStartNow = () => {
+    // Scroll to subjects section
+    const subjectsSection = document.getElementById('subjects-section');
+    if (subjectsSection) {
+      subjectsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleLearnMore = () => {
+    toast({
+      title: "Περισσότερες πληροφορίες",
+      description: "Θα βρείτε περισσότερες πληροφορίες για την πλατφόρμα μας σύντομα.",
+    });
+  };
+
+  const handleCreateAccount = () => {
+    toast({
+      title: "Δημιουργία λογαριασμού",
+      description: "Η λειτουργία δημιουργίας λογαριασμού θα είναι διαθέσιμη σύντομα.",
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -37,10 +64,10 @@ const Index = () => {
             Προετοιμαστείτε για επιτυχία μέσα από προσομοιώσεις και διαγωνίσματα για όλα τα σχολικά μαθήματα
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+            <Button size="lg" className="bg-white text-primary hover:bg-gray-100" onClick={handleStartNow}>
               Ξεκινήστε Τώρα
             </Button>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
+            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10" onClick={handleLearnMore}>
               Μάθετε Περισσότερα
             </Button>
           </div>
@@ -64,7 +91,7 @@ const Index = () => {
       </div>
       
       {/* Subjects Section */}
-      <div className="container mx-auto px-4 py-12 md:py-16">
+      <div id="subjects-section" className="container mx-auto px-4 py-12 md:py-16">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">Διαθέσιμα Μαθήματα</h2>
         
         {/* Search Bar */}
@@ -152,7 +179,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">Έτοιμοι να ξεκινήσετε;</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">Δημιουργήστε λογαριασμό δωρεάν και ξεκινήστε να εξασκείστε στα μαθήματά σας</p>
-          <Button size="lg" variant="secondary" className="animate-pulse-scale">
+          <Button size="lg" variant="secondary" className="animate-pulse-scale" onClick={handleCreateAccount}>
             Δημιουργία Λογαριασμού
           </Button>
         </div>

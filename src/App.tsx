@@ -10,6 +10,10 @@ import QuizPage from "./pages/QuizPage";
 import AddContentPage from "./pages/AddContentPage";
 import SchoolRegistration from "./pages/SchoolRegistration";
 import NotFound from "./pages/NotFound";
+import AboutPage from "./pages/AboutPage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import ContactPage from "./pages/ContactPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +29,10 @@ const App = () => (
           <Route path="/quiz/:subjectId/:quizType" element={<QuizPage />} />
           <Route path="/add-content" element={<AddContentPage />} />
           <Route path="/school-registration" element={<SchoolRegistration />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

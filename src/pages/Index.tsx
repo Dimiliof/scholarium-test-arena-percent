@@ -79,7 +79,7 @@ const Index = () => {
       <TestimonialsSection />
       <HomeCallToAction onCreateAccount={handleCreateAccount} />
       
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col space-y-4">
+      <div className="fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center pb-4">
         {isAuthenticated && <AddContentButton />}
         <DownloadAppButton />
       </div>

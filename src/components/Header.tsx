@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import UserMenu from "@/components/UserMenu";
 import { School } from 'lucide-react';
+import MobileMenu from "@/components/MobileMenu";
 
 const Header = () => {
   const { isAuthenticated } = useAuth();
@@ -22,10 +23,13 @@ const Header = () => {
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link to="/" className="flex items-center text-2xl font-bold text-primary hover-scale">
-          <School className="h-8 w-8 mr-2 text-primary" />
-          <span className="hidden md:inline">EduPercentage</span>
-        </Link>
+        <div className="flex items-center">
+          <MobileMenu />
+          <Link to="/" className="flex items-center text-2xl font-bold text-primary hover-scale">
+            <School className="h-8 w-8 mr-2 text-primary" />
+            <span className="hidden md:inline">EduPercentage</span>
+          </Link>
+        </div>
         
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList>

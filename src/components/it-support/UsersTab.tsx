@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { toast } from "sonner";
 
 type UsersTabProps = {
   onAction: (action: string) => void;
@@ -11,25 +13,33 @@ type UsersTabProps = {
 
 const UsersTab = ({ onAction }: UsersTabProps) => {
   const { fixAdminEmail } = useAuth();
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFixAdmin = async () => {
+    setIsLoading(true);
     const adminEmail = "liofisdimitris@gmail.com";
     const success = await fixAdminEmail(adminEmail);
     
     if (success) {
-      toast({
+      uiToast({
         title: "Επιτυχής ενημέρωση",
         description: `Ο χρήστης ${adminEmail} ορίστηκε ως διαχειριστής επιτυχώς.`,
       });
+      
+      toast.success("Ο διαχειριστής ορίστηκε επιτυχώς!", {
+        position: "top-center",
+      });
+      
       onAction("Όρισμός διαχειριστή");
     } else {
-      toast({
+      uiToast({
         variant: "destructive",
         title: "Σφάλμα",
         description: "Προέκυψε πρόβλημα κατά την ενημέρωση του ρόλου.",
       });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -60,9 +70,10 @@ const UsersTab = ({ onAction }: UsersTabProps) => {
           variant="outline" 
           className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
           onClick={handleFixAdmin}
+          disabled={isLoading}
         >
           <ShieldCheck className="h-4 w-4 mr-2" />
-          Όρισε Διαχειριστή
+          {isLoading ? "Ορισμός..." : "Όρισε Διαχειριστή"}
         </Button>
       </CardContent>
     </Card>

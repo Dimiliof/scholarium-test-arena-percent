@@ -17,13 +17,20 @@ const ITSupportLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { login, fixAdminEmail } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // Πρώτα δοκιμάζουμε να διορθώσουμε το email διαχειριστή
+      if (email === "liofisdimitris@gmail.com") {
+        const fixed = await fixAdminEmail(email);
+        console.log("Προσπάθεια διόρθωσης διαχειριστή:", fixed);
+      }
+      
+      // Στη συνέχεια κάνουμε το login
       const success = await login(email, password);
       
       if (success) {

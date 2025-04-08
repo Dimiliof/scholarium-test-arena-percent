@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -34,7 +35,8 @@ const AdminUsersPage = () => {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Έλεγχος αν ο χρήστης είναι διαχειριστής
   useEffect(() => {
@@ -74,22 +76,29 @@ const AdminUsersPage = () => {
 
   // Διόρθωση του ρόλου του διαχειριστή
   const handleFixAdminRole = async () => {
+    setIsLoading(true);
     const adminEmail = "liofisdimitris@gmail.com";
     const success = await fixAdminEmail(adminEmail);
     
     if (success) {
-      toast({
+      uiToast({
         title: "Επιτυχής ενημέρωση",
         description: `Ο χρήστης ${adminEmail} ορίστηκε ως διαχειριστής επιτυχώς.`,
       });
+      
+      toast.success("Ο διαχειριστής ορίστηκε επιτυχώς!", {
+        position: "top-center",
+      });
+      
       loadUsers(); // Επαναφόρτωση χρηστών για να εμφανιστούν οι αλλαγές
     } else {
-      toast({
+      uiToast({
         variant: "destructive",
         title: "Σφάλμα",
         description: "Προέκυψε πρόβλημα κατά την ενημέρωση του ρόλου.",
       });
     }
+    setIsLoading(false);
   };
 
   // Αν ο χρήστης δεν είναι διαχειριστής, δεν εμφανίζουμε τίποτα
@@ -117,9 +126,10 @@ const AdminUsersPage = () => {
               variant="outline" 
               className="flex items-center gap-2 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
               onClick={handleFixAdminRole}
+              disabled={isLoading}
             >
               <ShieldCheck className="h-4 w-4" />
-              Όρισε Διαχειριστή
+              {isLoading ? "Ορισμός..." : "Όρισε Διαχειριστή"}
             </Button>
           </div>
         </div>

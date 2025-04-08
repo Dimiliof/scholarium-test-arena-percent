@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from "react";
 
 // Τύπος δεδομένων για την εγγραφή
@@ -101,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let needsUpdate = false;
       
       const updatedUsers = users.map((u: User) => {
-        if (u.email === adminEmail && u.role !== "admin") {
+        if (u.email === adminEmail) {
           needsUpdate = true;
           console.log(`Διόρθωση ρόλου για τον διαχειριστή ${adminEmail} από ${u.role} σε admin`);
           return { ...u, role: "admin" as const };
@@ -123,7 +122,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης-διαχειριστής");
           }
         }
+      } else {
+        // Αν δεν υπάρχει ο διαχειριστής, τον δημιουργούμε
+        const adminExists = users.some((u: User) => u.email === adminEmail);
+        if (!adminExists) {
+          console.log("Ο διαχειριστής δεν υπάρχει, τον δημιουργούμε");
+          const newAdmin = {
+            id: Math.random().toString(36).substring(2, 15),
+            firstName: "Διαχειριστής",
+            lastName: "Συστήματος",
+            email: adminEmail,
+            password: "admin12345",
+            role: "admin" as const,
+          };
+          users.push(newAdmin);
+          localStorage.setItem("users", JSON.stringify(users));
+          console.log("Δημιουργήθηκε ο διαχειριστής:", newAdmin);
+        }
       }
+    } else {
+      // Αν δεν υπάρχουν χρήστες, δημιουργούμε τον διαχειριστή
+      const newAdmin = {
+        id: Math.random().toString(36).substring(2, 15),
+        firstName: "Διαχειριστής",
+        lastName: "Συστήματος",
+        email: adminEmail,
+        password: "admin12345",
+        role: "admin" as const,
+      };
+      localStorage.setItem("users", JSON.stringify([newAdmin]));
+      console.log("Δημιουργήθηκε αρχικός διαχειριστής:", newAdmin);
     }
   };
   
@@ -131,29 +159,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fixAdminEmail = async (email: string): Promise<boolean> => {
     try {
       const storedUsers = localStorage.getItem("users");
-      if (!storedUsers) return false;
+      if (!storedUsers) {
+        // Αν δεν υπάρχουν χρήστες, δημιουργούμε τον διαχειριστή
+        const newAdmin = {
+          id: Math.random().toString(36).substring(2, 15),
+          firstName: "Διαχειριστής",
+          lastName: "Συστήματος",
+          email: email,
+          password: "admin12345",
+          role: "admin" as const,
+        };
+        localStorage.setItem("users", JSON.stringify([newAdmin]));
+        console.log("Δημιουργήθηκε αρχικός διαχειριστής:", newAdmin);
+        return true;
+      }
       
       const users = JSON.parse(storedUsers);
       let userFound = false;
       
-      const updatedUsers = users.map((u: User) => {
+      const updatedUsers = users.map((u: User & { password?: string }) => {
         if (u.email === email) {
           userFound = true;
+          console.log(`Ο χρήστης ${email} βρέθηκε. Ενημέρωση ρόλου σε admin.`);
           return { ...u, role: "admin" as const };
         }
         return u;
       });
       
-      if (!userFound) return false;
+      if (!userFound) {
+        // Αν δεν υπάρχει ο χρήστης, τον δημιουργούμε
+        console.log(`Ο χρήστης ${email} δεν βρέθηκε. Δημιουργία νέου διαχειριστή.`);
+        const newAdmin = {
+          id: Math.random().toString(36).substring(2, 15),
+          firstName: "Διαχειριστής",
+          lastName: "Συστήματος",
+          email: email,
+          password: "admin12345",
+          role: "admin" as const,
+        };
+        updatedUsers.push(newAdmin);
+      }
       
       localStorage.setItem("users", JSON.stringify(updatedUsers));
+      console.log("Η λίστα χρηστών ενημερώθηκε επιτυχώς");
       
       // Αν ο συνδεδεμένος χρήστης είναι αυτός που ενημερώνουμε, ενημερώνουμε και το user state
       if (user && user.email === email) {
-        const updatedUser: User = { ...user, role: "admin" };
+        const updatedUser: User = { ...user, role: "admin" as const };
         setUser(updatedUser);
         setIsAdmin(true);
         localStorage.setItem("user", JSON.stringify(updatedUser));
+        console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης");
       }
       
       return true;
@@ -171,8 +227,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const user = users.find((u: User & { password?: string }) => u.email === email && u.password === password);
 
     if (user) {
-      setUser(user);
-      localStorage.setItem("user", JSON.stringify(user));
+      // Αφαιρούμε τον κωδικό πριν αποθηκεύσουμε τον χρήστη στο state
+      const userWithoutPassword = { ...user };
+      delete userWithoutPassword.password;
+      
+      setUser(userWithoutPassword);
+      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
       setIsAuthenticated(true);
       setIsAdmin(user.role === "admin");
       setIsTeacher(user.role === "teacher");

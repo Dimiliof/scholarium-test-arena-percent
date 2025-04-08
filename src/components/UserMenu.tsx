@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -96,6 +97,9 @@ const UserMenu = () => {
            user.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής";
   };
 
+  // Προσδιορίζουμε εάν ο χρήστης είναι μαθητής (όχι admin, όχι teacher)
+  const isStudent = isAuthenticated && !isAdmin && !isTeacher;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -125,12 +129,16 @@ const UserMenu = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        
+        {/* Προβολή προφίλ και αποσύνδεση είναι διαθέσιμα για όλους τους χρήστες */}
         <DropdownMenuItem asChild>
           <Link to="/profile" className="cursor-pointer flex w-full items-center">
             <User className="mr-2 h-4 w-4" />
             <span>Το προφίλ μου</span>
           </Link>
         </DropdownMenuItem>
+        
+        {/* Επεξεργασία προφίλ είναι επίσης διαθέσιμη για όλους */}
         <DropdownMenuItem asChild>
           <Link to="/edit-profile" className="cursor-pointer flex w-full items-center">
             <Settings className="mr-2 h-4 w-4" />
@@ -138,6 +146,7 @@ const UserMenu = () => {
           </Link>
         </DropdownMenuItem>
 
+        {/* Επιλογές μόνο για εκπαιδευτικούς */}
         {isTeacher && (
           <>
             <DropdownMenuItem asChild>
@@ -155,6 +164,7 @@ const UserMenu = () => {
           </>
         )}
 
+        {/* Επιλογές μόνο για διαχειριστές */}
         {isAdmin && (
           <>
             <DropdownMenuSeparator />

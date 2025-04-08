@@ -9,6 +9,7 @@ interface HomeSubjectsGridProps {
 }
 
 const HomeSubjectsGrid = ({ subjects, isAuthenticated }: HomeSubjectsGridProps) => {
+  // Περνάμε το isAuthenticated στο SubjectsSection για να ελέγξουμε τι θα εμφανίσουμε
   return <SubjectsSection subjects={subjects} isAuthenticated={isAuthenticated} />;
 };
 

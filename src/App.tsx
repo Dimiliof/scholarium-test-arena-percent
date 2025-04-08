@@ -58,13 +58,14 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const TeacherRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isTeacher } = useAuth();
+  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   
-  if (!isTeacher) {
+  // Επιτρέπουμε πρόσβαση και στους διαχειριστές
+  if (!isTeacher && !isAdmin) {
     return <Navigate to="/" replace />;
   }
   

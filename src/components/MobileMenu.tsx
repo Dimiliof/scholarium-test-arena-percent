@@ -14,7 +14,7 @@ import { Menu, School } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const MobileMenu = () => {
-  const { isAuthenticated, isTeacher } = useAuth();
+  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
   const isMobile = useIsMobile();
 
   if (!isMobile) return null;
@@ -79,7 +79,7 @@ const MobileMenu = () => {
             <Link to="/about" className="text-lg font-medium hover:text-primary">
               Σχετικά
             </Link>
-            {isAuthenticated && isTeacher && (
+            {isAuthenticated && (isTeacher || isAdmin) && (
               <Link to="/add-content" className="text-lg font-medium hover:text-primary">
                 Προσθήκη Υλικού
               </Link>

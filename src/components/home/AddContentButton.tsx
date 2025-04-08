@@ -6,10 +6,10 @@ import { PlusCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const AddContentButton = () => {
-  const { isAuthenticated, isTeacher } = useAuth();
+  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
   
   // Εμφάνιση του κουμπιού μόνο για εκπαιδευτικούς και διαχειριστές
-  if (!isAuthenticated || !isTeacher) {
+  if (!isAuthenticated || (!isTeacher && !isAdmin)) {
     return null;
   }
   

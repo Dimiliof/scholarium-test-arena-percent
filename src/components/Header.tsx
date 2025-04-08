@@ -18,7 +18,7 @@ import { School } from 'lucide-react';
 import MobileMenu from "@/components/MobileMenu";
 
 const Header = () => {
-  const { isAuthenticated, isTeacher } = useAuth();
+  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -101,7 +101,7 @@ const Header = () => {
               </NavigationMenuLink>
             </NavigationMenuItem>
             
-            {isAuthenticated && isTeacher && (
+            {isAuthenticated && (isTeacher || isAdmin) && (
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
                   <Link to="/add-content" className={navigationMenuTriggerStyle()}>

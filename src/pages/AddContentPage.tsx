@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, AlertCircle, Mail, Smartphone } from 'lucide-react';
 import Header from '@/components/Header';
@@ -27,6 +27,23 @@ const AddContentPage = () => {
   const [otpCode, setOtpCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const { addQuestion, isAdding } = useAddQuestion();
+  
+  // Έλεγχος αν ο χρήστης είναι ήδη επαληθευμένος κατά τη φόρτωση της σελίδας
+  useEffect(() => {
+    const isVerified = localStorage.getItem('educatorVerified') === 'true';
+    if (isVerified) {
+      setVerificationStep('verified');
+      const savedEmail = localStorage.getItem('educatorEmail');
+      const savedPhone = localStorage.getItem('educatorPhone');
+      if (savedEmail) {
+        setEmailInput(savedEmail);
+        setVerificationMethod('email');
+      } else if (savedPhone) {
+        setPhoneInput(savedPhone);
+        setVerificationMethod('sms');
+      }
+    }
+  }, []);
   
   const handleSubjectSelect = (subjectId: string) => {
     setSelectedSubject(subjectId);
@@ -69,16 +86,37 @@ const AddContentPage = () => {
 
     setIsVerifying(true);
     
-    // Προσομοίωση αποστολής κωδικού
+    // Προσομοίωση αποστολής κωδικού και εμφάνιση toast
     setTimeout(() => {
       setIsVerifying(false);
       setVerificationStep('verify');
-      toast({
-        title: "Κωδικός εστάλη",
-        description: verificationMethod === 'email' 
-          ? `Ένας κωδικός επαλήθευσης έχει σταλεί στο ${emailInput}` 
-          : `Ένας κωδικός επαλήθευσης έχει σταλεί στο ${phoneInput}`,
-      });
+      
+      // Προσθήκη toast ειδοποίησης
+      if (verificationMethod === 'email') {
+        toast({
+          title: "Κωδικός εστάλη στο email σας",
+          description: `Ένας 6-ψήφιος κωδικός επαλήθευσης έχει σταλεί στο ${emailInput}. Παρακαλώ ελέγξτε τα εισερχόμενά σας.`,
+        });
+        
+        // Εμφάνιση της ειδοποίησης και στο sonner
+        import('sonner').then(({ toast: sonnerToast }) => {
+          sonnerToast.success(`Κωδικός επαλήθευσης εστάλη στο ${emailInput}`);
+        });
+        
+        console.log(`Κωδικός επαλήθευσης εστάλη στο ${emailInput}`);
+      } else {
+        toast({
+          title: "SMS εστάλη",
+          description: `Ένα SMS με τον 6-ψήφιο κωδικό επαλήθευσης έχει σταλεί στο ${phoneInput}.`,
+        });
+        
+        // Εμφάνιση της ειδοποίησης και στο sonner
+        import('sonner').then(({ toast: sonnerToast }) => {
+          sonnerToast.success(`Κωδικός επαλήθευσης εστάλη στο ${phoneInput}`);
+        });
+        
+        console.log(`Κωδικός επαλήθευσης εστάλη στο ${phoneInput}`);
+      }
     }, 1500);
   };
 
@@ -86,7 +124,7 @@ const AddContentPage = () => {
     if (!otpCode || otpCode.length < 6) {
       toast({
         title: "Σφάλμα",
-        description: "Παρακαλώ εισάγετε έναν έγκυρο κωδικό επαλήθευσης.",
+        description: "Παρακαλώ εισάγετε έναν έγκυρο 6-ψήφιο κωδικό επαλήθευσης.",
         variant: "destructive",
       });
       return;
@@ -100,41 +138,41 @@ const AddContentPage = () => {
       
       if (otpCode === "123456") {
         setVerificationStep('verified');
+        
+        // Αποθηκεύουμε την επαλήθευση στο localStorage
+        localStorage.setItem('educatorVerified', 'true');
+        localStorage.setItem('educatorEmail', verificationMethod === 'email' ? emailInput : '');
+        localStorage.setItem('educatorPhone', verificationMethod === 'sms' ? phoneInput : '');
+        
         toast({
           title: "Επιτυχής επαλήθευση!",
           description: "Έχετε πλέον πρόσβαση στην προσθήκη εκπαιδευτικού υλικού.",
         });
         
-        // Αποθηκεύουμε την επαλήθευση στο localStorage για να μη χρειάζεται να επαληθεύει κάθε φορά
-        localStorage.setItem('educatorVerified', 'true');
-        localStorage.setItem('educatorEmail', verificationMethod === 'email' ? emailInput : '');
-        localStorage.setItem('educatorPhone', verificationMethod === 'sms' ? phoneInput : '');
+        import('sonner').then(({ toast: sonnerToast }) => {
+          sonnerToast.success("Επιτυχής επαλήθευση!");
+        });
       } else {
         toast({
           title: "Λάθος κωδικός",
           description: "Ο κωδικός που εισάγατε δεν είναι σωστός. Παρακαλώ δοκιμάστε ξανά.",
           variant: "destructive",
         });
+        
+        import('sonner').then(({ toast: sonnerToast }) => {
+          sonnerToast.error("Λάθος κωδικός επαλήθευσης");
+        });
       }
     }, 1500);
   };
 
-  // Έλεγχος αν ο χρήστης είναι ήδη επαληθευμένος
-  useState(() => {
-    const isVerified = localStorage.getItem('educatorVerified') === 'true';
-    if (isVerified) {
-      setVerificationStep('verified');
-      const savedEmail = localStorage.getItem('educatorEmail');
-      const savedPhone = localStorage.getItem('educatorPhone');
-      if (savedEmail) {
-        setEmailInput(savedEmail);
-        setVerificationMethod('email');
-      } else if (savedPhone) {
-        setPhoneInput(savedPhone);
-        setVerificationMethod('sms');
-      }
-    }
-  });
+  // Βοηθητική συνάρτηση που εμφανίζει τον κωδικό για δοκιμή (ΣΗΜΕΙΩΣΗ: Μόνο για δοκιμαστικούς σκοπούς)
+  const showTestCode = () => {
+    toast({
+      title: "Δοκιμαστικός Κωδικός",
+      description: "Ο δοκιμαστικός κωδικός είναι: 123456",
+    });
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -175,6 +213,13 @@ const AddContentPage = () => {
                     <Button onClick={handleSendVerification} disabled={isVerifying} className="w-full">
                       {isVerifying ? "Αποστολή..." : "Αποστολή Κωδικού Επαλήθευσης"}
                     </Button>
+                    
+                    {/* Δοκιμαστική λειτουργία - εμφάνιση κωδικού για εύκολη δοκιμή */}
+                    <p className="text-xs text-center text-muted-foreground mt-2">
+                      <Button variant="link" className="p-0 h-auto text-xs" onClick={showTestCode}>
+                        Εμφάνιση δοκιμαστικού κωδικού (για ανάπτυξη)
+                      </Button>
+                    </p>
                   </div>
                 </TabsContent>
                 <TabsContent value="sms">
@@ -195,6 +240,13 @@ const AddContentPage = () => {
                     <Button onClick={handleSendVerification} disabled={isVerifying} className="w-full">
                       {isVerifying ? "Αποστολή..." : "Αποστολή Κωδικού Επαλήθευσης"}
                     </Button>
+                    
+                    {/* Δοκιμαστική λειτουργία - εμφάνιση κωδικού για εύκολη δοκιμή */}
+                    <p className="text-xs text-center text-muted-foreground mt-2">
+                      <Button variant="link" className="p-0 h-auto text-xs" onClick={showTestCode}>
+                        Εμφάνιση δοκιμαστικού κωδικού (για ανάπτυξη)
+                      </Button>
+                    </p>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -235,6 +287,13 @@ const AddContentPage = () => {
                 </div>
                 <p className="text-sm text-center text-muted-foreground">
                   Δεν λάβατε τον κωδικό; <Button variant="link" className="p-0 h-auto" onClick={handleSendVerification}>Αποστολή ξανά</Button>
+                </p>
+                
+                {/* Υπενθύμιση δοκιμαστικού κωδικού */}
+                <p className="text-xs text-center text-muted-foreground mt-2">
+                  <Button variant="link" className="p-0 h-auto text-xs" onClick={showTestCode}>
+                    Εμφάνιση δοκιμαστικού κωδικού (για ανάπτυξη)
+                  </Button>
                 </p>
               </div>
             </CardContent>

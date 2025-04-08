@@ -43,6 +43,10 @@ export const usePrintQuiz = () => {
         .quiz-controls, .progress-indicator {
           display: none !important;
         }
+        .options-label {
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
       }
     `,
   });

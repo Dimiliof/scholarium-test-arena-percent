@@ -44,6 +44,36 @@ const mockForumData = {
       content: 'Πώς μπορώ να εφαρμόσω το δεύτερο νόμο του Νεύτωνα σε προβλήματα με τριβή;',
       replies: []
     }
+  ],
+  'chemistry': [
+    {
+      id: 4,
+      title: 'Ερώτηση για χημικές αντιδράσεις',
+      author: 'Ελένη Μ.',
+      date: '2025-04-06',
+      content: 'Πώς μπορώ να καταλάβω πότε μια χημική αντίδραση είναι εξώθερμη ή ενδόθερμη;',
+      replies: []
+    }
+  ],
+  'biology': [
+    {
+      id: 5,
+      title: 'Κύτταρο και λειτουργίες',
+      author: 'Κώστας Λ.',
+      date: '2025-04-07',
+      content: 'Μπορεί κάποιος να μου εξηγήσει τις βασικές λειτουργίες του κυττάρου;',
+      replies: []
+    }
+  ],
+  'literature': [
+    {
+      id: 6,
+      title: 'Ανάλυση ποιήματος Καβάφη',
+      author: 'Αναστασία Κ.',
+      date: '2025-04-08',
+      content: 'Θα ήθελα βοήθεια στην ανάλυση του ποιήματος "Ιθάκη" του Καβάφη.',
+      replies: []
+    }
   ]
 };
 
@@ -57,6 +87,8 @@ const ForumDiscussion: React.FC<ForumDiscussionProps> = ({ subjectId }) => {
   const { toast } = useToast();
   
   const subject = subjectId ? subjects.find(s => s.id === subjectId) : null;
+  
+  // Get posts for the current subject or return an empty array if not found
   const posts = subjectId && mockForumData[subjectId as keyof typeof mockForumData] 
     ? mockForumData[subjectId as keyof typeof mockForumData] 
     : [];
@@ -125,7 +157,16 @@ const ForumDiscussion: React.FC<ForumDiscussionProps> = ({ subjectId }) => {
               </TabsList>
               
               <TabsContent value="posts">
-                <ForumPostList posts={posts} />
+                {posts.length > 0 ? (
+                  <ForumPostList posts={posts} />
+                ) : (
+                  <Card className="bg-muted/20">
+                    <CardContent className="py-8 text-center">
+                      <p className="text-muted-foreground mb-4">Δεν υπάρχουν αναρτήσεις ακόμα για αυτό το μάθημα.</p>
+                      <Button onClick={() => setShowNewPostForm(true)}>Δημιουργία πρώτης ανάρτησης</Button>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
               
               <TabsContent value="my-posts">
@@ -136,7 +177,15 @@ const ForumDiscussion: React.FC<ForumDiscussionProps> = ({ subjectId }) => {
               </TabsContent>
               
               <TabsContent value="unanswered">
-                <ForumPostList posts={posts.filter(post => post.replies.length === 0)} />
+                {posts.filter(post => post.replies.length === 0).length > 0 ? (
+                  <ForumPostList posts={posts.filter(post => post.replies.length === 0)} />
+                ) : (
+                  <Card className="bg-muted/20">
+                    <CardContent className="py-8 text-center">
+                      <p className="text-muted-foreground">Δεν υπάρχουν αναπάντητες αναρτήσεις.</p>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
             </Tabs>
           )}

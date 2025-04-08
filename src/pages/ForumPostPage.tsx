@@ -47,14 +47,44 @@ const mockForumData = {
       subjectId: 'physics',
       replies: []
     }
+  ],
+  'chemistry': [
+    {
+      id: 4,
+      title: 'Ερώτηση για χημικές αντιδράσεις',
+      author: 'Ελένη Μ.',
+      date: '2025-04-06',
+      content: 'Πώς μπορώ να καταλάβω πότε μια χημική αντίδραση είναι εξώθερμη ή ενδόθερμη;',
+      subjectId: 'chemistry',
+      replies: []
+    }
+  ],
+  'biology': [
+    {
+      id: 5,
+      title: 'Κύτταρο και λειτουργίες',
+      author: 'Κώστας Λ.',
+      date: '2025-04-07',
+      content: 'Μπορεί κάποιος να μου εξηγήσει τις βασικές λειτουργίες του κυττάρου;',
+      subjectId: 'biology',
+      replies: []
+    }
+  ],
+  'literature': [
+    {
+      id: 6,
+      title: 'Ανάλυση ποιήματος Καβάφη',
+      author: 'Αναστασία Κ.',
+      date: '2025-04-08',
+      content: 'Θα ήθελα βοήθεια στην ανάλυση του ποιήματος "Ιθάκη" του Καβάφη.',
+      subjectId: 'literature',
+      replies: []
+    }
   ]
 };
 
 // Flatten posts for easier lookup
-const allPosts = [
-  ...mockForumData.mathematics, 
-  ...mockForumData.physics
-];
+const allPosts = Object.values(mockForumData).flat();
 
 const ForumPostPage = () => {
   const { postId } = useParams<{ postId: string }>();

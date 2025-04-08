@@ -1,7 +1,7 @@
 
 // Service worker για την εφαρμογή EduPercentage PWA
 
-const CACHE_NAME = 'eduPercentage-v3';
+const CACHE_NAME = 'eduPercentage-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -9,7 +9,8 @@ const urlsToCache = [
   '/logo.png',
   '/src/index.css',
   '/src/main.tsx',
-  '/lovable-uploads/c9f693b7-586d-4d3d-b6c2-c494a723965d.png' // Προσθήκη της νέας εικόνας
+  '/lovable-uploads/c9f693b7-586d-4d3d-b6c2-c494a723965d.png',
+  'https://edupercentage.s3.eu-central-1.amazonaws.com/releases/eduPercentage-latest.apk'
 ];
 
 // Εγκατάσταση Service Worker

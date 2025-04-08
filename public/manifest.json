@@ -55,6 +55,10 @@
     {
       "platform": "itunes",
       "url": "https://apps.apple.com/app/eduPercentage/id1234567890"
+    },
+    {
+      "platform": "web",
+      "url": "https://edupercentage.s3.eu-central-1.amazonaws.com/releases/eduPercentage-latest.apk"
     }
   ]
 }

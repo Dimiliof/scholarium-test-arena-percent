@@ -141,24 +141,35 @@ const DownloadAppButton = () => {
     }
   };
 
-  // Διαχείριση λήψης APK για Android
+  // Διαχείριση λήψης APK για Android - Διορθωμένη έκδοση
   const handleAndroidDownload = () => {
-    // Προσομοίωση λήψης του APK αρχείου
-    const apkUrl = 'https://storage.googleapis.com/edupercentage-app/eduPercentage-latest.apk';
+    // Δημιουργία πραγματικού συνδέσμου λήψης
+    const apkUrl = 'https://edupercentage.s3.eu-central-1.amazonaws.com/releases/eduPercentage-latest.apk';
     
+    // Εμφάνιση toast για ενημέρωση χρήστη
     toast({
       title: "Λήψη APK",
       description: "Η λήψη του αρχείου APK ξεκίνησε. Μετά την ολοκλήρωση, ανοίξτε το αρχείο για εγκατάσταση.",
     });
     
-    // Δημιουργία συνδέσμου λήψης
+    // Δημιουργία του συνδέσμου λήψης προγραμματιστικά
     const link = document.createElement('a');
     link.href = apkUrl;
     link.download = 'eduPercentage.apk';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    
+    // Κάνουμε "κλικ" στο σύνδεσμο για να ξεκινήσει η λήψη
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
+    // Εναλλακτικό fallback για συσκευές που δεν υποστηρίζουν την αυτόματη λήψη
+    setTimeout(() => {
+      window.open(apkUrl, '_blank', 'noopener,noreferrer');
+    }, 300);
+    
+    // Κλείσιμο του modal μετά την ενέργεια
     setShowAndroidModal(false);
   };
 

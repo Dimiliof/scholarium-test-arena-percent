@@ -2,16 +2,17 @@
 import { useState } from 'react';
 import { QuizQuestion, sampleQuestions } from '@/lib/subjectsData';
 import { toast } from 'sonner';
+import { QuizType } from '@/components/AddQuestionForm';
 
 interface AddQuestionResult {
-  addQuestion: (subjectId: string, question: QuizQuestion, quizType: string) => void;
+  addQuestion: (subjectId: string, question: QuizQuestion, quizType: QuizType) => void;
   isAdding: boolean;
 }
 
 export function useAddQuestion(): AddQuestionResult {
   const [isAdding, setIsAdding] = useState(false);
   
-  const addQuestion = (subjectId: string, question: QuizQuestion, quizType: string) => {
+  const addQuestion = (subjectId: string, question: QuizQuestion, quizType: QuizType) => {
     setIsAdding(true);
     
     try {

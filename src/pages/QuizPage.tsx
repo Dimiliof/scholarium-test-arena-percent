@@ -12,6 +12,7 @@ import { ChevronLeft, ChevronRight, Clock, AlertTriangle, AlertCircle, Wrench, P
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuestionManagement } from '@/hooks/useQuestionManagement';
+import { QuizType } from '@/components/AddQuestionForm';
 
 const QuizPage = () => {
   const { subjectId, quizType } = useParams<{ subjectId: string; quizType: string }>();
@@ -130,8 +131,34 @@ const QuizPage = () => {
     
     setIsLoading(true);
     
+    // Convert string quizType to QuizType enum for getQuestions function
+    let quizTypeEnum: QuizType;
+    
+    switch(quizType) {
+      case 'basic':
+        quizTypeEnum = QuizType.BASIC;
+        break;
+      case 'intermediate':
+        quizTypeEnum = QuizType.INTERMEDIATE;
+        break;
+      case 'advanced':
+        quizTypeEnum = QuizType.ADVANCED;
+        break;
+      case 'quick':
+        quizTypeEnum = QuizType.QUICK;
+        break;
+      case 'medium':
+        quizTypeEnum = QuizType.MEDIUM;
+        break;
+      case 'full':
+        quizTypeEnum = QuizType.FULL;
+        break;
+      default:
+        quizTypeEnum = QuizType.BASIC;
+    }
+    
     // Ανάκτηση ερωτήσεων από το useQuestionManagement hook
-    const availableQuestions = getQuestions(subjectId, quizType);
+    const availableQuestions = getQuestions(subjectId, quizTypeEnum);
     
     if (availableQuestions.length === 0) {
       setIsLoading(false);

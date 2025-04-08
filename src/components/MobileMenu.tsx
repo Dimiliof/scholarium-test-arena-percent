@@ -55,28 +55,6 @@ const MobileMenu = () => {
                 <Link to="/subject/physics" className="text-lg font-medium hover:text-primary">
                   Φυσική
                 </Link>
-                <Link to="/subject/literature" className="text-lg font-medium hover:text-primary">
-                  Λογοτεχνία
-                </Link>
-              </div>
-            </div>
-            
-            {/* Λογοτεχνία */}
-            <div className="pt-2 pb-2">
-              <p className="text-sm font-semibold text-muted-foreground mb-2">Λογοτεχνία</p>
-              <div className="pl-2 flex flex-col space-y-2">
-                <Link to="/tools/literature/source-finder" className="text-lg font-medium hover:text-primary">
-                  Εύρεση Πηγής
-                </Link>
-                <Link to="/tools/literature/authors" className="text-lg font-medium hover:text-primary">
-                  Συγγραφείς
-                </Link>
-                <Link to="/tools/literature/research" className="text-lg font-medium hover:text-primary">
-                  Έρευνα Λογοτεχνίας
-                </Link>
-                <Link to="/tools/literature/periods" className="text-lg font-medium hover:text-primary">
-                  Λογοτεχνικές Περίοδοι
-                </Link>
               </div>
             </div>
             

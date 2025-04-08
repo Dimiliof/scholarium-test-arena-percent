@@ -66,49 +66,6 @@ const Header = () => {
                   <ListItem href="/subject/physics" title="Φυσική">
                     Πειράματα και προσομοιώσεις
                   </ListItem>
-                  <ListItem href="/subject/literature" title="Λογοτεχνία">
-                    Κείμενα και αναλύσεις
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Λογοτεχνία</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                  <ListItem href="/tools/literature/source-finder" title="Εύρεση Πηγής">
-                    Αναζήτηση βιβλιογραφικών πηγών και αναφορών
-                  </ListItem>
-                  <ListItem href="/tools/literature/authors" title="Συγγραφείς">
-                    Πληροφορίες για συγγραφείς και το έργο τους
-                  </ListItem>
-                  <ListItem href="/tools/literature/research" title="Έρευνα Λογοτεχνίας">
-                    Εργαλείο για αναζήτηση λογοτεχνικών πληροφοριών
-                  </ListItem>
-                  <ListItem href="/tools/literature/periods" title="Λογοτεχνικές Περίοδοι">
-                    Χρονολόγιο και βασικά χαρακτηριστικά λογοτεχνικών περιόδων
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Εργαλεία</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                  <ListItem href="/tools/calculator" title="Υπολογιστής">
-                    Επιστημονικός υπολογιστής για μαθηματικές πράξεις
-                  </ListItem>
-                  <ListItem href="/tools/converter" title="Μετατροπέας">
-                    Μετατροπή μονάδων μέτρησης
-                  </ListItem>
-                  <ListItem href="/tools/periodic-table" title="Περιοδικός Πίνακας">
-                    Διαδραστικός περιοδικός πίνακας στοιχείων
-                  </ListItem>
-                  <ListItem href="/tools/formulas" title="Συλλογή Τύπων">
-                    Μαθηματικοί και φυσικοί τύποι
-                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>

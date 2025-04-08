@@ -36,13 +36,7 @@ import ConverterPage from "./pages/tools/ConverterPage";
 import PeriodicTablePage from "./pages/tools/PeriodicTablePage";
 import FormulasPage from "./pages/tools/FormulasPage";
 
-// Εισαγωγή των σελίδων εργαλείων λογοτεχνίας
-import LiteratureSourceFinderPage from "./pages/tools/literature/LiteratureSourceFinderPage";
-import LiteratureAuthorsPage from "./pages/tools/literature/LiteratureAuthorsPage";
-import LiteratureResearchPage from "./pages/tools/literature/LiteratureResearchPage";
-import LiteraturePeriodsPage from "./pages/tools/literature/LiteraturePeriodsPage";
-
-// Εισαγωγή των νέων σελίδων για τους μαθητές
+// Εισαγωγή των σελίδων για μαθητές
 import StudentCoursesPage from "./pages/student/StudentCoursesPage";
 import StudentEnrollPage from "./pages/student/StudentEnrollPage";
 import StudentResultsPage from "./pages/student/StudentResultsPage";
@@ -139,12 +133,6 @@ const App = () => (
             <Route path="/tools/converter" element={<ConverterPage />} />
             <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
             <Route path="/tools/formulas" element={<FormulasPage />} />
-            
-            {/* Εργαλεία λογοτεχνίας */}
-            <Route path="/tools/literature/source-finder" element={<LiteratureSourceFinderPage />} />
-            <Route path="/tools/literature/authors" element={<LiteratureAuthorsPage />} />
-            <Route path="/tools/literature/research" element={<LiteratureResearchPage />} />
-            <Route path="/tools/literature/periods" element={<LiteraturePeriodsPage />} />
             
             {/* Σελίδες μαθητών */}
             <Route path="/student/courses" element={<StudentRoute><StudentCoursesPage /></StudentRoute>} />

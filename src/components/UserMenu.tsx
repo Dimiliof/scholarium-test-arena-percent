@@ -11,10 +11,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, LogOut, Settings, Book, BookPlus, School, PlusCircle } from "lucide-react";
+import { User, LogOut, Settings, Book, BookPlus, School, PlusCircle, Users, Shield } from "lucide-react";
 
 const UserMenu = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, isTeacher, logout } = useAuth();
 
   if (!isAuthenticated) {
     return (
@@ -53,6 +53,10 @@ const UserMenu = () => {
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}
             </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {user?.role === "admin" ? "Διαχειριστής" : 
+               user?.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής"}
+            </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -62,18 +66,45 @@ const UserMenu = () => {
             <span>Το προφίλ μου</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/teacher-dashboard" className="cursor-pointer flex w-full items-center">
-            <School className="mr-2 h-4 w-4" />
-            <span>Πίνακας Εκπαιδευτικού</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/add-content" className="cursor-pointer flex w-full items-center">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Προσθήκη Υλικού</span>
-          </Link>
-        </DropdownMenuItem>
+
+        {/* Μενού για εκπαιδευτικούς */}
+        {isTeacher && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link to="/teacher-dashboard" className="cursor-pointer flex w-full items-center">
+                <School className="mr-2 h-4 w-4" />
+                <span>Πίνακας Εκπαιδευτικού</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/add-content" className="cursor-pointer flex w-full items-center">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                <span>Προσθήκη Υλικού</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {/* Μενού για διαχειριστές */}
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs">Διαχείριση</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/users" className="cursor-pointer flex w-full items-center">
+                <Users className="mr-2 h-4 w-4" />
+                <span>Διαχείριση Χρηστών</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/logins" className="cursor-pointer flex w-full items-center">
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Καταγραφές Συνδέσεων</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer text-red-500 focus:text-red-500"

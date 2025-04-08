@@ -2,30 +2,51 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { toast } from "sonner";
 
+// Ορισμός του ρόλου χρήστη
+export type UserRole = "student" | "teacher" | "admin";
+
 // Ορισμός του τύπου χρήστη
 export type User = {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
+  role: UserRole;
+};
+
+// Ορισμός του τύπου για την καταγραφή σύνδεσης
+export type LoginRecord = {
+  userId: string;
+  userName: string;
+  email: string;
+  timestamp: number;
+  role: UserRole;
 };
 
 // Ορισμός του τύπου για το context
 type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
+  isTeacher: boolean;
+  loginRecords: LoginRecord[];
   login: (email: string, password: string) => Promise<boolean>;
-  register: (firstName: string, lastName: string, email: string, password: string) => Promise<boolean>;
+  register: (firstName: string, lastName: string, email: string, password: string, role?: UserRole) => Promise<boolean>;
   logout: () => void;
+  getAllUsers: () => User[];
 };
 
 // Δημιουργία context με αρχικές τιμές
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
+  isAdmin: false,
+  isTeacher: false,
+  loginRecords: [],
   login: async () => false,
   register: async () => false,
   logout: () => {},
+  getAllUsers: () => [],
 });
 
 // Hook για εύκολη χρήση του context
@@ -38,6 +59,7 @@ type AuthProviderProps = {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginRecords, setLoginRecords] = useState<LoginRecord[]>([]);
 
   // Έλεγχος για υπάρχουσα σύνδεση κατά την αρχικοποίηση
   useEffect(() => {
@@ -52,8 +74,55 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.removeItem("user");
       }
     }
+    
+    // Φόρτωση των καταγραφών συνδέσεων
+    const storedRecords = localStorage.getItem("login_records");
+    if (storedRecords) {
+      try {
+        const parsedRecords = JSON.parse(storedRecords);
+        setLoginRecords(parsedRecords);
+      } catch (error) {
+        console.error("Σφάλμα ανάλυσης καταγραφών συνδέσεων:", error);
+      }
+    }
   }, []);
 
+  // Βοηθητικές συναρτήσεις για τον έλεγχο ρόλων
+  const isAdmin = user?.role === "admin";
+  const isTeacher = user?.role === "teacher" || user?.role === "admin";
+
+  // Προσθήκη καταγραφής σύνδεσης
+  const addLoginRecord = (user: User) => {
+    const newRecord: LoginRecord = {
+      userId: user.id,
+      userName: `${user.firstName} ${user.lastName}`,
+      email: user.email,
+      timestamp: Date.now(),
+      role: user.role,
+    };
+    
+    // Προσθήκη στο state
+    const updatedRecords = [newRecord, ...loginRecords].slice(0, 100); // Κρατάμε μέχρι 100 καταγραφές
+    setLoginRecords(updatedRecords);
+    
+    // Αποθήκευση στο localStorage
+    localStorage.setItem("login_records", JSON.stringify(updatedRecords));
+  };
+
+  // Λήψη όλων των χρηστών
+  const getAllUsers = (): User[] => {
+    try {
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      return users.map((u: any) => {
+        const { password, ...userWithoutPassword } = u;
+        return userWithoutPassword;
+      });
+    } catch (error) {
+      console.error("Σφάλμα κατά την ανάκτηση χρηστών:", error);
+      return [];
+    }
+  };
+  
   // Προσομοίωση σύνδεσης
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -64,9 +133,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (foundUser && foundUser.password === password) {
         // Αφαιρούμε τον κωδικό πριν αποθηκεύσουμε τον χρήστη στο state
         const { password: _, ...userWithoutPassword } = foundUser;
+        
+        // Βεβαιωνόμαστε ότι υπάρχει ρόλος, αν όχι προσθέτουμε τον προεπιλεγμένο
+        if (!userWithoutPassword.role) {
+          userWithoutPassword.role = "student";
+          
+          // Ενημέρωση του χρήστη στο localStorage με το ρόλο
+          const updatedUsers = users.map((u: any) => 
+            u.id === foundUser.id ? { ...u, role: "student" } : u
+          );
+          localStorage.setItem("users", JSON.stringify(updatedUsers));
+        }
+        
         setUser(userWithoutPassword);
         setIsAuthenticated(true);
         localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+        
+        // Καταγραφή της σύνδεσης
+        addLoginRecord(userWithoutPassword);
+        
         toast.success("Επιτυχής σύνδεση", {
           description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
         });
@@ -80,7 +165,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   // Προσομοίωση εγγραφής
-  const register = async (firstName: string, lastName: string, email: string, password: string): Promise<boolean> => {
+  const register = async (
+    firstName: string, 
+    lastName: string, 
+    email: string, 
+    password: string, 
+    role: UserRole = "student"
+  ): Promise<boolean> => {
     try {
       // Ελέγχουμε αν υπάρχει ήδη ο χρήστης
       const users = JSON.parse(localStorage.getItem("users") || "[]");
@@ -100,6 +191,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         lastName,
         email,
         password,
+        role,
       };
 
       // Αποθήκευση στη λίστα χρηστών
@@ -111,6 +203,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser(userWithoutPassword);
       setIsAuthenticated(true);
       localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+      
+      // Καταγραφή της σύνδεσης
+      addLoginRecord(userWithoutPassword);
       
       toast.success("Επιτυχής εγγραφή", {
         description: "Ο λογαριασμός σας δημιουργήθηκε με επιτυχία και είστε συνδεδεμένοι.",
@@ -140,9 +235,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       value={{
         user,
         isAuthenticated,
+        isAdmin,
+        isTeacher,
+        loginRecords,
         login,
         register,
         logout,
+        getAllUsers,
       }}
     >
       {children}

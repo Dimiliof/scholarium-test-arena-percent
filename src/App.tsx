@@ -21,6 +21,10 @@ import PrivacyPage from "./pages/PrivacyPage";
 import ContactPage from "./pages/ContactPage";
 import ProfilePage from "./pages/ProfilePage";
 
+// Admin Pages
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
+import AdminLoginsPage from "./pages/admin/AdminLoginsPage";
+
 // Tool Pages
 import CalculatorPage from "./pages/tools/CalculatorPage";
 import ConverterPage from "./pages/tools/ConverterPage";
@@ -38,12 +42,42 @@ const queryClient = new QueryClient({
   },
 });
 
-// Protected route component
+// Protected route component για χρήστες
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Protected route component για εκπαιδευτικούς
+const TeacherRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isTeacher } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (!isTeacher) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Protected route component για διαχειριστές
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isAdmin } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;
@@ -75,10 +109,16 @@ const App = () => (
             <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
             <Route path="/tools/formulas" element={<FormulasPage />} />
             
-            {/* Protected Routes */}
+            {/* Protected Routes - User */}
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/add-content" element={<ProtectedRoute><AddContentPage /></ProtectedRoute>} />
-            <Route path="/teacher-dashboard" element={<ProtectedRoute><TeacherDashboardPage /></ProtectedRoute>} />
+            
+            {/* Protected Routes - Teacher */}
+            <Route path="/add-content" element={<TeacherRoute><AddContentPage /></TeacherRoute>} />
+            <Route path="/teacher-dashboard" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
+            
+            {/* Protected Routes - Admin */}
+            <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+            <Route path="/admin/logins" element={<AdminRoute><AdminLoginsPage /></AdminRoute>} />
             
             {/* Catch-all - Not Found */}
             <Route path="*" element={<NotFound />} />

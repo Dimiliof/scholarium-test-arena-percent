@@ -7,13 +7,25 @@ import {
   FlaskConical, 
   ScrollText, 
   Landmark, 
-  Code 
+  Code,
+  Music,
+  Heart,
+  Globe,
+  Calculator,
+  Dna,
+  Lightbulb,
+  BookText,
+  Building,
+  Infinity,
+  PenTool,
+  Palette,
+  ActivitySquare,
+  School
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Subject } from '@/lib/subjectsData';
 
-// Updated the list to use FlaskConical instead of Flask
 const subjectsList = [
   { 
     id: 'all', 
@@ -22,31 +34,109 @@ const subjectsList = [
     color: 'bg-blue-500' 
   },
   { 
-    id: 'ancient-greek', 
+    id: 'ancient-greek-language', 
     name: 'Αρχαία Ελληνική Γλώσσα', 
     icon: ScrollText, 
     color: 'bg-purple-500' 
   },
   { 
-    id: 'mathematics', 
-    name: 'Μαθηματικά', 
-    icon: Book, 
-    color: 'bg-green-500' 
+    id: 'ancient-greek-literature', 
+    name: 'Αρχαία Ελληνική Γραμματεία', 
+    icon: BookText, 
+    color: 'bg-purple-700' 
   },
   { 
-    id: 'physics', 
-    name: 'Φυσική', 
-    icon: FlaskConical, 
-    color: 'bg-red-500' 
+    id: 'modern-greek-language', 
+    name: 'Νεοελληνική Γλώσσα', 
+    icon: PenTool, 
+    color: 'bg-indigo-500' 
+  },
+  { 
+    id: 'modern-greek-literature', 
+    name: 'Νεοελληνική Γραμματεία', 
+    icon: Book, 
+    color: 'bg-indigo-700' 
   },
   { 
     id: 'history', 
     name: 'Ιστορία', 
     icon: Landmark, 
+    color: 'bg-amber-600' 
+  },
+  { 
+    id: 'religious-studies', 
+    name: 'Θρησκευτικά', 
+    icon: Building, 
+    color: 'bg-blue-600' 
+  },
+  { 
+    id: 'civics', 
+    name: 'ΚΠΑ', 
+    icon: School, 
+    color: 'bg-green-600' 
+  },
+  { 
+    id: 'mathematics', 
+    name: 'Μαθηματικά', 
+    icon: Calculator, 
+    color: 'bg-green-500' 
+  },
+  { 
+    id: 'chemistry', 
+    name: 'Χημεία', 
+    icon: FlaskConical, 
+    color: 'bg-pink-500' 
+  },
+  { 
+    id: 'physics', 
+    name: 'Φυσική', 
+    icon: Infinity, 
+    color: 'bg-red-500' 
+  },
+  { 
+    id: 'biology', 
+    name: 'Βιολογία', 
+    icon: Dna, 
+    color: 'bg-emerald-500' 
+  },
+  { 
+    id: 'technology', 
+    name: 'Τεχνολογία', 
+    icon: Code, 
+    color: 'bg-slate-700' 
+  },
+  { 
+    id: 'music', 
+    name: 'Μουσική', 
+    icon: Music, 
+    color: 'bg-violet-500' 
+  },
+  { 
+    id: 'emotional-education', 
+    name: 'Συναισθηματική Αγωγή', 
+    icon: Heart, 
+    color: 'bg-red-400' 
+  },
+  { 
+    id: 'geography', 
+    name: 'Γεωγραφία', 
+    icon: Globe, 
+    color: 'bg-cyan-500' 
+  },
+  { 
+    id: 'art', 
+    name: 'Καλλιτεχνικά', 
+    icon: Palette, 
     color: 'bg-orange-500' 
   },
   { 
-    id: 'computer_science', 
+    id: 'physical-education', 
+    name: 'Φυσική Αγωγή', 
+    icon: ActivitySquare, 
+    color: 'bg-yellow-500' 
+  },
+  { 
+    id: 'computer-science', 
     name: 'Πληροφορική', 
     icon: Code, 
     color: 'bg-indigo-500' 
@@ -67,7 +157,7 @@ const SubjectsSection: React.FC<SubjectsSectionProps> = ({ subjects, isAuthentic
         Επιλέξτε Μάθημα
       </h2>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {subjectsList.map((subject) => (
           <Button
             key={subject.id}

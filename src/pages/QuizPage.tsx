@@ -1,22 +1,24 @@
+
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import QuizResults from '@/components/QuizResults';
-import { subjects, sampleQuestions, QuizQuestion } from '@/lib/subjectsData';
+import { subjects, QuizQuestion } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Clock, AlertTriangle, AlertCircle, Wrench } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, AlertTriangle, AlertCircle, Wrench, PlusCircle } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { useQuestionManagement } from '@/hooks/useQuestionManagement';
 
 const QuizPage = () => {
   const { subjectId, quizType } = useParams<{ subjectId: string; quizType: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAuthenticated, isTeacher, isAdmin } = useAuth();
+  const { getQuestions } = useQuestionManagement();
   
   const hasAccess = !isAuthenticated || isTeacher || isAdmin;
   
@@ -124,19 +126,15 @@ const QuizPage = () => {
   };
   
   useEffect(() => {
-    if (!subjectId) return;
+    if (!subjectId || !quizType) return;
     
     setIsLoading(true);
     
-    const availableQuestions = sampleQuestions[subjectId] || [];
+    // Ανάκτηση ερωτήσεων από το useQuestionManagement hook
+    const availableQuestions = getQuestions(subjectId, quizType);
     
     if (availableQuestions.length === 0) {
-      toast({
-        title: "Δεν βρέθηκαν ερωτήσεις",
-        description: "Δεν υπάρχουν διαθέσιμες ερωτήσεις για αυτό το μάθημα.",
-        variant: "destructive"
-      });
-      navigate(`/subject/${subjectId}`);
+      setIsLoading(false);
       return;
     }
     
@@ -153,7 +151,7 @@ const QuizPage = () => {
     
     setUserAnswers(new Array(numQuestions).fill(-1));
     setIsLoading(false);
-  }, [subjectId, quizType, navigate, toast]);
+  }, [subjectId, quizType, getQuestions]);
   
   if (!subject) {
     return (
@@ -242,7 +240,7 @@ const QuizPage = () => {
     );
   }
   
-  if (isLoading || questions.length === 0) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -251,6 +249,62 @@ const QuizPage = () => {
             <h1 className="text-2xl font-bold mb-4">Φόρτωση ερωτήσεων...</h1>
             <p className="text-gray-600">Παρακαλώ περιμένετε</p>
           </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Εμφάνιση μηνύματος όταν δεν υπάρχουν διαθέσιμες ερωτήσεις
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-grow container mx-auto px-4 py-12">
+          <Card className="bg-blue-50 border-blue-200 max-w-4xl mx-auto">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-blue-100 p-4 rounded-full mb-6">
+                  <AlertCircle className="h-10 w-10 text-blue-600" />
+                </div>
+                <h1 className="text-2xl font-bold text-blue-800 mb-4">
+                  Δεν υπάρχει διαθέσιμο υλικό
+                </h1>
+                <p className="text-blue-700 mb-6 max-w-lg">
+                  Δεν υπάρχουν ακόμα διαθέσιμες ερωτήσεις για το {getQuizTitle()} στο μάθημα {subject.name}.
+                </p>
+
+                {(isTeacher || isAdmin) && (
+                  <div className="mb-6">
+                    <p className="text-blue-700 mb-4">
+                      Ως εκπαιδευτικός, μπορείτε να προσθέσετε ερωτήσεις για να δημιουργήσετε υλικό εξάσκησης για τους μαθητές.
+                    </p>
+                    <Link to="/add-content">
+                      <Button className="flex items-center gap-2">
+                        <PlusCircle className="h-4 w-4" />
+                        Προσθήκη Ερωτήσεων
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                  <Link to={`/subject/${subjectId}`}>
+                    <Button variant="outline">
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      Επιστροφή στο μάθημα
+                    </Button>
+                  </Link>
+                  <Link to="/">
+                    <Button variant="outline">
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      Επιστροφή στην αρχική
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
         <Footer />
       </div>

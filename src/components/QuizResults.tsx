@@ -1,12 +1,9 @@
 
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Check, X, RefreshCw, Home, ChevronLeft } from 'lucide-react';
-import { QuizQuestion } from '@/lib/subjectsData';
-import { Subject } from '@/lib/subjectsData';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { QuizQuestion, Subject } from "@/lib/subjectsData";
+import { Check, X, RotateCcw, Printer } from "lucide-react";
+import { usePrintResults } from "@/hooks/usePrintResults";
 
 interface QuizResultsProps {
   questions: QuizQuestion[];
@@ -17,135 +14,132 @@ interface QuizResultsProps {
 }
 
 const QuizResults = ({ questions, userAnswers, subject, quizType, onRetry }: QuizResultsProps) => {
-  const navigate = useNavigate();
-  const [showDetails, setShowDetails] = useState(false);
-  
-  // Calculate score
-  const correctAnswers = userAnswers.filter(
-    (answer, index) => answer === questions[index].correctAnswer
+  const correctAnswers = userAnswers.filter((answer, index) => 
+    answer === questions[index].correctAnswer
   ).length;
   
-  const scorePercentage = Math.round((correctAnswers / questions.length) * 100);
+  const percentage = Math.round((correctAnswers / questions.length) * 100);
   
-  // Get feedback based on score
-  let feedback = '';
-  let feedbackColor = '';
+  const getGrade = () => {
+    if (percentage >= 90) return { grade: "Άριστα", color: "text-green-600" };
+    if (percentage >= 80) return { grade: "Πολύ καλά", color: "text-green-500" };
+    if (percentage >= 70) return { grade: "Καλά", color: "text-blue-500" };
+    if (percentage >= 60) return { grade: "Μέτρια", color: "text-yellow-500" };
+    if (percentage >= 50) return { grade: "Επαρκώς", color: "text-orange-500" };
+    return { grade: "Ανεπαρκώς", color: "text-red-500" };
+  };
   
-  if (scorePercentage >= 90) {
-    feedback = 'Εξαιρετικά! Έχετε κατανοήσει πλήρως το υλικό.';
-    feedbackColor = 'text-green-600';
-  } else if (scorePercentage >= 70) {
-    feedback = 'Πολύ καλά! Έχετε καλή κατανόηση του υλικού.';
-    feedbackColor = 'text-green-500';
-  } else if (scorePercentage >= 50) {
-    feedback = 'Καλά! Υπάρχει περιθώριο βελτίωσης.';
-    feedbackColor = 'text-yellow-500';
-  } else {
-    feedback = 'Χρειάζεστε περισσότερη εξάσκηση σε αυτή την ενότητα.';
-    feedbackColor = 'text-red-500';
-  }
+  const { grade, color } = getGrade();
+  
+  const getCurrentDate = () => {
+    const now = new Date();
+    return now.toLocaleDateString('el-GR', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+  
+  const { componentRef, handlePrint } = usePrintResults();
   
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Card className="shadow-lg overflow-hidden">
-        <div className={`${subject.color} py-6 px-8 text-white`}>
-          <h2 className="text-2xl font-bold mb-2">Αποτελέσματα {quizType}</h2>
-          <p className="text-white/80">{subject.name}</p>
+    <div className="container mx-auto max-w-4xl px-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Αποτελέσματα {quizType}</h1>
+        <Button 
+          variant="outline" 
+          className="flex items-center gap-2"
+          onClick={handlePrint}
+        >
+          <Printer className="h-4 w-4" />
+          Εκτύπωση
+        </Button>
+      </div>
+      
+      <div ref={componentRef} className="print-container">
+        <div className="print-header">
+          <h1 className="text-2xl font-bold">{subject.name} - {quizType}</h1>
+          <p className="text-gray-500">Ημερομηνία: {getCurrentDate()}</p>
         </div>
         
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="flex flex-col items-center">
-              <div className="relative mb-6">
-                <div className="w-40 h-40 rounded-full border-8 border-gray-100 flex items-center justify-center">
-                  <span className="text-4xl font-bold">{scorePercentage}%</span>
-                </div>
-                <Progress 
-                  value={scorePercentage} 
-                  className="w-40 h-8 absolute -bottom-4 left-0 rounded-full" 
-                />
-              </div>
-              
-              <p className="mb-2">
-                <span className="font-bold">{correctAnswers}</span> σωστές από{' '}
-                <span className="font-bold">{questions.length}</span> ερωτήσεις
-              </p>
-              <p className={`text-lg font-medium ${feedbackColor}`}>{feedback}</p>
+        <Card className="mb-8">
+          <CardHeader className="text-center">
+            <CardTitle>Σύνοψη</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <div className="mb-4">
+              <span className="text-4xl font-bold">
+                {correctAnswers}/{questions.length}
+              </span>
+              <p className="text-gray-500">σωστές απαντήσεις</p>
             </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => setShowDetails(!showDetails)}
-            >
-              {showDetails ? 'Απόκρυψη Λεπτομερειών' : 'Εμφάνιση Λεπτομερειών'}
-            </Button>
-            
-            <Button 
-              className="flex items-center gap-2"
-              onClick={onRetry}
-            >
-              <RefreshCw className="h-4 w-4" />
-              Επανάληψη
-            </Button>
-          </div>
-          
-          {showDetails && (
-            <div className="space-y-6 mt-8 border-t pt-6">
-              <h3 className="text-xl font-bold mb-4">Ανάλυση Απαντήσεων</h3>
-              
-              {questions.map((question, index) => {
-                const isCorrect = userAnswers[index] === question.correctAnswer;
-                return (
-                  <div 
-                    key={question.id} 
-                    className={`border rounded-lg p-4 ${isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`flex-shrink-0 p-1 rounded-full ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
-                        {isCorrect ? <Check className="h-4 w-4 text-white" /> : <X className="h-4 w-4 text-white" />}
-                      </div>
-                      <div>
-                        <p className="font-medium mb-2">Ερώτηση {index + 1}: {question.question}</p>
-                        <p className="text-sm mb-2">
-                          <span className="font-medium">Η απάντησή σας:</span> {question.options[userAnswers[index]]}
-                          {!isCorrect && (
-                            <span className="block mt-1">
-                              <span className="font-medium">Σωστή απάντηση:</span> {question.options[question.correctAnswer]}
-                            </span>
-                          )}
-                        </p>
-                      </div>
+            <div className="mb-4">
+              <span className={`text-4xl font-bold ${color}`}>
+                {percentage}%
+              </span>
+              <p className={`${color} font-medium`}>{grade}</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <h2 className="text-xl font-bold mb-4">Αναλυτικά Αποτελέσματα</h2>
+        
+        <div className="space-y-6">
+          {questions.map((question, index) => (
+            <div key={index} className="question-container border rounded-lg p-4">
+              <div className="flex items-start gap-2">
+                <div>
+                  {userAnswers[index] === question.correctAnswer ? (
+                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                      <Check className="h-4 w-4" />
                     </div>
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                      <X className="h-4 w-4" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium mb-2">
+                    {index + 1}. {question.question}
+                  </p>
+                  <div className="space-y-1 ml-1">
+                    {question.options.map((option, optionIndex) => (
+                      <div key={optionIndex} className={`
+                        text-sm p-2 rounded 
+                        ${optionIndex === question.correctAnswer ? 'bg-green-50 text-green-700' : ''}
+                        ${optionIndex === userAnswers[index] && optionIndex !== question.correctAnswer ? 'bg-red-50 text-red-700' : ''}
+                        ${optionIndex !== userAnswers[index] && optionIndex !== question.correctAnswer ? 'text-gray-600' : ''}
+                      `}>
+                        <div className="flex items-center">
+                          <span className="mr-2">{String.fromCharCode(65 + optionIndex)}.</span>
+                          <span>{option}</span>
+                          {optionIndex === question.correctAnswer && (
+                            <Check className="h-4 w-4 ml-2 text-green-600" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                );
-              })}
+                </div>
+              </div>
             </div>
-          )}
-          
-          <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8 pt-4 border-t">
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => navigate(`/subject/${subject.id}`)}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Επιστροφή στο μάθημα
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => navigate('/')}
-            >
-              <Home className="h-4 w-4" />
-              Αρχική σελίδα
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+        
+        <div className="print-footer">
+          <p>© {new Date().getFullYear()} - Εκπαιδευτική Πλατφόρμα</p>
+        </div>
+      </div>
+      
+      <div className="flex justify-center mt-8 no-print">
+        <Button onClick={onRetry} className="flex items-center gap-2">
+          <RotateCcw className="h-4 w-4" />
+          Επανάληψη
+        </Button>
+      </div>
     </div>
   );
 };

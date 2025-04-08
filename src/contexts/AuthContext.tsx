@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { toast } from "sonner";
 
 // Ορισμός του τύπου χρήστη
 export type User = {
@@ -47,7 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(parsedUser);
         setIsAuthenticated(true);
       } catch (error) {
-        console.error("Error parsing stored user:", error);
+        console.error("Σφάλμα ανάλυσης αποθηκευμένου χρήστη:", error);
         localStorage.removeItem("user");
       }
     }
@@ -55,19 +56,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Προσομοίωση σύνδεσης
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Ελέγχουμε αν υπάρχει ο χρήστης στο localStorage
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const foundUser = users.find((u: any) => u.email === email);
+    try {
+      // Ελέγχουμε αν υπάρχει ο χρήστης στο localStorage
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      const foundUser = users.find((u: any) => u.email === email);
 
-    if (foundUser && foundUser.password === password) {
-      // Αφαιρούμε τον κωδικό πριν αποθηκεύσουμε τον χρήστη στο state
-      const { password: _, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
-      setIsAuthenticated(true);
-      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
-      return true;
+      if (foundUser && foundUser.password === password) {
+        // Αφαιρούμε τον κωδικό πριν αποθηκεύσουμε τον χρήστη στο state
+        const { password: _, ...userWithoutPassword } = foundUser;
+        setUser(userWithoutPassword);
+        setIsAuthenticated(true);
+        localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+        toast.success("Επιτυχής σύνδεση", {
+          description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Σφάλμα σύνδεσης:", error);
+      return false;
     }
-    return false;
   };
 
   // Προσομοίωση εγγραφής
@@ -78,6 +87,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const userExists = users.some((u: any) => u.email === email);
 
       if (userExists) {
+        toast.error("Σφάλμα εγγραφής", {
+          description: "Το email χρησιμοποιείται ήδη. Παρακαλώ χρησιμοποιήστε άλλο email.",
+        });
         return false;
       }
 
@@ -99,10 +111,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser(userWithoutPassword);
       setIsAuthenticated(true);
       localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+      
+      toast.success("Επιτυχής εγγραφή", {
+        description: "Ο λογαριασμός σας δημιουργήθηκε με επιτυχία και είστε συνδεδεμένοι.",
+      });
 
       return true;
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Σφάλμα εγγραφής:", error);
+      toast.error("Σφάλμα εγγραφής", {
+        description: "Παρουσιάστηκε σφάλμα κατά την εγγραφή. Παρακαλώ προσπαθήστε ξανά.",
+      });
       return false;
     }
   };
@@ -111,6 +130,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem("user");
+    toast.info("Αποσύνδεση", {
+      description: "Έχετε αποσυνδεθεί επιτυχώς.",
+    });
   };
 
   return (

@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -44,9 +45,9 @@ const formSchema = z.object({
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register: registerUser } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,7 +65,7 @@ const RegisterPage = () => {
     setRegisterError(null);
     
     try {
-      const success = await register(
+      const success = await registerUser(
         values.firstName,
         values.lastName,
         values.email,
@@ -72,7 +73,7 @@ const RegisterPage = () => {
       );
       
       if (success) {
-        toast({
+        uiToast({
           title: "Επιτυχής εγγραφή",
           description: "Ο λογαριασμός σας δημιουργήθηκε επιτυχώς. Είστε τώρα συνδεδεμένοι.",
         });
@@ -187,7 +188,14 @@ const RegisterPage = () => {
                   />
                   
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Εγγραφή..." : "Εγγραφή"}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Εγγραφή...
+                      </>
+                    ) : (
+                      "Εγγραφή"
+                    )}
                   </Button>
                 </form>
               </Form>

@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -34,7 +35,7 @@ const formSchema = z.object({
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -54,7 +55,7 @@ const LoginPage = () => {
       const success = await login(values.email, values.password);
       
       if (success) {
-        toast({
+        uiToast({
           title: "Επιτυχής σύνδεση",
           description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
         });
@@ -125,7 +126,14 @@ const LoginPage = () => {
                   />
                   
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Σύνδεση..." : "Σύνδεση"}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Σύνδεση...
+                      </>
+                    ) : (
+                      "Σύνδεση"
+                    )}
                   </Button>
                 </form>
               </Form>

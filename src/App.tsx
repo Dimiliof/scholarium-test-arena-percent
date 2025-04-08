@@ -36,6 +36,12 @@ import ConverterPage from "./pages/tools/ConverterPage";
 import PeriodicTablePage from "./pages/tools/PeriodicTablePage";
 import FormulasPage from "./pages/tools/FormulasPage";
 
+// Εισαγωγή των νέων σελίδων εργαλείων λογοτεχνίας
+import LiteratureSourceFinderPage from "./pages/tools/literature/LiteratureSourceFinderPage";
+import LiteratureAuthorsPage from "./pages/tools/literature/LiteratureAuthorsPage";
+import LiteratureResearchPage from "./pages/tools/literature/LiteratureResearchPage";
+import LiteraturePeriodsPage from "./pages/tools/literature/LiteraturePeriodsPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -108,10 +114,17 @@ const App = () => (
             <Route path="/school-registration" element={<SchoolRegistration />} />
             <Route path="/it-support-login" element={<ITSupportLoginPage />} />
             
+            {/* Εργαλεία */}
             <Route path="/tools/calculator" element={<CalculatorPage />} />
             <Route path="/tools/converter" element={<ConverterPage />} />
             <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
             <Route path="/tools/formulas" element={<FormulasPage />} />
+            
+            {/* Νέα εργαλεία λογοτεχνίας */}
+            <Route path="/tools/literature/source-finder" element={<LiteratureSourceFinderPage />} />
+            <Route path="/tools/literature/authors" element={<LiteratureAuthorsPage />} />
+            <Route path="/tools/literature/research" element={<LiteratureResearchPage />} />
+            <Route path="/tools/literature/periods" element={<LiteraturePeriodsPage />} />
             
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/edit-profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />

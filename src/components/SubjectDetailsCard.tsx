@@ -10,12 +10,12 @@ interface SubjectDetailsCardProps {
 
 const SubjectDetailsCard: React.FC<SubjectDetailsCardProps> = ({ subject }) => {
   // Create icon as a valid React element
-  const Icon = subject.icon;
+  const IconComponent = subject.icon;
   
   return (
     <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
       <div className="flex items-center mb-4">
-        <Icon className={`h-10 w-10 mr-4 ${subject.color.replace('bg-', 'text-')}`} />
+        <IconComponent className={`h-10 w-10 mr-4 ${subject.color.replace('bg-', 'text-')}`} />
         <h2 className="text-2xl font-bold">{subject.name}</h2>
       </div>
       

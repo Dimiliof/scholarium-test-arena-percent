@@ -7,8 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Table, 
@@ -144,10 +142,7 @@ const SubjectPage = () => {
     );
   }
 
-  const IconComponent = subject ? 
-    (LucideIcons[subject.icon as keyof typeof LucideIcons] as LucideIcon) || 
-    (() => <span className="text-white text-3xl">?</span>)
-    : () => null;
+  const IconComponent = subject.icon;
 
   const getRankIcon = (position: number) => {
     if (position === 0) return <Trophy className="h-5 w-5 text-amber-500" />;
@@ -330,7 +325,7 @@ const SubjectPage = () => {
                 <Card className="card-hover">
                   <CardContent className="p-6">
                     <h3 className="font-bold text-lg mb-2">Διαγώνισμα Εφ' Όλης της Ύλης</h3>
-                    <p className="text-gray-600 mb-4">Ολοκληρωμένο διαγώνισμα που καλύπτει όλη την ύλη</p>
+                    <p className="text-gray-600 mb-4">Ο��οκληρωμένο διαγώνισμα που καλύπτει όλη την ύλη</p>
                     <Link to={`/quiz/${subject.id}/full`}>
                       <Button className="w-full">Έναρξη</Button>
                     </Link>

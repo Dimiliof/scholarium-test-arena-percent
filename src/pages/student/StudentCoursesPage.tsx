@@ -33,7 +33,6 @@ const StudentCoursesPage = () => {
   const loadEnrolledCourses = () => {
     setIsLoading(true);
     
-    // Προσωρινά δημιουργούμε κάποια δεδομένα για τα μαθήματα στα οποία είναι εγγεγραμμένος ο μαθητής
     const mockCourses: EnrolledCourse[] = [
       {
         id: '1',
@@ -64,13 +63,11 @@ const StudentCoursesPage = () => {
       }
     ];
     
-    // Αποθήκευση των δεδομένων στο localStorage αν δεν υπάρχουν
     const storageKey = `enrolled_courses_${user?.id || 'guest'}`;
     if (!localStorage.getItem(storageKey)) {
       localStorage.setItem(storageKey, JSON.stringify(mockCourses));
     }
     
-    // Φόρτωση των δεδομένων από το localStorage
     const storedCourses = localStorage.getItem(storageKey);
     if (storedCourses) {
       try {
@@ -122,7 +119,7 @@ const StudentCoursesPage = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold">Τα Μαθήματά μου</h1>
+              <h1 className="text-3xl font-bold">Τα Μαθήματα μου</h1>
               <p className="text-muted-foreground">Διαχειριστείτε τα μαθήματα στα οποία είστε εγγεγραμμένοι</p>
             </div>
             

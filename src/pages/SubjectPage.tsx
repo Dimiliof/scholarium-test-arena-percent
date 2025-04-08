@@ -1,4 +1,3 @@
-
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Header from '@/components/Header';
@@ -7,7 +6,7 @@ import { subjects } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, ClipboardCheck, Award, ChevronLeft, AlertCircle, Wrench } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Award, ChevronLeft } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,48 +14,21 @@ import { useAuth } from '@/contexts/AuthContext';
 const SubjectPage = () => {
   const { subjectId } = useParams<{ subjectId: string }>();
   const [activeTab, setActiveTab] = useState('overview');
-  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   const subject = subjects.find(s => s.id === subjectId);
   
-  // Έλεγχος πρόσβασης - μόνο εκπαιδευτικοί και διαχειριστές έχουν πρόσβαση
-  const hasAccess = !isAuthenticated || isTeacher || isAdmin;
-  
-  if (!hasAccess) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <div className="flex-grow container mx-auto px-4 py-12">
-          <Card className="bg-amber-50 border-amber-200 max-w-4xl mx-auto">
-            <CardContent className="p-8">
-              <div className="flex flex-col items-center text-center">
-                <div className="bg-amber-200 p-4 rounded-full mb-6">
-                  <AlertCircle className="h-10 w-10 text-amber-600" />
-                </div>
-                <h1 className="text-2xl font-bold text-amber-800 mb-4">
-                  Περιορισμένη Πρόσβαση
-                </h1>
-                <p className="text-amber-700 mb-6 max-w-lg">
-                  Ως μαθητής έχετε πρόσβαση μόνο στα εργαλεία της πλατφόρμας. 
-                  Δεν μπορείτε να δείτε το περιεχόμενο των μαθημάτων.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                  <Link to="/">
-                    <Button variant="outline">
-                      <ChevronLeft className="h-4 w-4 mr-2" />
-                      Επιστροφή στην αρχική
-                    </Button>
-                  </Link>
-                  <Link to="/tools/calculator">
-                    <Button>
-                      <Wrench className="h-4 w-4 mr-2" />
-                      Μετάβαση στα εργαλεία
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Απαιτείται σύνδεση</h1>
+            <Link to="/login">
+              <Button>Σύνδεση</Button>
+            </Link>
+          </div>
         </div>
         <Footer />
       </div>
@@ -80,7 +52,6 @@ const SubjectPage = () => {
     );
   }
 
-  // Δυναμική εύρεση του κατάλληλου εικονιδίου
   const IconComponent = subject ? 
     (LucideIcons[subject.icon as keyof typeof LucideIcons] as LucideIcon) || 
     (() => <span className="text-white text-3xl">?</span>)
@@ -206,7 +177,7 @@ const SubjectPage = () => {
                 <Card className="card-hover">
                   <CardContent className="p-6">
                     <h3 className="font-bold text-lg mb-2">Ενδιάμεσες Ασκήσεις</h3>
-                    <p className="text-gray-600 mb-4">Ασκήσεις μεσαίου επιπέδου για εμβάθυνση γνώσεων</p>
+                    <p className="text-gray-600 mb-4">Ασκήσεις μεσαίου επ��πέδου για εμβάθυνση γνώσεων</p>
                     <Link to={`/quiz/${subject.id}/intermediate`}>
                       <Button className="w-full">Έναρξη</Button>
                     </Link>

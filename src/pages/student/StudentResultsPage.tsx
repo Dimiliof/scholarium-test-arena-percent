@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -66,7 +65,7 @@ const StudentResultsPage = () => {
     const mockResults: StudentResult[] = [
       {
         id: 1,
-        studentId: user?.id || 0,
+        studentId: user?.id ? Number(user.id) : 0,
         studentName: user?.firstName + ' ' + user?.lastName || 'Ανώνυμος Μαθητής',
         subjectId: 'mathematics',
         quizType: 'basic',
@@ -76,7 +75,7 @@ const StudentResultsPage = () => {
       },
       {
         id: 2,
-        studentId: user?.id || 0,
+        studentId: user?.id ? Number(user.id) : 0,
         studentName: user?.firstName + ' ' + user?.lastName || 'Ανώνυμος Μαθητής',
         subjectId: 'mathematics',
         quizType: 'intermediate',
@@ -86,7 +85,7 @@ const StudentResultsPage = () => {
       },
       {
         id: 3,
-        studentId: user?.id || 0,
+        studentId: user?.id ? Number(user.id) : 0,
         studentName: user?.firstName + ' ' + user?.lastName || 'Ανώνυμος Μαθητής',
         subjectId: 'physics',
         quizType: 'basic',
@@ -96,7 +95,7 @@ const StudentResultsPage = () => {
       },
       {
         id: 4,
-        studentId: user?.id || 0,
+        studentId: user?.id ? Number(user.id) : 0,
         studentName: user?.firstName + ' ' + user?.lastName || 'Ανώνυμος Μαθητής',
         subjectId: 'literature',
         quizType: 'full',
@@ -106,7 +105,7 @@ const StudentResultsPage = () => {
       },
       {
         id: 5,
-        studentId: user?.id || 0,
+        studentId: user?.id ? Number(user.id) : 0,
         studentName: user?.firstName + ' ' + user?.lastName || 'Ανώνυμος Μαθητής',
         subjectId: 'mathematics',
         quizType: 'medium',

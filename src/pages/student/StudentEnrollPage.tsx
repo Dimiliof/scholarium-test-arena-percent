@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -13,12 +12,13 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-type Subject = {
+type EnhancedSubject = {
   id: string;
   name: string;
   description: string;
-  imageUrl: string;
-  subtitle?: string;
+  icon: string;
+  color: string;
+  imageUrl?: string;
   teacherName?: string;
   isEnrolled?: boolean;
 };
@@ -51,7 +51,7 @@ const StudentEnrollPage = () => {
   }, [user?.id]);
   
   // Προσθήκη επιπλέον πληροφοριών στα μαθήματα
-  const enhancedSubjects: Subject[] = subjects.map(subject => ({
+  const enhancedSubjects: EnhancedSubject[] = subjects.map(subject => ({
     ...subject,
     teacherName: getTeacherName(subject.id),
     isEnrolled: enrolledCourses.includes(subject.id)
@@ -193,7 +193,7 @@ const StudentEnrollPage = () => {
                 <Card key={subject.id} className="overflow-hidden">
                   <div 
                     className="h-40 bg-cover bg-center" 
-                    style={{ backgroundImage: `url(${subject.imageUrl})` }}
+                    style={{ backgroundImage: `url(${subject.imageUrl || '/placeholder.svg'})` }}
                   />
                   <CardHeader>
                     <div className="flex justify-between items-start">

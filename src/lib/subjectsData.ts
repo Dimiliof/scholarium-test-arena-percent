@@ -5,6 +5,7 @@ export interface Subject {
   icon: string;
   color: string;
   description: string;
+  imageUrl?: string; // Adding optional imageUrl property
 }
 
 export const subjects: Subject[] = [
@@ -14,6 +15,7 @@ export const subjects: Subject[] = [
     icon: "Pi",
     color: "bg-blue-500",
     description: "Εξερευνήστε τον κόσμο των αριθμών, των σχημάτων και των μοτίβων.",
+    imageUrl: "https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=2670&auto=format&fit=crop"
   },
   {
     id: "physics",
@@ -21,6 +23,7 @@ export const subjects: Subject[] = [
     icon: "Atom",
     color: "bg-orange-500",
     description: "Ανακαλύψτε τις θεμελιώδεις αρχές που διέπουν το σύμπαν.",
+    imageUrl: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?q=80&w=2574&auto=format&fit=crop"
   },
   {
     id: "chemistry",
@@ -28,6 +31,7 @@ export const subjects: Subject[] = [
     icon: "FlaskConical",
     color: "bg-green-500",
     description: "Κατανοήστε τη σύνθεση, τις ιδιότητες και τις αντιδράσεις της ύλης.",
+    imageUrl: "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6?q=80&w=2670&auto=format&fit=crop"
   },
   {
     id: "biology",
@@ -35,6 +39,7 @@ export const subjects: Subject[] = [
     icon: "Dna",
     color: "bg-red-500",
     description: "Μελετήστε τη ζωή, από τα μικρόβια έως τα οικοσυστήματα.",
+    imageUrl: "https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?q=80&w=2670&auto=format&fit=crop"
   },
   {
     id: "history",
@@ -42,6 +47,7 @@ export const subjects: Subject[] = [
     icon: "Scroll",
     color: "bg-purple-500",
     description: "Ταξιδέψτε στο χρόνο και εξερευνήστε το παρελθόν.",
+    imageUrl: "https://images.unsplash.com/photo-1461360228754-6e81c478b882?q=80&w=2574&auto=format&fit=crop"
   },
   {
     id: "geography",
@@ -49,6 +55,7 @@ export const subjects: Subject[] = [
     icon: "Globe",
     color: "bg-cyan-500",
     description: "Εξερευνήστε τον κόσμο και τις σχέσεις μεταξύ ανθρώπων και περιβάλλοντος.",
+    imageUrl: "https://images.unsplash.com/photo-1589519160732-576a3e4f0b11?q=80&w=2670&auto=format&fit=crop"
   },
   {
     id: "informatics",
@@ -56,6 +63,7 @@ export const subjects: Subject[] = [
     icon: "MonitorSmartphone",
     color: "bg-slate-500",
     description: "Εξερευνήστε τον κόσμο των υπολογιστών και της πληροφορικής.",
+    imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2670&auto=format&fit=crop"
   },
   {
     id: "ancient-greek",
@@ -63,6 +71,7 @@ export const subjects: Subject[] = [
     icon: "BookOpen",
     color: "bg-amber-500",
     description: "Εξερευνήστε την αρχαία ελληνική γλώσσα και τον πολιτισμό.",
+    imageUrl: "https://images.unsplash.com/photo-1525924236058-dbe495cd1e3a?q=80&w=2574&auto=format&fit=crop"
   },
   {
     id: "robotics",
@@ -70,6 +79,7 @@ export const subjects: Subject[] = [
     icon: "Bot",
     color: "bg-blue-400",
     description: "Εξερευνήστε τον κόσμο της ρομποτικής και του αυτοματισμού.",
+    imageUrl: "https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?q=80&w=2574&auto=format&fit=crop"
   },
 ];
 

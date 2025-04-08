@@ -6,7 +6,7 @@ import { subjects } from '@/lib/subjectsData';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import PublicSchoolBanner from '@/components/home/PublicSchoolBanner';
+// import PublicSchoolBanner from '@/components/home/PublicSchoolBanner'; // Αφαιρέθηκε
 import HomeHero from '@/components/home/HomeHero';
 import HomeSubjectsGrid from '@/components/home/HomeSubjectsGrid';
 import HomeFeaturesList from '@/components/home/HomeFeaturesList';
@@ -39,7 +39,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <PublicSchoolBanner />
+      {/* Αφαιρέθηκε το PublicSchoolBanner */}
       <HomeHero 
         onStartNow={handleStartNow} 
         onLearnMore={handleLearnMore} 
@@ -61,3 +61,4 @@ const Index = () => {
 };
 
 export default Index;
+

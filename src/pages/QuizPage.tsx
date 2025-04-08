@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -8,13 +7,59 @@ import { subjects, sampleQuestions, QuizQuestion } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Clock, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, AlertTriangle, AlertCircle, Wrench } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 const QuizPage = () => {
   const { subjectId, quizType } = useParams<{ subjectId: string; quizType: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
+  
+  const hasAccess = !isAuthenticated || isTeacher || isAdmin;
+  
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-grow container mx-auto px-4 py-12">
+          <Card className="bg-amber-50 border-amber-200 max-w-4xl mx-auto">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-amber-200 p-4 rounded-full mb-6">
+                  <AlertCircle className="h-10 w-10 text-amber-600" />
+                </div>
+                <h1 className="text-2xl font-bold text-amber-800 mb-4">
+                  Περιορισμένη Πρόσβαση
+                </h1>
+                <p className="text-amber-700 mb-6 max-w-lg">
+                  Ως μαθητής έχετε πρόσβαση μόνο στα εργαλεία της πλατφόρμας. 
+                  Δεν μπορείτε να συμμετέχετε σε διαγωνίσματα και ασκήσεις.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                  <Link to="/">
+                    <Button variant="outline">
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      Επιστροφή στην αρχική
+                    </Button>
+                  </Link>
+                  <Link to="/tools/calculator">
+                    <Button>
+                      <Wrench className="h-4 w-4 mr-2" />
+                      Μετάβαση στα εργαλεία
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [userAnswers, setUserAnswers] = useState<number[]>([]);
@@ -26,7 +71,6 @@ const QuizPage = () => {
   
   const subject = subjects.find(s => s.id === subjectId);
   
-  // Determine time limit based on quiz type
   useEffect(() => {
     if (!quizType) return;
     
@@ -49,7 +93,6 @@ const QuizPage = () => {
     setTimeLeft(seconds);
   }, [quizType]);
   
-  // Set up timer
   useEffect(() => {
     if (timeLeft <= 0 || quizCompleted) return;
     
@@ -57,7 +100,6 @@ const QuizPage = () => {
       setTimeLeft(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          // Auto-submit quiz if time runs out
           if (!quizCompleted) {
             toast({
               title: "Ο χρόνος τελείωσε!",
@@ -75,20 +117,17 @@ const QuizPage = () => {
     return () => clearInterval(timer);
   }, [timeLeft, quizCompleted, toast]);
   
-  // Format time
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
   
-  // Load questions
   useEffect(() => {
     if (!subjectId) return;
     
     setIsLoading(true);
     
-    // Get questions for this subject
     const availableQuestions = sampleQuestions[subjectId] || [];
     
     if (availableQuestions.length === 0) {
@@ -101,21 +140,17 @@ const QuizPage = () => {
       return;
     }
     
-    // Determine number of questions based on quiz type
     let numQuestions = 5; // Default
     if (quizType === 'medium') numQuestions = 10;
     if (quizType === 'full') numQuestions = 15;
     
-    // Limit to available questions
     numQuestions = Math.min(numQuestions, availableQuestions.length);
     
-    // Shuffle and select questions
     const shuffledQuestions = [...availableQuestions].sort(() => 0.5 - Math.random());
     const selectedQuestions = shuffledQuestions.slice(0, numQuestions);
     
     setQuestions(selectedQuestions);
     
-    // Initialize user answers array
     setUserAnswers(new Array(numQuestions).fill(-1));
     setIsLoading(false);
   }, [subjectId, quizType, navigate, toast]);
@@ -135,7 +170,6 @@ const QuizPage = () => {
     );
   }
   
-  // Get quiz title based on type
   const getQuizTitle = () => {
     switch (quizType) {
       case 'basic': return 'Βασικές Ασκήσεις';
@@ -148,21 +182,17 @@ const QuizPage = () => {
     }
   };
   
-  // Handle option selection
   const handleOptionSelect = (optionIndex: number) => {
     setSelectedOption(optionIndex);
   };
   
-  // Handle next question
   const handleNextQuestion = () => {
     if (selectedOption === null) return;
     
-    // Update user answers
     const newAnswers = [...userAnswers];
     newAnswers[currentQuestion] = selectedOption;
     setUserAnswers(newAnswers);
     
-    // Move to next question or complete quiz
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedOption(userAnswers[currentQuestion + 1] !== -1 ? userAnswers[currentQuestion + 1] : null);
@@ -171,7 +201,6 @@ const QuizPage = () => {
     }
   };
   
-  // Handle previous question
   const handlePreviousQuestion = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
@@ -179,14 +208,12 @@ const QuizPage = () => {
     }
   };
   
-  // Handle retry quiz
   const handleRetry = () => {
     setCurrentQuestion(0);
     setUserAnswers(new Array(questions.length).fill(-1));
     setSelectedOption(null);
     setQuizCompleted(false);
     
-    // Reset timer based on quiz type
     let seconds = 0;
     switch (quizType) {
       case 'quick': seconds = 15 * 60; break;
@@ -197,7 +224,6 @@ const QuizPage = () => {
     setTimeLeft(seconds);
   };
   
-  // If the quiz is completed, show results
   if (quizCompleted) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -216,7 +242,6 @@ const QuizPage = () => {
     );
   }
   
-  // If questions are still loading
   if (isLoading || questions.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -238,7 +263,6 @@ const QuizPage = () => {
       
       <div className="flex-grow py-8">
         <div className="container mx-auto px-4 max-w-4xl">
-          {/* Quiz Header */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
               <div>
@@ -262,7 +286,6 @@ const QuizPage = () => {
             </div>
           </div>
           
-          {/* Quiz Question */}
           <Card className="shadow mb-8">
             <CardContent className="p-6">
               <h2 className="text-xl font-medium mb-6">
@@ -325,7 +348,6 @@ const QuizPage = () => {
             </CardFooter>
           </Card>
           
-          {/* Warning when time is almost up */}
           {timeLeft < 60 && !quizCompleted && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
               <AlertTriangle className="h-5 w-5 text-red-500 mr-2" />

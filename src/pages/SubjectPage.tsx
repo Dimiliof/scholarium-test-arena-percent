@@ -7,15 +7,61 @@ import { subjects } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, ClipboardCheck, Award, ChevronLeft } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Award, ChevronLeft, AlertCircle, Wrench } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SubjectPage = () => {
   const { subjectId } = useParams<{ subjectId: string }>();
   const [activeTab, setActiveTab] = useState('overview');
+  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
   
   const subject = subjects.find(s => s.id === subjectId);
+  
+  // Έλεγχος πρόσβασης - μόνο εκπαιδευτικοί και διαχειριστές έχουν πρόσβαση
+  const hasAccess = !isAuthenticated || isTeacher || isAdmin;
+  
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-grow container mx-auto px-4 py-12">
+          <Card className="bg-amber-50 border-amber-200 max-w-4xl mx-auto">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-amber-200 p-4 rounded-full mb-6">
+                  <AlertCircle className="h-10 w-10 text-amber-600" />
+                </div>
+                <h1 className="text-2xl font-bold text-amber-800 mb-4">
+                  Περιορισμένη Πρόσβαση
+                </h1>
+                <p className="text-amber-700 mb-6 max-w-lg">
+                  Ως μαθητής έχετε πρόσβαση μόνο στα εργαλεία της πλατφόρμας. 
+                  Δεν μπορείτε να δείτε το περιεχόμενο των μαθημάτων.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                  <Link to="/">
+                    <Button variant="outline">
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      Επιστροφή στην αρχική
+                    </Button>
+                  </Link>
+                  <Link to="/tools/calculator">
+                    <Button>
+                      <Wrench className="h-4 w-4 mr-2" />
+                      Μετάβαση στα εργαλεία
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
   if (!subject) {
     return (

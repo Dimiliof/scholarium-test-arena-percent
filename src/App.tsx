@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -24,6 +25,8 @@ import ContactPage from "./pages/ContactPage";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import ForumPage from "./pages/ForumPage";
+import ForumPostPage from "./pages/ForumPostPage";
 
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminLoginsPage from "./pages/admin/AdminLoginsPage";
@@ -127,6 +130,9 @@ const App = () => (
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/school-registration" element={<SchoolRegistration />} />
             <Route path="/it-support-login" element={<ITSupportLoginPage />} />
+            
+            <Route path="/forum/:subjectId" element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
+            <Route path="/forum/post/:postId" element={<ProtectedRoute><ForumPostPage /></ProtectedRoute>} />
             
             <Route path="/resources" element={<ResourcesPage />} />
             

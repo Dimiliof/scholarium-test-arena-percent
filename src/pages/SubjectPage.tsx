@@ -6,7 +6,7 @@ import { subjects } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Table, 
@@ -18,6 +18,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import ForumDiscussion from '@/components/forum/ForumDiscussion';
 
 type LeaderboardStudent = {
   id: number;
@@ -183,10 +184,14 @@ const SubjectPage = () => {
       
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" onValueChange={setActiveTab} value={activeTab}>
-          <TabsList className="grid w-full md:w-auto grid-cols-4 mb-8">
+          <TabsList className="grid w-full md:w-auto grid-cols-5 mb-8">
             <TabsTrigger value="overview">Επισκόπηση</TabsTrigger>
             <TabsTrigger value="practice">Εξάσκηση</TabsTrigger>
             <TabsTrigger value="tests">Διαγωνίσματα</TabsTrigger>
+            <TabsTrigger value="forum" className="flex items-center gap-1">
+              <MessageSquare className="h-4 w-4" />
+              Συζήτηση
+            </TabsTrigger>
             <TabsTrigger value="leaderboard">Κατάταξη</TabsTrigger>
           </TabsList>
           
@@ -331,6 +336,22 @@ const SubjectPage = () => {
                     </Link>
                   </CardContent>
                 </Card>
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="forum">
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Φόρουμ Συζήτησης</h2>
+              
+              <ForumDiscussion subjectId={subjectId} />
+              
+              <div className="mt-6 flex justify-center">
+                <Link to={`/forum/${subjectId}`}>
+                  <Button variant="outline">
+                    Προβολή όλων των συζητήσεων
+                  </Button>
+                </Link>
               </div>
             </div>
           </TabsContent>

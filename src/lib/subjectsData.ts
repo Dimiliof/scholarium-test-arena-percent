@@ -1,4 +1,3 @@
-
 export interface Subject {
   id: string;
   name: string;
@@ -126,6 +125,13 @@ export const subjects: Subject[] = [
     icon: "🤖",
     color: "bg-slate-600",
     description: "Κατασκευή και προγραμματισμός ρομπότ και αυτοματισμών"
+  },
+  {
+    id: "informatics",
+    name: "Πληροφορική",
+    icon: "💻", // Χρησιμοποιώ το εικονίδιο υπολογιστή
+    color: "bg-blue-800", // Διαλέγω ένα διαφορετικό μπλε από τα υπάρχοντα
+    description: "Προγραμματισμός, δίκτυα, πληροφοριακά συστήματα και ψηφιακές τεχνολογίες"
   }
 ];
 
@@ -665,46 +671,4 @@ export const sampleQuestions: Record<string, QuizQuestion[]> = {
     {
       id: 3,
       question: "Τι είναι ο σερβοκινητήρας;",
-      options: ["Κινητήρας που μπορεί να ελέγξει με ακρίβεια τη θέση του", "Κινητήρας υψηλής ταχύτητας", "Κινητήρας χαμηλής κατανάλωσης", "Κινητήρας μεγάλης ισχύος"],
-      correctAnswer: 0
-    },
-    {
-      id: 4,
-      question: "Τι είναι το Arduino;",
-      options: ["Μια πλατφόρμα ανοιχτού κώδικα για ηλεκτρονικά έργα", "Ένα λειτουργικό σύστημα", "Ένα ρομπότ", "Ένα πρόγραμμα σχεδίασης 3D"],
-      correctAnswer: 0
-    },
-    {
-      id: 5,
-      question: "Ποιο από τα παρακάτω είναι παράδειγμα αυτόνομου ρομπότ;",
-      options: ["Ρομποτική ηλεκτρική σκούπα", "Τηλεκατευθυνόμενο αυτοκίνητο", "Μηχανικό χέρι σε εργοστάσιο", "Ηλεκτρονικό παιχνίδι"],
-      correctAnswer: 0
-    }
-  ]
-};
-
-// We don't need this section anymore since we've provided questions for all subjects
-// subjects.forEach(subject => {
-//   if (!sampleQuestions[subject.id]) {
-//     sampleQuestions[subject.id] = [
-//       {
-//         id: 1,
-//         question: `Ερώτηση δείγματος 1 για ${subject.name}`,
-//         options: ["Επιλογή Α", "Επιλογή Β", "Επιλογή Γ", "Επιλογή Δ"],
-//         correctAnswer: 0
-//       },
-//       {
-//         id: 2,
-//         question: `Ερώτηση δείγματος 2 για ${subject.name}`,
-//         options: ["Επιλογή Α", "Επιλογή Β", "Επιλογή Γ", "Επιλογή Δ"],
-//         correctAnswer: 1
-//       },
-//       {
-//         id: 3,
-//         question: `Ερώτηση δείγματος 3 για ${subject.name}`,
-//         options: ["Επιλογή Α", "Επιλογή Β", "Επιλογή Γ", "Επιλογή Δ"],
-//         correctAnswer: 2
-//       }
-//     ];
-//   }
-// });
+      options: ["Κινητήρας που

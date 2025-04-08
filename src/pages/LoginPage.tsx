@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -154,7 +155,7 @@ const LoginPage = () => {
                     className="flex items-center hover:text-primary transition-colors"
                   >
                     <Mail className="mr-2 h-4 w-4" />
-                    <span>Email Support</span>
+                    <span>Υποστήριξη Email</span>
                   </a>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">

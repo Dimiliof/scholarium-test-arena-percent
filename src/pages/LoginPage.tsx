@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Loader2, Mail, Phone } from "lucide-react";
+import { AlertCircle, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -148,20 +148,13 @@ const LoginPage = () => {
               
               <div className="mt-6 border-t pt-4 text-center">
                 <h3 className="text-sm font-semibold mb-2">Χρειάζεστε βοήθεια;</h3>
-                <div className="flex justify-center space-x-4 text-muted-foreground">
+                <div className="flex justify-center text-muted-foreground">
                   <a 
                     href="mailto:it-support@atsoglou.gr" 
                     className="flex items-center hover:text-primary transition-colors"
                   >
                     <Mail className="mr-2 h-4 w-4" />
                     <span>Email Support</span>
-                  </a>
-                  <a 
-                    href="tel:+302101234567" 
-                    className="flex items-center hover:text-primary transition-colors"
-                  >
-                    <Phone className="mr-2 h-4 w-4" />
-                    <span>210 123 4567</span>
                   </a>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">

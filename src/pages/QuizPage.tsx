@@ -9,10 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, ChevronRight, Clock, AlertTriangle } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 const QuizPage = () => {
   const { subjectId, quizType } = useParams<{ subjectId: string; quizType: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [userAnswers, setUserAnswers] = useState<number[]>([]);
@@ -20,6 +22,7 @@ const QuizPage = () => {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const subject = subjects.find(s => s.id === subjectId);
   
@@ -51,11 +54,26 @@ const QuizPage = () => {
     if (timeLeft <= 0 || quizCompleted) return;
     
     const timer = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          // Auto-submit quiz if time runs out
+          if (!quizCompleted) {
+            toast({
+              title: "Ο χρόνος τελείωσε!",
+              description: "Το διαγώνισμα υποβλήθηκε αυτόματα.",
+              variant: "destructive"
+            });
+            setQuizCompleted(true);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [timeLeft, quizCompleted]);
+  }, [timeLeft, quizCompleted, toast]);
   
   // Format time
   const formatTime = (seconds: number) => {
@@ -68,24 +86,39 @@ const QuizPage = () => {
   useEffect(() => {
     if (!subjectId) return;
     
-    // Get sample questions for this subject
+    setIsLoading(true);
+    
+    // Get questions for this subject
     const availableQuestions = sampleQuestions[subjectId] || [];
     
-    // Shuffle and select questions based on quiz type
-    let numQuestions = 3; // Default for demo
-    if (quizType === 'medium') numQuestions = 5;
-    if (quizType === 'full') numQuestions = 10;
+    if (availableQuestions.length === 0) {
+      toast({
+        title: "Δεν βρέθηκαν ερωτήσεις",
+        description: "Δεν υπάρχουν διαθέσιμες ερωτήσεις για αυτό το μάθημα.",
+        variant: "destructive"
+      });
+      navigate(`/subject/${subjectId}`);
+      return;
+    }
+    
+    // Determine number of questions based on quiz type
+    let numQuestions = 5; // Default
+    if (quizType === 'medium') numQuestions = 10;
+    if (quizType === 'full') numQuestions = 15;
     
     // Limit to available questions
     numQuestions = Math.min(numQuestions, availableQuestions.length);
     
     // Shuffle and select questions
     const shuffledQuestions = [...availableQuestions].sort(() => 0.5 - Math.random());
-    setQuestions(shuffledQuestions.slice(0, numQuestions));
+    const selectedQuestions = shuffledQuestions.slice(0, numQuestions);
+    
+    setQuestions(selectedQuestions);
     
     // Initialize user answers array
     setUserAnswers(new Array(numQuestions).fill(-1));
-  }, [subjectId, quizType]);
+    setIsLoading(false);
+  }, [subjectId, quizType, navigate, toast]);
   
   if (!subject) {
     return (
@@ -132,7 +165,7 @@ const QuizPage = () => {
     // Move to next question or complete quiz
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedOption(null);
+      setSelectedOption(userAnswers[currentQuestion + 1] !== -1 ? userAnswers[currentQuestion + 1] : null);
     } else {
       setQuizCompleted(true);
     }
@@ -142,7 +175,7 @@ const QuizPage = () => {
   const handlePreviousQuestion = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
-      setSelectedOption(userAnswers[currentQuestion - 1]);
+      setSelectedOption(userAnswers[currentQuestion - 1] !== -1 ? userAnswers[currentQuestion - 1] : null);
     }
   };
   
@@ -183,14 +216,15 @@ const QuizPage = () => {
     );
   }
   
-  // If no questions are loaded yet
-  if (questions.length === 0) {
+  // If questions are still loading
+  if (isLoading || questions.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-grow flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Φόρτωση ερωτήσεων...</h1>
+            <p className="text-gray-600">Παρακαλώ περιμένετε</p>
           </div>
         </div>
         <Footer />

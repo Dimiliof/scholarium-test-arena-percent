@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,11 +28,11 @@ const Header = () => {
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList>
             <NavigationMenuItem>
-              <Link to="/" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink asChild>
+                <Link to="/" className={navigationMenuTriggerStyle()}>
                   Αρχική
-                </NavigationMenuLink>
-              </Link>
+                </Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
             
             <NavigationMenuItem>
@@ -87,20 +88,20 @@ const Header = () => {
             </NavigationMenuItem>
             
             <NavigationMenuItem>
-              <Link to="/about" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink asChild>
+                <Link to="/about" className={navigationMenuTriggerStyle()}>
                   Σχετικά
-                </NavigationMenuLink>
-              </Link>
+                </Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
             
             {isAuthenticated && (
               <NavigationMenuItem>
-                <Link to="/add-content" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink asChild>
+                  <Link to="/add-content" className={navigationMenuTriggerStyle()}>
                     Προσθήκη Υλικού
-                  </NavigationMenuLink>
-                </Link>
+                  </Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
             )}
           </NavigationMenuList>

@@ -115,6 +115,7 @@ const Header = () => {
   );
 };
 
+// Define ListItem component with proper React reference
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a"> & { title: string }

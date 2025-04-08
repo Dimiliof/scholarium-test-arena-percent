@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollText, Calculator, BookOpen, Landmark, Cross, Users, 
-  FlaskConical, Atom, Leaf, Wrench, Music, Heart, Globe, Computer } from 'lucide-react';
+  FlaskConical, Atom, Leaf, Wrench, Music, Heart, Globe, Computer,
+  FileText, FileSpreadsheet, FilePresentation } from 'lucide-react';
 
 export interface Subject {
   id: string;
@@ -104,7 +105,7 @@ export const sampleQuestions: Record<string, QuizQuestion[]> = {
     },
     {
       id: 3,
-      question: 'Ποια μάχη θεωρείται καθοριστική για την έκβαση ��ου Β΄ Παγκοσμίου Πολέμου στην Ευρώπη;',
+      question: 'Ποια μάχη θεωρείται καθοριστική για την έκβαση ��ου Β΄ Παγκοσμίου Πολ��μου στην Ευρώπη;',
       options: ['Μάχη της Αγγλίας', 'Μάχη του Στάλινγκραντ', 'Μάχη των Αρδεννών', 'Απόβαση στη Νορμανδία'],
       correctAnswer: 1
     },
@@ -164,6 +165,132 @@ export const sampleQuestions: Record<string, QuizQuestion[]> = {
       question: 'Τι μετράει η κλίμακα Ρίχτερ;',
       options: ['Την ένταση του ήχου', 'Το μέγεθος των σεισμών', 'Τη θερμοκρασία', 'Την ταχύτητα του ανέμου'],
       correctAnswer: 1
+    }
+  ],
+  'ecdl-word': [
+    {
+      id: 1,
+      question: 'Ποιο από τα παρακάτω πλήκτρα συντόμευσης χρησιμοποιείται για την αποθήκευση ενός εγγράφου στο Word;',
+      options: ['Ctrl+P', 'Ctrl+S', 'Ctrl+C', 'Ctrl+V'],
+      correctAnswer: 1
+    },
+    {
+      id: 2,
+      question: 'Πώς μπορείτε να δημιουργήσετε έναν πίνακα περιεχομένων στο Word;',
+      options: [
+        'Με την εντολή Insert > Table of Contents', 
+        'Με την εντολή References > Table of Contents', 
+        'Με την εντολή View > Table of Contents', 
+        'Με την εντολή Format > Table of Contents'
+      ],
+      correctAnswer: 1
+    },
+    {
+      id: 3,
+      question: 'Ποια είναι η συντόμευση για να κάνετε έντονη (bold) τη γραμματοσειρά;',
+      options: ['Ctrl+I', 'Ctrl+B', 'Ctrl+U', 'Ctrl+A'],
+      correctAnswer: 1
+    },
+    {
+      id: 4,
+      question: 'Πώς μπορείτε να εισάγετε αυτόματα αρίθμηση σελίδων σε ένα έγγραφο Word;',
+      options: [
+        'Insert > Page Number', 
+        'Format > Page Number', 
+        'References > Page Number', 
+        'View > Page Number'
+      ],
+      correctAnswer: 0
+    },
+    {
+      id: 5,
+      question: 'Ποια είναι η προεπιλεγμένη προβολή στο Word;',
+      options: ['Print Layout', 'Web Layout', 'Draft', 'Outline'],
+      correctAnswer: 0
+    }
+  ],
+  'ecdl-excel': [
+    {
+      id: 1,
+      question: 'Πώς αναφέρεται στο Excel μια απόλυτη αναφορά κελιού;',
+      options: ['A1', '$A$1', 'A$1', '$A1'],
+      correctAnswer: 1
+    },
+    {
+      id: 2,
+      question: 'Ποια συνάρτηση χρησιμοποιείται για το άθροισμα μιας περιοχής κελιών;',
+      options: ['COUNT', 'SUM', 'AVERAGE', 'MAX'],
+      correctAnswer: 1
+    },
+    {
+      id: 3,
+      question: 'Πώς μπορείτε να δημιουργήσετε ένα γράφημα στο Excel;',
+      options: [
+        'Insert > Chart', 
+        'Format > Chart', 
+        'Data > Chart', 
+        'View > Chart'
+      ],
+      correctAnswer: 0
+    },
+    {
+      id: 4,
+      question: 'Ποια συνάρτηση χρησιμοποιείται για να βρείτε τη μέγιστη τιμή σε μια περιοχή κελιών;',
+      options: ['MAX', 'MAXIMUM', 'LARGE', 'TOP'],
+      correctAnswer: 0
+    },
+    {
+      id: 5,
+      question: 'Τι κάνει η συνάρτηση VLOOKUP;',
+      options: [
+        'Αναζητά τιμές σε οριζόντιο πίνακα', 
+        'Αναζητά τιμές σε κάθετο πίνακα', 
+        'Υπολογίζει το μέσο όρο των τιμών', 
+        'Μετράει τον αριθμό των κελιών με αριθμητικές τιμές'
+      ],
+      correctAnswer: 1
+    }
+  ],
+  'ecdl-powerpoint': [
+    {
+      id: 1,
+      question: 'Ποιο πλήκτρο συντόμευσης χρησιμοποιείται για την έναρξη μιας παρουσίασης από την αρχή;',
+      options: ['F1', 'F5', 'F7', 'F9'],
+      correctAnswer: 1
+    },
+    {
+      id: 2,
+      question: 'Πώς μπορείτε να προσθέσετε εφέ μετάβασης μεταξύ των διαφανειών;',
+      options: [
+        'Design > Transitions', 
+        'Animations > Transitions', 
+        'Transitions > Effects', 
+        'Insert > Transitions'
+      ],
+      correctAnswer: 0
+    },
+    {
+      id: 3,
+      question: 'Πώς ονομάζεται η προβολή στο PowerPoint που σας επιτρέπει να δείτε όλες τις διαφάνειες σε μικρογραφίες;',
+      options: ['Normal View', 'Slide Sorter View', 'Reading View', 'Slide Show View'],
+      correctAnswer: 1
+    },
+    {
+      id: 4,
+      question: 'Ποια εντολή χρησιμοποιείται για να εισάγετε μια νέα διαφάνεια;',
+      options: [
+        'Home > New Slide', 
+        'Insert > New Slide', 
+        'Design > New Slide', 
+        'View > New Slide'
+      ],
+      correctAnswer: 0
+    },
+    {
+      id: 5,
+      question: 'Ποιο από τα παρακάτω ΔΕΝ είναι διαθέσιμο εφέ κίνησης στο PowerPoint;',
+      options: ['Entrance', 'Emphasis', 'Exit', 'Translation'],
+      correctAnswer: 3
     }
   ]
 };
@@ -294,5 +421,32 @@ export const subjects: Subject[] = [
     description: 'Μελέτη των υπολογιστών, της επιστήμης των υπολογιστών και της τεχνολογίας πληροφοριών',
     availableTests: 30,
     availableMaterials: 55
+  },
+  { 
+    id: 'ecdl-word', 
+    name: 'ECDL Word', 
+    icon: FileText, 
+    color: 'bg-blue-600',
+    description: 'Επεξεργασία κειμένου με το Microsoft Word',
+    availableTests: 15,
+    availableMaterials: 22
+  },
+  { 
+    id: 'ecdl-excel', 
+    name: 'ECDL Excel', 
+    icon: FileSpreadsheet, 
+    color: 'bg-green-600',
+    description: 'Υπολογιστικά φύλλα με το Microsoft Excel',
+    availableTests: 18,
+    availableMaterials: 25
+  },
+  { 
+    id: 'ecdl-powerpoint', 
+    name: 'ECDL PowerPoint', 
+    icon: FilePresentation, 
+    color: 'bg-orange-500',
+    description: 'Παρουσιάσεις με το Microsoft PowerPoint',
+    availableTests: 12,
+    availableMaterials: 20
   }
 ];

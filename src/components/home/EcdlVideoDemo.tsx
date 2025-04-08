@@ -33,17 +33,18 @@ const EcdlVideoDemo = ({ embedded = false }: EcdlVideoDemoProps) => {
           <div className="aspect-video bg-black relative">
             <iframe 
               className="w-full h-full absolute inset-0"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&showinfo=0" 
-              title="ECDL Simulation Demo"
+              src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fatsoglou.gr&tabs=timeline&width=500&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId" 
+              title="Atsoglou Facebook Page"
               frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+              scrolling="no"
               allowFullScreen
             ></iframe>
           </div>
           <div className="p-6">
-            <h3 className="text-lg font-bold mb-2">Προσομοίωση ECDL</h3>
+            <h3 className="text-lg font-bold mb-2">Νέα και Ενημερώσεις</h3>
             <p className="text-gray-600 mb-4">
-              Παρακολουθήστε πώς λειτουργούν οι προσομοιώσεις ECDL στην πλατφόρμα μας για τις ενότητες Word, Excel και PowerPoint.
+              Μείνετε ενημερωμένοι με τα τελευταία νέα και εκπαιδευτικές ενημερώσεις από την σελίδα μας.
             </p>
             <div className="flex justify-end">
               <Button onClick={handleNavigate} className="flex items-center gap-2">

@@ -1,14 +1,5 @@
-User-agent: Googlebot
-Allow: /
 
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
+# Allow all web crawlers complete access
 User-agent: *
 Allow: /
+Sitemap: https://scholarium-test-arena-percent.lovable.app/sitemap.xml

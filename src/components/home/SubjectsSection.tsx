@@ -71,24 +71,37 @@ const SubjectsSection: React.FC<SubjectsSectionProps> = ({ subjects, isAuthentic
         {subjectsList.map((subject) => (
           <Button
             key={subject.id}
-            variant={selectedSubject === subject.id ? 'default' : 'outline'}
+            variant="outline"
             className={cn(
-              "w-full flex flex-col items-center justify-center space-y-2 h-32 hover:shadow-md transition-all duration-300",
-              selectedSubject === subject.id 
-                ? `${subject.color} text-white hover:${subject.color}` 
-                : "bg-white border hover:border-primary"
+              "w-full flex flex-col items-center justify-center space-y-2 h-32 transition-all duration-300",
+              subject.id === 'all' 
+                ? "bg-blue-500 text-white hover:bg-blue-600 border-0"
+                : selectedSubject === subject.id 
+                  ? `${subject.color} text-white hover:opacity-90` 
+                  : "bg-white border hover:border-primary"
             )}
             onClick={() => setSelectedSubject(subject.id)}
           >
-            <subject.icon 
-              className={cn(
-                "h-8 w-8", 
-                selectedSubject === subject.id ? "text-white" : subject.color
-              )} 
-            />
-            <span className="text-sm font-medium text-center">
-              {subject.name}
-            </span>
+            {subject.id === 'all' ? (
+              <div className="flex flex-col items-center justify-center">
+                <subject.icon className="h-8 w-8 mb-4 text-white" />
+                <span className="text-lg font-medium text-center text-white">
+                  {subject.name}
+                </span>
+              </div>
+            ) : (
+              <>
+                <subject.icon 
+                  className={cn(
+                    "h-7 w-7", 
+                    selectedSubject === subject.id ? "text-white" : subject.color
+                  )} 
+                />
+                <span className="text-sm font-medium text-center">
+                  {subject.name}
+                </span>
+              </>
+            )}
           </Button>
         ))}
       </div>

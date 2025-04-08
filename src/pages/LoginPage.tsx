@@ -59,8 +59,10 @@ const LoginPage = () => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const user = JSON.parse(storedUser);
-          const roleText = user.role === "teacher" ? "Εκπαιδευτικός" : 
-                         user.role === "admin" ? "Διαχειριστής" : "Μαθητής";
+          const roleText = user.role === "admin" ? "Διαχειριστής" : 
+                         user.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής";
+          
+          console.log(`Επιτυχής σύνδεση ως ${roleText} (${user.role})`);
           
           uiToast({
             title: "Επιτυχής σύνδεση",

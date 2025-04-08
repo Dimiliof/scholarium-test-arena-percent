@@ -47,6 +47,7 @@ const UserMenu = () => {
     let color = "";
     let label = "";
     
+    // Διορθώνουμε την αναγνώριση των ρόλων
     switch (user.role) {
       case "admin":
         color = "bg-red-500";

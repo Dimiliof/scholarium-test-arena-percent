@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Βοηθητικές συναρτήσεις για τον έλεγχο ρόλων
   const isAdmin = user?.role === "admin";
-  const isTeacher = user?.role === "teacher" || user?.role === "admin";
+  const isTeacher = user?.role === "teacher" || user?.role === "admin"; // Ο admin έχει και δικαιώματα εκπαιδευτικού
 
   // Προσθήκη καταγραφής σύνδεσης
   const addLoginRecord = (user: User) => {
@@ -156,6 +156,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         
         console.log("Σύνδεση επιτυχής. Ρόλος χρήστη:", userWithoutPassword.role);
         
+        // Ελέγχουμε αν ο χρήστης είναι admin και καταγράφουμε το γεγονός
+        if (userWithoutPassword.role === "admin") {
+          console.log("Συνδέθηκε διαχειριστής:", userWithoutPassword.email);
+        } else if (userWithoutPassword.role === "teacher") {
+          console.log("Συνδέθηκε εκπαιδευτικός:", userWithoutPassword.email);
+        }
+        
         setUser(userWithoutPassword);
         setIsAuthenticated(true);
         localStorage.setItem("user", JSON.stringify(userWithoutPassword));
@@ -163,8 +170,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Καταγραφή της σύνδεσης
         addLoginRecord(userWithoutPassword);
         
+        const roleText = userWithoutPassword.role === "admin" ? "Διαχειριστής" : 
+                        userWithoutPassword.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής";
+        
         toast.success("Επιτυχής σύνδεση", {
-          description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
+          description: `Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά. Συνδεθήκατε ως ${roleText}.`,
         });
         return true;
       }

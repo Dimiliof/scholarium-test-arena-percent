@@ -1,29 +1,23 @@
 
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import SubjectCard from '@/components/SubjectCard';
-import { subjects } from '@/lib/subjectsData';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, Lock } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Badge } from "@/components/ui/badge";
+import { subjects } from '@/lib/subjectsData';
+
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import PublicSchoolBanner from '@/components/home/PublicSchoolBanner';
+import HeroSection from '@/components/home/HeroSection';
+import SubjectsSection from '@/components/home/SubjectsSection';
+import FeaturesSection from '@/components/home/FeaturesSection';
+import CTASection from '@/components/home/CTASection';
+import AddContentButton from '@/components/home/AddContentButton';
 
 const Index = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   
-  const filteredSubjects = subjects.filter(subject => 
-    subject.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const handleStartNow = () => {
     // Scroll to subjects section
     const subjectsSection = document.getElementById('subjects-section');
@@ -46,203 +40,13 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <PublicSchoolBanner />
+      <HeroSection onStartNow={handleStartNow} onLearnMore={handleLearnMore} />
+      <SubjectsSection subjects={subjects} isAuthenticated={isAuthenticated} />
+      <FeaturesSection />
+      <CTASection onCreateAccount={handleCreateAccount} />
       
-      {/* Public School Banner */}
-      <div className="bg-green-100 py-3 text-center">
-        <p className="text-green-800 font-medium">
-          Δωρεάν εκπαιδευτική πλατφόρμα διαθέσιμη για όλα τα σχολεία της Ελλάδας
-        </p>
-      </div>
-      
-      {/* Hero Section */}
-      <div className="gradient-bg text-white py-16 md:py-24">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-5xl font-bold mb-6">
-            Εκπαιδευτική Πλατφόρμα Προσομοιώσεων και Test
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-            Προετοιμαστείτε για επιτυχία μέσα από προσομοιώσεις και διαγωνίσματα για όλα τα σχολικά μαθήματα
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <Button size="lg" className="bg-white text-primary hover:bg-gray-100" onClick={handleStartNow}>
-              Ξεκινήστε Τώρα
-            </Button>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10" onClick={handleLearnMore}>
-              Μάθετε Περισσότερα
-            </Button>
-          </div>
-          
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <p className="text-4xl font-bold mb-2">17+</p>
-              <p className="text-sm">Διαφορετικά Μαθήματα</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <p className="text-4xl font-bold mb-2">100+</p>
-              <p className="text-sm">Τεστ και Προσομοιώσεις</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <p className="text-4xl font-bold mb-2">1000+</p>
-              <p className="text-sm">Ερωτήσεις και Ασκήσεις</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Subjects Section */}
-      <div id="subjects-section" className="container mx-auto px-4 py-12 md:py-16">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">Διαθέσιμα Μαθήματα</h2>
-        
-        {isAuthenticated ? (
-          // Εμφάνιση πλήρων καρτών μαθημάτων για συνδεδεμένους χρήστες
-          <>
-            {/* Search Bar */}
-            <div className="max-w-md mx-auto mb-12 relative">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Αναζήτηση μαθήματος..."
-                  className="pl-10 py-6"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            
-            {/* Subjects Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredSubjects.map((subject) => (
-                <SubjectCard key={subject.id} subject={subject} />
-              ))}
-            </div>
-            
-            {filteredSubjects.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-xl text-gray-500">Δεν βρέθηκαν μαθήματα με αυτό το όνομα</p>
-                <Button className="mt-4" onClick={() => setSearchTerm('')}>
-                  Εμφάνιση όλων των μαθημάτων
-                </Button>
-              </div>
-            )}
-          </>
-        ) : (
-          // Απλή λίστα μαθημάτων για μη συνδεδεμένους χρήστες
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-gray-50 p-8 rounded-lg border border-gray-200 mb-8">
-              <div className="flex items-center mb-6">
-                <Lock className="h-6 w-6 mr-2 text-primary" />
-                <h3 className="text-xl font-medium">Συνδεθείτε για πρόσβαση στο πλήρες υλικό</h3>
-              </div>
-              <p className="text-gray-600 mb-6">
-                Για να αποκτήσετε πλήρη πρόσβαση στο εκπαιδευτικό υλικό, τα διαγωνίσματα και τις 
-                προσομοιώσεις, παρακαλούμε συνδεθείτε ή δημιουργήστε ένα λογαριασμό.
-              </p>
-              <div className="flex gap-4">
-                <Link to="/login">
-                  <Button variant="outline">Σύνδεση</Button>
-                </Link>
-                <Link to="/register">
-                  <Button className="bg-primary">Εγγραφή</Button>
-                </Link>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
-              {subjects.map((subject) => (
-                <div key={subject.id} className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={`w-8 h-8 rounded-full ${subject.color} flex items-center justify-center text-white`}>
-                      {subject.icon}
-                    </div>
-                    <h3 className="font-medium">{subject.name}</h3>
-                  </div>
-                  <Badge variant="outline" className="bg-gray-100">
-                    Απαιτείται σύνδεση
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-      
-      {/* Features Section */}
-      <div className="bg-gray-50 py-12 md:py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">Γιατί να μας επιλέξετε</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">📊</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Άμεση Αξιολόγηση</h3>
-              <p className="text-gray-600">Δείτε τα αποτελέσματα και την πρόοδό σας αμέσως μετά την ολοκλήρωση κάθε τεστ</p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🎯</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Στοχευμένη Εξάσκηση</h3>
-              <p className="text-gray-600">Εξασκηθείτε στα σημεία που χρειάζεστε περισσότερη βοήθεια</p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">📱</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Παντού και Πάντα</h3>
-              <p className="text-gray-600">Πρόσβαση από όλες τις συσκευές, οποιαδήποτε στιγμή, ακόμα και εκτός σύνδεσης</p>
-            </div>
-          </div>
-          
-          <div className="mt-12 text-center">
-            <div className="inline-block bg-green-50 border border-green-200 rounded-lg p-6 max-w-3xl">
-              <h3 className="text-xl font-bold mb-3 text-green-800">Για Εκπαιδευτικούς & Σχολεία</h3>
-              <p className="text-gray-700 mb-4">
-                Η πλατφόρμα μας είναι διαθέσιμη δωρεάν για όλα τα σχολεία. 
-                Οι εκπαιδευτικοί μπορούν να προσθέσουν το δικό τους εκπαιδευτικό υλικό 
-                και να παρακολουθούν την πρόοδο των μαθητών τους.
-              </p>
-              <Link to="/school-registration">
-                <Button variant="outline" className="bg-green-600 text-white hover:bg-green-700 border-0">
-                  Εγγραφή Σχολείου
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* CTA Section */}
-      <div className="py-12 md:py-16 bg-primary text-white text-center">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6">Έτοιμοι να ξεκινήσετε;</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">Δημιουργήστε λογαριασμό δωρεάν και ξεκινήστε να εξασκείστε στα μαθήματά σας</p>
-          <Button size="lg" variant="secondary" className="animate-pulse-scale" onClick={handleCreateAccount}>
-            Δημιουργία Λογαριασμού
-          </Button>
-        </div>
-      </div>
-      
-      {isAuthenticated && (
-        <div className="flex justify-center mb-8">
-          <Link to="/add-content">
-            <Button className="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-plus">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="12" x2="12" y1="18" y2="12"/>
-                <line x1="9" x2="15" y1="15" y2="15"/>
-              </svg>
-              Προσθήκη Υλικού
-            </Button>
-          </Link>
-        </div>
-      )}
+      {isAuthenticated && <AddContentButton />}
       
       <Footer />
     </div>

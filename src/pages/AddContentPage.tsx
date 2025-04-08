@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, AlertCircle, Mail, Smartphone } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { subjects } from '@/lib/subjectsData';
-import { useAddQuestion } from '@/hooks/useAddQuestion';
+import { useQuestionManagement } from '@/hooks/useQuestionManagement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -26,9 +25,8 @@ const AddContentPage = () => {
   const [phoneInput, setPhoneInput] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const { addQuestion, isAdding } = useAddQuestion();
+  const { addQuestion, isLoading: isAdding } = useQuestionManagement();
   
-  // Έλεγχος αν ο χρήστης είναι ήδη επαληθευμένος κατά τη φόρτωση της σελίδας
   useEffect(() => {
     const isVerified = localStorage.getItem('educatorVerified') === 'true';
     if (isVerified) {
@@ -86,19 +84,16 @@ const AddContentPage = () => {
 
     setIsVerifying(true);
     
-    // Προσομοίωση αποστολής κωδικού και εμφάνιση toast
     setTimeout(() => {
       setIsVerifying(false);
       setVerificationStep('verify');
       
-      // Προσθήκη toast ειδοποίησης
       if (verificationMethod === 'email') {
         toast({
           title: "Κωδικός εστάλη στο email σας",
           description: `Ένας 6-ψήφιος κωδικός επαλήθευσης έχει σταλεί στο ${emailInput}. Παρακαλώ ελέγξτε τα εισερχόμενά σας.`,
         });
         
-        // Εμφάνιση της ειδοποίησης και στο sonner
         import('sonner').then(({ toast: sonnerToast }) => {
           sonnerToast.success(`Κωδικός επαλήθευσης εστάλη στο ${emailInput}`);
         });
@@ -110,7 +105,6 @@ const AddContentPage = () => {
           description: `Ένα SMS με τον 6-ψήφιο κωδικό επαλήθευσης έχει σταλεί στο ${phoneInput}.`,
         });
         
-        // Εμφάνιση της ειδοποίησης και στο sonner
         import('sonner').then(({ toast: sonnerToast }) => {
           sonnerToast.success(`Κωδικός επαλήθευσης εστάλη στο ${phoneInput}`);
         });
@@ -132,14 +126,12 @@ const AddContentPage = () => {
 
     setIsVerifying(true);
     
-    // Προσομοίωση επαλήθευσης κωδικού - για δοκιμή θεωρούμε ότι ο κωδικός 123456 είναι σωστός
     setTimeout(() => {
       setIsVerifying(false);
       
       if (otpCode === "123456") {
         setVerificationStep('verified');
         
-        // Αποθηκεύουμε την επαλήθευση στο localStorage
         localStorage.setItem('educatorVerified', 'true');
         localStorage.setItem('educatorEmail', verificationMethod === 'email' ? emailInput : '');
         localStorage.setItem('educatorPhone', verificationMethod === 'sms' ? phoneInput : '');
@@ -166,7 +158,6 @@ const AddContentPage = () => {
     }, 1500);
   };
 
-  // Βοηθητική συνάρτηση που εμφανίζει τον κωδικό για δοκιμή (ΣΗΜΕΙΩΣΗ: Μόνο για δοκιμαστικούς σκοπούς)
   const showTestCode = () => {
     toast({
       title: "Δοκιμαστικός Κωδικός",
@@ -214,7 +205,6 @@ const AddContentPage = () => {
                       {isVerifying ? "Αποστολή..." : "Αποστολή Κωδικού Επαλήθευσης"}
                     </Button>
                     
-                    {/* Δοκιμαστική λειτουργία - εμφάνιση κωδικού για εύκολη δοκιμή */}
                     <p className="text-xs text-center text-muted-foreground mt-2">
                       <Button variant="link" className="p-0 h-auto text-xs" onClick={showTestCode}>
                         Εμφάνιση δοκιμαστικού κωδικού (για ανάπτυξη)
@@ -241,7 +231,6 @@ const AddContentPage = () => {
                       {isVerifying ? "Αποστολή..." : "Αποστολή Κωδικού Επαλήθευσης"}
                     </Button>
                     
-                    {/* Δοκιμαστική λειτουργία - εμφάνιση κωδικού για εύκολη δοκιμή */}
                     <p className="text-xs text-center text-muted-foreground mt-2">
                       <Button variant="link" className="p-0 h-auto text-xs" onClick={showTestCode}>
                         Εμφάνιση δοκιμαστικού κωδικού (για ανάπτυξη)
@@ -289,7 +278,6 @@ const AddContentPage = () => {
                   Δεν λάβατε τον κωδικό; <Button variant="link" className="p-0 h-auto" onClick={handleSendVerification}>Αποστολή ξανά</Button>
                 </p>
                 
-                {/* Υπενθύμιση δοκιμαστικού κωδικού */}
                 <p className="text-xs text-center text-muted-foreground mt-2">
                   <Button variant="link" className="p-0 h-auto text-xs" onClick={showTestCode}>
                     Εμφάνιση δοκιμαστικού κωδικού (για ανάπτυξη)
@@ -307,6 +295,16 @@ const AddContentPage = () => {
               <p className="text-green-700">
                 Έχετε επαληθευτεί ως εκπαιδευτικός και μπορείτε να προσθέσετε υλικό.
               </p>
+            </div>
+            
+            <div className="mb-6">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/teacher-dashboard')}
+                className="flex items-center gap-2"
+              >
+                <span>Μετάβαση στον Πίνακα Εκπαιδευτικού</span>
+              </Button>
             </div>
             
             <p className="text-lg mb-6">Επιλέξτε το μάθημα στο οποίο θέλετε να προσθέσετε υλικό:</p>

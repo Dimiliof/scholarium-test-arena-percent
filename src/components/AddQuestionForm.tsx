@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { QuizQuestion } from "@/lib/subjectsData";
-import { useAddQuestion } from "@/hooks/useAddQuestion";
+import { useQuestionManagement } from "@/hooks/useQuestionManagement";
 
 const questionSchema = z.object({
   question: z.string().min(5, {
@@ -48,38 +47,64 @@ type QuestionFormValues = z.infer<typeof questionSchema>;
 interface AddQuestionFormProps {
   subjectId: string;
   onSuccess?: () => void;
+  initialData?: QuizQuestion;
+  initialQuizType?: string;
 }
 
-export function AddQuestionForm({ subjectId, onSuccess }: AddQuestionFormProps) {
-  const { addQuestion, isAdding } = useAddQuestion();
+export function AddQuestionForm({ 
+  subjectId, 
+  onSuccess, 
+  initialData, 
+  initialQuizType = "basic" 
+}: AddQuestionFormProps) {
+  const { addQuestion, editQuestion, isLoading } = useQuestionManagement();
+  const isEditing = !!initialData;
+  
+  const defaultValues = isEditing 
+    ? {
+        question: initialData.question,
+        optionA: initialData.options[0],
+        optionB: initialData.options[1],
+        optionC: initialData.options[2],
+        optionD: initialData.options[3],
+        correctAnswer: initialData.correctAnswer.toString() as "0" | "1" | "2" | "3",
+        quizType: initialQuizType,
+      }
+    : {
+        question: "",
+        optionA: "",
+        optionB: "",
+        optionC: "",
+        optionD: "",
+        quizType: initialQuizType,
+      };
   
   const form = useForm<QuestionFormValues>({
     resolver: zodResolver(questionSchema),
-    defaultValues: {
-      question: "",
-      optionA: "",
-      optionB: "",
-      optionC: "",
-      optionD: "",
-      quizType: "basic",
-    },
+    defaultValues,
   });
 
   const onSubmit = (data: QuestionFormValues) => {
-    const newQuestion: QuizQuestion = {
-      id: Date.now(), // Απλή λύση για μοναδικό ID (σε πραγματική εφαρμογή θα χρησιμοποιούσαμε κάτι πιο αξιόπιστο)
+    const questionData: QuizQuestion = {
+      id: isEditing ? initialData.id : Date.now(),
       question: data.question,
       options: [data.optionA, data.optionB, data.optionC, data.optionD],
       correctAnswer: parseInt(data.correctAnswer),
     };
     
-    addQuestion(subjectId, newQuestion, data.quizType);
+    if (isEditing) {
+      editQuestion(subjectId, questionData, data.quizType, initialQuizType);
+    } else {
+      addQuestion(subjectId, questionData, data.quizType);
+    }
     
     if (onSuccess) {
       onSuccess();
     }
     
-    form.reset();
+    if (!isEditing) {
+      form.reset();
+    }
   };
 
   return (
@@ -282,8 +307,8 @@ export function AddQuestionForm({ subjectId, onSuccess }: AddQuestionFormProps) 
           )}
         />
         
-        <Button type="submit" disabled={isAdding}>
-          {isAdding ? "Προσθήκη..." : "Προσθήκη Ερώτησης"}
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Αποθήκευση..." : isEditing ? "Ενημέρωση Ερώτησης" : "Προσθήκη Ερώτησης"}
         </Button>
       </form>
     </Form>

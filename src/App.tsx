@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import SubjectPage from "./pages/SubjectPage";
 import QuizPage from "./pages/QuizPage";
 import AddContentPage from "./pages/AddContentPage";
+import TeacherDashboardPage from "./pages/TeacherDashboardPage";
 import SchoolRegistration from "./pages/SchoolRegistration";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -77,6 +78,7 @@ const App = () => (
             {/* Protected Routes */}
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/add-content" element={<ProtectedRoute><AddContentPage /></ProtectedRoute>} />
+            <Route path="/teacher-dashboard" element={<ProtectedRoute><TeacherDashboardPage /></ProtectedRoute>} />
             
             {/* Catch-all - Not Found */}
             <Route path="*" element={<NotFound />} />

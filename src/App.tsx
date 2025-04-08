@@ -9,6 +9,8 @@ import SubjectPage from "./pages/SubjectPage";
 import QuizPage from "./pages/QuizPage";
 import AddContentPage from "./pages/AddContentPage";
 import SchoolRegistration from "./pages/SchoolRegistration";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import NotFound from "./pages/NotFound";
 import AboutPage from "./pages/AboutPage";
 import TermsPage from "./pages/TermsPage";
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/quiz/:subjectId/:quizType" element={<QuizPage />} />
           <Route path="/add-content" element={<AddContentPage />} />
           <Route path="/school-registration" element={<SchoolRegistration />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />

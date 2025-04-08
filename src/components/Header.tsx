@@ -7,21 +7,14 @@ import { useToast } from "@/hooks/use-toast";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    toast({
-      title: "Λειτουργία σε εξέλιξη",
-      description: "Η λειτουργία εισόδου θα είναι διαθέσιμη σύντομα.",
-    });
+    navigate('/login');
   };
 
   const handleRegister = () => {
-    toast({
-      title: "Λειτουργία σε εξέλιξη",
-      description: "Η λειτουργία εγγραφής θα είναι διαθέσιμη σύντομα.",
-    });
+    navigate('/register');
   };
 
   return (

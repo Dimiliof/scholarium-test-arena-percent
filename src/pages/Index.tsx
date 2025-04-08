@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -37,10 +36,7 @@ const Index = () => {
   };
 
   const handleCreateAccount = () => {
-    toast({
-      title: "Δημιουργία λογαριασμού",
-      description: "Η λειτουργία δημιουργίας λογαριασμού θα είναι διαθέσιμη σύντομα.",
-    });
+    navigate('/register');
   };
 
   return (

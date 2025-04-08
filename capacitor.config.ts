@@ -22,7 +22,26 @@ const config: CapacitorConfig = {
     StatusBar: {
       style: "LIGHT",
       backgroundColor: "#4f46e5"
+    },
+    // Προσθήκη ρυθμίσεων για την εγκατάσταση και το κατέβασμα της εφαρμογής
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"]
     }
+  },
+  android: {
+    flavor: "adhoc",
+    buildOptions: {
+      keystorePath: null,
+      keystorePassword: null,
+      keystoreAlias: null,
+      keystoreAliasPassword: null,
+      releaseType: "AAB"
+    }
+  },
+  ios: {
+    contentInset: "always",
+    scheme: "EduPercentage",
+    limitsNavigationsToAppBoundDomains: true
   }
 };
 

@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +13,7 @@ import HomeCallToAction from '@/components/home/HomeCallToAction';
 import AddContentButton from '@/components/home/AddContentButton';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
 import SchoolIntegrationSection from '@/components/home/SchoolIntegrationSection';
+import DownloadAppButton from '@/components/home/DownloadAppButton';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -80,6 +80,7 @@ const Index = () => {
       <HomeCallToAction onCreateAccount={handleCreateAccount} />
       
       {isAuthenticated && <AddContentButton />}
+      <DownloadAppButton />
       
       <Footer />
     </div>

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Loader2, GraduationCap } from "lucide-react";
+import { AlertCircle, Loader2, BookOpen } from "lucide-react";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -32,8 +32,8 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Παρακαλώ εισάγετε έγκυρη διεύθυνση email.",
   }),
-  classYear: z.string().min(1, {
-    message: "Παρακαλώ εισάγετε την τάξη σας.",
+  school: z.string().min(2, {
+    message: "Παρακαλώ εισάγετε το σχολείο σας.",
   }),
   password: z.string().min(8, {
     message: "Ο κωδικός πρόσβασης πρέπει να έχει τουλάχιστον 8 χαρακτήρες.",
@@ -44,7 +44,7 @@ const formSchema = z.object({
   path: ["confirmPassword"],
 });
 
-const RegisterPage = () => {
+const TeacherRegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -57,7 +57,7 @@ const RegisterPage = () => {
       firstName: "",
       lastName: "",
       email: "",
-      classYear: "",
+      school: "",
       password: "",
       confirmPassword: "",
     },
@@ -73,14 +73,14 @@ const RegisterPage = () => {
         lastName: values.lastName,
         email: values.email,
         password: values.password,
-        classYear: values.classYear,
+        school: values.school,
         termsAccepted: true,
-        role: "student" // Καθορίζουμε τον ρόλο ως "student"
+        role: "teacher" // Σημαντικό: Καθορίζουμε τον ρόλο ως "teacher"
       });
       
       if (success) {
         toast({
-          title: "Επιτυχής εγγραφή",
+          title: "Επιτυχής εγγραφή εκπαιδευτικού",
           description: "Ο λογαριασμός σας δημιουργήθηκε επιτυχώς. Μπορείτε τώρα να συνδεθείτε.",
         });
         navigate("/login");
@@ -104,11 +104,11 @@ const RegisterPage = () => {
           <Card>
             <CardHeader className="space-y-1">
               <div className="flex items-center justify-center mb-2">
-                <GraduationCap className="h-12 w-12 text-green-500" />
+                <BookOpen className="h-12 w-12 text-blue-500" />
               </div>
-              <CardTitle className="text-2xl font-bold text-center">Εγγραφή Μαθητή</CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">Εγγραφή Εκπαιδευτικού</CardTitle>
               <CardDescription className="text-center">
-                Δημιουργήστε το λογαριασμό σας στην πλατφόρμα ΕκπαιδευτικήΓωνιά
+                Δημιουργήστε λογαριασμό εκπαιδευτικού για να μπορείτε να προσθέτετε εκπαιδευτικό υλικό
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -170,12 +170,12 @@ const RegisterPage = () => {
                   
                   <FormField
                     control={form.control}
-                    name="classYear"
+                    name="school"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Τάξη</FormLabel>
+                        <FormLabel>Σχολείο</FormLabel>
                         <FormControl>
-                          <Input placeholder="π.χ. Β' Γυμνασίου" {...field} />
+                          <Input placeholder="Όνομα σχολείου" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -221,7 +221,7 @@ const RegisterPage = () => {
                         Εγγραφή...
                       </>
                     ) : (
-                      "Εγγραφή ως Μαθητής"
+                      "Εγγραφή ως Εκπαιδευτικός"
                     )}
                   </Button>
                 </form>
@@ -238,9 +238,9 @@ const RegisterPage = () => {
               
               <div className="mt-4 text-center text-sm">
                 <p>
-                  Είστε εκπαιδευτικός;{" "}
-                  <Link to="/teacher-register" className="text-primary hover:underline">
-                    Εγγραφή ως εκπαιδευτικός
+                  Είστε μαθητής;{" "}
+                  <Link to="/register" className="text-primary hover:underline">
+                    Εγγραφή ως μαθητής
                   </Link>
                 </p>
               </div>
@@ -254,4 +254,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default TeacherRegisterPage;

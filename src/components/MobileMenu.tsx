@@ -84,6 +84,17 @@ const MobileMenu = () => {
                 Προσθήκη Υλικού
               </Link>
             )}
+            
+            {!isAuthenticated && (
+              <div className="pt-4 space-y-2 border-t border-gray-200">
+                <Link to="/login" className="block">
+                  <Button variant="outline" className="w-full">Σύνδεση</Button>
+                </Link>
+                <Link to="/register-type" className="block">
+                  <Button className="w-full">Εγγραφή</Button>
+                </Link>
+              </div>
+            )}
           </nav>
         </div>
       </SheetContent>

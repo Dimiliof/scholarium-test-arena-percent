@@ -23,7 +23,7 @@ const UserMenu = () => {
         <Link to="/login">
           <Button variant="outline">Σύνδεση</Button>
         </Link>
-        <Link to="/register" className="hidden sm:block">
+        <Link to="/register-type" className="hidden sm:block">
           <Button>Εγγραφή</Button>
         </Link>
         <Link to="/it-support-login" className="hidden sm:block">

@@ -10,6 +10,7 @@ type RegisterData = {
   school?: string;
   classYear?: string;
   termsAccepted: boolean;
+  role?: "teacher" | "student";
 };
 
 // Τύπος χρήστη
@@ -197,18 +198,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (userData: RegisterData) => {
     try {
-      const newUser = {
-        id: Math.random().toString(36).substring(2, 15),
-        ...userData,
-        role: "student",
-      };
-
+      // Ελέγχουμε αν το email υπάρχει ήδη
       const storedUsers = localStorage.getItem("users");
       let users = [];
-
+      
       if (storedUsers) {
         users = JSON.parse(storedUsers);
+        const existingUser = users.find((u: User) => u.email === userData.email);
+        if (existingUser) {
+          return false; // Το email υπάρχει ήδη
+        }
       }
+      
+      // Καθορίζουμε τον ρόλο (αν δεν έχει καθοριστεί, ο προεπιλεγμένος είναι "student")
+      const role = userData.role || "student";
+      
+      const newUser = {
+        id: Math.random().toString(36).substring(2, 15),
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        password: userData.password,
+        role: role as "admin" | "teacher" | "student",
+      };
 
       users.push(newUser);
       localStorage.setItem("users", JSON.stringify(users));

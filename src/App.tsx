@@ -15,6 +15,8 @@ import TeacherDashboardPage from "./pages/TeacherDashboardPage";
 import SchoolRegistration from "./pages/SchoolRegistration";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import TeacherRegisterPage from "./pages/TeacherRegisterPage";
+import RegisterSelectionPage from "./pages/RegisterSelectionPage";
 import NotFound from "./pages/NotFound";
 import AboutPage from "./pages/AboutPage";
 import TermsPage from "./pages/TermsPage";
@@ -95,7 +97,9 @@ const App = () => (
             <Route path="/subject/:subjectId" element={<SubjectPage />} />
             <Route path="/quiz/:subjectId/:quizType" element={<QuizPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register-type" element={<RegisterSelectionPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/teacher-register" element={<TeacherRegisterPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />

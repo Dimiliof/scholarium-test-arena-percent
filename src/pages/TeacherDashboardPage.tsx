@@ -24,18 +24,9 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { subjectsData } from '@/lib/subjectsData';
+import { subjects, QuizQuestion } from '@/lib/subjectsData';
 
 // Ορισμός τύπων για τα δεδομένα
-interface QuizQuestion {
-  id: number;
-  question: string;
-  options?: string[];
-  answer?: string;
-  correct?: string;
-  explanation?: string;
-}
-
 interface TeacherContent {
   id: number;
   question: string;
@@ -80,7 +71,7 @@ const TeacherDashboardPage: React.FC = () => {
     try {
       let allContent: TeacherContent[] = [];
       
-      for (const subject of subjectsData) {
+      for (const subject of subjects) {
         for (const quizType of ['basic', 'intermediate', 'advanced', 'quick', 'medium', 'full']) {
           const storageKey = `quiz_${subject.id}_${quizType}`;
           const storedQuestions = localStorage.getItem(storageKey);
@@ -172,8 +163,8 @@ const TeacherDashboardPage: React.FC = () => {
   });
 
   const getSubjectName = (subjectId: string) => {
-    const subject = subjectsData.find(s => s.id === subjectId);
-    return subject ? subject.title : 'Άγνωστο';
+    const subject = subjects.find(s => s.id === subjectId);
+    return subject ? subject.name : 'Άγνωστο';
   };
 
   const getQuizTypeName = (quizType: string) => {
@@ -258,9 +249,9 @@ const TeacherDashboardPage: React.FC = () => {
         </div>
         
         <Avatar className="h-12 w-12">
-          <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'Προφίλ'} />
+          <AvatarImage src={user?.email ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}` : ''} alt={user?.email || 'Προφίλ'} />
           <AvatarFallback>
-            {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'U'}
+            {user?.email?.charAt(0) || 'U'}
           </AvatarFallback>
         </Avatar>
       </div>
@@ -299,9 +290,9 @@ const TeacherDashboardPage: React.FC = () => {
                     className="border rounded p-2"
                   >
                     <option value="all">Όλα τα μαθήματα</option>
-                    {subjectsData.map(subject => (
+                    {subjects.map(subject => (
                       <option key={subject.id} value={subject.id}>
-                        {subject.title}
+                        {subject.name}
                       </option>
                     ))}
                   </select>
@@ -497,3 +488,4 @@ const TeacherDashboardPage: React.FC = () => {
 };
 
 export default TeacherDashboardPage;
+

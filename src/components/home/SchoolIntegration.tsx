@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { School, ExternalLink, Users } from 'lucide-react';
+import { School, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const SchoolIntegration = () => {
@@ -24,7 +24,7 @@ const SchoolIntegration = () => {
       >
         <h2 className="text-2xl md:text-3xl font-bold mb-4">Σύνδεση με το Σχολείο σας</h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Η πλατφόρμα μας συνεργάζεται με το σύστημα του σχολείου σας για εύκολη πρόσβαση στο εκπαιδευτικό υλικό
+          Η πλατφόρμα μας παρέχει ολοκληρωμένες εκπαιδευτικές λύσεις για σχολεία και μαθητές
         </p>
       </motion.div>
 
@@ -37,22 +37,16 @@ const SchoolIntegration = () => {
             <div className="bg-primary/10 p-3 rounded-full mr-4">
               <School className="h-6 w-6 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold">Πρόσβαση μέσω edu4schools</h3>
+            <h3 className="text-xl font-semibold">Σχολική Υποστήριξη</h3>
           </div>
           <p className="text-gray-600 mb-6">
-            Χρησιμοποιήστε τον λογαριασμό σας στο edu4schools για άμεση πρόσβαση στην πλατφόρμα μας χωρίς επιπλέον εγγραφή.
+            Προηγμένες εκπαιδευτικές λειτουργίες και υποστήριξη για σχολεία και εκπαιδευτικούς.
           </p>
-          <a 
-            href="https://www.edu4schools.gr/Account/Login?ReturnUrl=%2FNews%2FNews%3FforSchool%3DTrue%26init%3DTrue" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center"
-          >
+          <Link to="/school-registration">
             <Button className="w-full">
-              Σύνδεση μέσω edu4schools
-              <ExternalLink className="ml-2 h-4 w-4" />
+              Εγγραφή Σχολικής Μονάδας
             </Button>
-          </a>
+          </Link>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -60,14 +54,14 @@ const SchoolIntegration = () => {
             <div className="bg-primary/10 p-3 rounded-full mr-4">
               <Users className="h-6 w-6 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold">Για Σχολικές Μονάδες</h3>
+            <h3 className="text-xl font-semibold">Για Εκπαιδευτικούς</h3>
           </div>
           <p className="text-gray-600 mb-6">
-            Είστε εκπαιδευτικός ή διευθυντής σχολείου; Εγγράψτε το σχολείο σας στην πλατφόρμα μας για πρόσβαση σε προηγμένες λειτουργίες.
+            Πρόσβαση σε προηγμένες λειτουργίες και εκπαιδευτικό υλικό για εκπαιδευτικούς.
           </p>
-          <Link to="/school-registration">
+          <Link to="/teacher-dashboard">
             <Button variant="outline" className="w-full">
-              Εγγραφή Σχολικής Μονάδας
+              Χώρος Εκπαιδευτικών
             </Button>
           </Link>
         </div>
@@ -77,7 +71,7 @@ const SchoolIntegration = () => {
         className="mt-8 text-center text-sm text-gray-500"
         variants={itemVariants}
       >
-        <p>Για οποιαδήποτε απορία ή βοήθεια με τη σύνδεση, επικοινωνήστε με την <Link to="/contact" className="text-primary hover:underline">τεχνική υποστήριξη</Link>.</p>
+        <p>Για οποιαδήποτε απορία ή βοήθεια, επικοινωνήστε με την <Link to="/contact" className="text-primary hover:underline">τεχνική υποστήριξη</Link>.</p>
       </motion.div>
     </div>
   );

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import UserMenu from "@/components/UserMenu";
-import { School, ExternalLink } from 'lucide-react';
+import { School } from 'lucide-react';
 import MobileMenu from "@/components/MobileMenu";
 
 const Header = () => {
@@ -91,20 +90,6 @@ const Header = () => {
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
-            </NavigationMenuItem>
-            
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <a 
-                  href="https://www.edu4schools.gr/Account/Login?ReturnUrl=%2FNews%2FNews%3FforSchool%3DTrue%26init%3DTrue" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className={cn(navigationMenuTriggerStyle(), "text-blue-600 hover:text-blue-700 flex items-center")}
-                >
-                  Edu4Schools
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </a>
-              </NavigationMenuLink>
             </NavigationMenuItem>
             
             <NavigationMenuItem>

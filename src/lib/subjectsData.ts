@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollText, Calculator, BookOpen, Landmark, Cross, Users, 
   FlaskConical, Atom, Leaf, Wrench, Music, Heart, Globe, Computer,
-  FileText, FileSpreadsheet, FilePresentation } from 'lucide-react';
+  FileText, FileSpreadsheet, Presentation } from 'lucide-react';
 
 export interface Subject {
   id: string;
@@ -105,7 +105,7 @@ export const sampleQuestions: Record<string, QuizQuestion[]> = {
     },
     {
       id: 3,
-      question: 'Ποια μάχη θεωρείται καθοριστική για την έκβαση ��ου Β΄ Παγκοσμίου Πολ��μου στην Ευρώπη;',
+      question: 'Ποια μάχη θεωρείται καθοριστική για την έκβαση ��ου Β΄ Πα��κοσμίου Πολ��μου στην Ευρώπη;',
       options: ['Μάχη της Αγγλίας', 'Μάχη του Στάλινγκραντ', 'Μάχη των Αρδεννών', 'Απόβαση στη Νορμανδία'],
       correctAnswer: 1
     },
@@ -443,7 +443,7 @@ export const subjects: Subject[] = [
   { 
     id: 'ecdl-powerpoint', 
     name: 'ECDL PowerPoint', 
-    icon: FilePresentation, 
+    icon: Presentation, 
     color: 'bg-orange-500',
     description: 'Παρουσιάσεις με το Microsoft PowerPoint',
     availableTests: 12,

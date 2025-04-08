@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { subjects } from '@/lib/subjectsData';
 import { motion } from "framer-motion";
-import { FileText, FileSpreadsheet, FilePresentation } from 'lucide-react';
+import { FileText, FileSpreadsheet, Presentation } from 'lucide-react';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -45,7 +45,7 @@ const Index = () => {
   const ecdlModules = [
     { id: 'ecdl-word', name: 'Word', icon: FileText, color: 'bg-blue-600' },
     { id: 'ecdl-excel', name: 'Excel', icon: FileSpreadsheet, color: 'bg-green-600' },
-    { id: 'ecdl-powerpoint', name: 'PowerPoint', icon: FilePresentation, color: 'bg-orange-500' }
+    { id: 'ecdl-powerpoint', name: 'PowerPoint', icon: Presentation, color: 'bg-orange-500' }
   ];
 
   const navigateToEcdlQuiz = (moduleId: string) => {

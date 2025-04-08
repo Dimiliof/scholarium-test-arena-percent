@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, ChevronRight, RotateCcw, Award, Clock } from 'lucide-react';
+import { Check, X, ChevronRight, RotateCcw, Award, Clock, PlayCircle, Video } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { sampleQuestions } from '@/lib/subjectsData';
@@ -21,6 +21,7 @@ const QuizDemo = () => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15); // 15 δευτερόλεπτα ανά ερώτηση
   const [carouselApi, setCarouselApi] = useState<any>(null);
+  const [showVideo, setShowVideo] = useState(false);
 
   // Επιλογή 3 τυχαίων ερωτήσεων από τα μαθηματικά
   const [questions, setQuestions] = useState(() => {
@@ -31,7 +32,7 @@ const QuizDemo = () => {
 
   // Timer για κάθε ερώτηση
   useEffect(() => {
-    if (isAnswered || isCompleted) return;
+    if (isAnswered || isCompleted || showVideo) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -45,7 +46,7 @@ const QuizDemo = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isAnswered, currentQuestion, isCompleted]);
+  }, [isAnswered, currentQuestion, isCompleted, showVideo]);
 
   // Effect για το carousel
   useEffect(() => {
@@ -89,7 +90,62 @@ const QuizDemo = () => {
     setScore(0);
     setIsCompleted(false);
     setTimeLeft(15);
+    setShowVideo(false);
   };
+
+  const toggleVideoDemo = () => {
+    setShowVideo(!showVideo);
+  };
+
+  // Βίντεο Προσομοίωσης ECDL
+  const VideoDemo = () => (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center"
+    >
+      <Card className="w-full shadow-lg border-2 border-primary/20 overflow-hidden">
+        <CardContent className="p-0">
+          <div className="aspect-video bg-black relative">
+            <iframe 
+              className="w-full h-full absolute inset-0"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&showinfo=0" 
+              title="ECDL Simulation Demo"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+            ></iframe>
+          </div>
+          <div className="p-6">
+            <h3 className="text-lg font-bold mb-2">Προσομοίωση ECDL</h3>
+            <p className="text-gray-600 mb-4">
+              Παρακολουθήστε πώς λειτουργούν οι προσομοιώσεις ECDL στην πλατφόρμα μας για τις ενότητες Word, Excel και PowerPoint.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+              <Button variant="outline" onClick={toggleVideoDemo}>
+                Δοκιμάστε το Quiz Demo
+              </Button>
+              <Button onClick={() => navigate('/subject/ecdl-word')} className="flex items-center gap-2">
+                Δοκιμάστε το ECDL
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Κώδικας ενσωμάτωσης για εξωτερικές ιστοσελίδες */}
+      <div className="mt-6 w-full max-w-xl mx-auto">
+        <h4 className="text-sm font-medium text-gray-500 mb-2">Κώδικας ενσωμάτωσης για την ιστοσελίδα σας:</h4>
+        <div className="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs">
+          <code>
+            {`<iframe width="560" height="315" src="https://www.yourwebsite.com/ecdl-demo-embed" title="ECDL Simulation Demo" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`}
+          </code>
+        </div>
+      </div>
+    </motion.div>
+  );
 
   // Προβολή αποτελεσμάτων
   if (isCompleted) {
@@ -121,7 +177,7 @@ const QuizDemo = () => {
                 />
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -129,6 +185,15 @@ const QuizDemo = () => {
                   <Button onClick={resetQuiz} variant="outline" className="flex items-center gap-2">
                     <RotateCcw className="h-4 w-4" />
                     Δοκιμάστε ξανά
+                  </Button>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button onClick={toggleVideoDemo} variant="outline" className="flex items-center gap-2">
+                    <Video className="h-4 w-4" />
+                    Δείτε το ECDL Video
                   </Button>
                 </motion.div>
                 <motion.div
@@ -148,6 +213,10 @@ const QuizDemo = () => {
     );
   }
 
+  if (showVideo) {
+    return <VideoDemo />;
+  }
+
   // Τρέχουσα ερώτηση
   const currentQ = questions[currentQuestion];
 
@@ -164,9 +233,15 @@ const QuizDemo = () => {
             <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50">
               Δοκιμαστικό Quiz
             </Badge>
-            <div className="text-sm font-semibold">
-              Ερώτηση {currentQuestion + 1} από {questions.length}
-            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="flex items-center gap-1 text-primary"
+              onClick={toggleVideoDemo}
+            >
+              <PlayCircle className="h-4 w-4" />
+              Δείτε το ECDL Video
+            </Button>
           </div>
           
           <div className="flex justify-between items-center mb-1">

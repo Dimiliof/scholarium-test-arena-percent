@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,6 +16,7 @@ import AddContentButton from '@/components/home/AddContentButton';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
 import QuizDemo from '@/components/home/QuizDemo';
 import SchoolIntegration from '@/components/home/SchoolIntegration';
+import EcdlVideoDemo from '@/components/home/EcdlVideoDemo';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -159,13 +161,19 @@ const Index = () => {
             Δοκιμάστε την πλατφόρμα μας
           </motion.h2>
           <motion.p 
-            className="text-gray-600 text-center mb-12 max-w-2xl mx-auto"
+            className="text-gray-600 text-center mb-8 max-w-2xl mx-auto"
             variants={sectionVariants}
           >
             Κάντε ένα σύντομο τεστ για να δείτε πώς λειτουργεί η εκπαιδευτική μας πλατφόρμα
           </motion.p>
-          <div className="max-w-2xl mx-auto">
-            <QuizDemo />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <div>
+              <QuizDemo />
+            </div>
+            <div>
+              <EcdlVideoDemo />
+            </div>
           </div>
         </div>
       </motion.div>

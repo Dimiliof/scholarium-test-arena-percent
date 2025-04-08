@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -43,6 +42,8 @@ import ResourcesPage from "./pages/ResourcesPage";
 import StudentCoursesPage from "./pages/student/StudentCoursesPage";
 import StudentEnrollPage from "./pages/student/StudentEnrollPage";
 import StudentResultsPage from "./pages/student/StudentResultsPage";
+
+import EcdlEmbedPage from './pages/EcdlEmbedPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -156,6 +157,8 @@ const App = () => (
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/logins" element={<AdminRoute><AdminLoginsPage /></AdminRoute>} />
             <Route path="/it-support" element={<AdminRoute><ITSupportPage /></AdminRoute>} />
+            
+            <Route path="/ecdl-demo-embed" element={<EcdlEmbedPage />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

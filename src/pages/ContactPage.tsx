@@ -92,14 +92,9 @@ const ContactPage = () => {
                 </div>
                 
                 <div>
-                  <h3 className="font-bold text-lg mb-2">Τηλέφωνο:</h3>
-                  <p>+30 210 1234567</p>
-                </div>
-
-                <div>
                   <h3 className="font-bold text-lg mb-2">WhatsApp Business:</h3>
                   <a 
-                    href="https://wa.me/+302101234567" 
+                    href="https://wa.me/+306946930288" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="text-primary hover:underline flex items-center gap-2"
@@ -107,7 +102,7 @@ const ContactPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-green-500">
                       <path d="M12.02 2C6.21 2 2 6.74 2 12c0 1.68.49 3.41 1.35 4.99L2 22l5.25-1.38c1.57.86 3.35 1.36 5.07 1.36 5.81 0 10.38-4.74 10.38-10.5C22.7 6.74 17.79 2 12.02 2zm5.81 14.12c-.25.63-1.26 1.2-1.77 1.25-.5.07-.99.35-3.25-1-2.26-1.35-3.75-3.88-3.87-4.08-.12-.2-1-1.33-1-2.54 0-1.2.62-1.8.87-2.05.25-.25.62-.38 1-.38.12 0 .25.01.37.07.12.06.27.19.42.44.18.3.62 1.08.67 1.16.06.08.1.19.03.37-.07.18-.4.74-.4.74s-.12.25.07.45c.18.2.78.79 1.58 1.28.58.4 1.08.51 1.28.59.2.07.33.06.45-.04.12-.1.42-.49.53-.66.12-.17.24-.14.42-.09.18.06 1.12.53 1.32.63.2.1.33.15.37.24.05.09.05.53-.2 1.05z"/>
                     </svg>
-                    WhatsApp
+                    Επικοινωνία μέσω WhatsApp
                   </a>
                 </div>
               </div>

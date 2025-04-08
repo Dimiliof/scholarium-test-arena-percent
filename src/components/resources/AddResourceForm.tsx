@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { subjects } from '@/lib/subjectsData';
 
 interface AddResourceFormProps {
   onSuccess: () => void;
@@ -180,14 +181,11 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
                 <SelectValue placeholder="Επιλέξτε μάθημα" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="mathematics">Μαθηματικά</SelectItem>
-                <SelectItem value="physics">Φυσική</SelectItem>
-                <SelectItem value="chemistry">Χημεία</SelectItem>
-                <SelectItem value="biology">Βιολογία</SelectItem>
-                <SelectItem value="history">Ιστορία</SelectItem>
-                <SelectItem value="literature">Λογοτεχνία</SelectItem>
-                <SelectItem value="geography">Γεωγραφία</SelectItem>
-                <SelectItem value="computer_science">Πληροφορική</SelectItem>
+                {subjects.map((subject) => (
+                  <SelectItem key={subject.id} value={subject.id}>
+                    {subject.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

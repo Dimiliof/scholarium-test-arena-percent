@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -38,8 +37,8 @@ const ResourcesPage = () => {
   const [resources] = useState<Resource[]>([
     {
       id: '1',
-      title: 'Οδηγός Μαθηματικών Α' Γυμνασίου',
-      description: 'Πλήρης οδηγός με όλη την ύλη των μαθηματικών για την Α\' Γυμνασίου, με λυμένες ασκήσεις.',
+      title: "Οδηγός Μαθηματικών Α' Γυμνασίου",
+      description: "Πλήρης οδηγός με όλη την ύλη των μαθηματικών για την Α' Γυμνασίου, με λυμένες ασκήσεις.",
       type: 'book',
       url: '/resources/math-guide-a.pdf',
       subject: 'mathematics',

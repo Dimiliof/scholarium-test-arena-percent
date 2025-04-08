@@ -21,7 +21,6 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -45,9 +44,9 @@ const formSchema = z.object({
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
-  const { toast: uiToast } = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const { register: registerUser } = useAuth();
+  const { register } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,15 +64,16 @@ const RegisterPage = () => {
     setRegisterError(null);
     
     try {
-      const success = await registerUser(
-        values.firstName,
-        values.lastName,
-        values.email,
-        values.password
-      );
+      const success = await register({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+        termsAccepted: true
+      });
       
       if (success) {
-        uiToast({
+        toast({
           title: "Επιτυχής εγγραφή",
           description: "Ο λογαριασμός σας δημιουργήθηκε επιτυχώς. Είστε τώρα συνδεδεμένοι.",
         });

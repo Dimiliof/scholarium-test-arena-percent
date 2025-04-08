@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from "react";
 
 // Τύπος δεδομένων για την εγγραφή
@@ -21,6 +22,15 @@ export type User = {
   profileImage?: string | null;
 };
 
+// Τύπος καταγραφής σύνδεσης
+export type LoginRecord = {
+  userId: string;
+  userName: string;
+  email: string;
+  role: string;
+  timestamp: number;
+};
+
 type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
@@ -31,6 +41,8 @@ type AuthContextType = {
   logout: () => void;
   updateUserProfile: (updatedUser: User) => Promise<boolean>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
+  getAllUsers: () => User[];
+  loginRecords: LoginRecord[];
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -43,6 +55,8 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   updateUserProfile: async () => false,
   changePassword: async () => false,
+  getAllUsers: () => [],
+  loginRecords: [],
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -52,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
+  const [loginRecords, setLoginRecords] = useState<LoginRecord[]>([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -61,6 +76,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(true);
       setIsAdmin(parsedUser.role === "admin");
       setIsTeacher(parsedUser.role === "teacher");
+    }
+    
+    // Φόρτωση των καταγραφών σύνδεσης
+    const storedRecords = localStorage.getItem("loginRecords");
+    if (storedRecords) {
+      setLoginRecords(JSON.parse(storedRecords));
     }
   }, []);
 
@@ -77,6 +98,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(true);
       setIsAdmin(user.role === "admin");
       setIsTeacher(user.role === "teacher");
+      
+      // Καταγραφή της σύνδεσης
+      const loginRecord: LoginRecord = {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        role: user.role,
+        timestamp: Date.now(),
+      };
+      
+      const records = [...loginRecords, loginRecord];
+      setLoginRecords(records);
+      localStorage.setItem("loginRecords", JSON.stringify(records));
+      
       return true;
     }
 
@@ -178,6 +213,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
   };
+  
+  // Λήψη όλων των χρηστών (για διαχειριστές)
+  const getAllUsers = () => {
+    const storedUsers = localStorage.getItem("users");
+    if (!storedUsers) return [];
+    
+    return JSON.parse(storedUsers);
+  };
 
   return (
     <AuthContext.Provider
@@ -190,7 +233,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         logout,
         updateUserProfile,
-        changePassword
+        changePassword,
+        getAllUsers,
+        loginRecords
       }}
     >
       {children}

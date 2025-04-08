@@ -9,5 +9,26 @@ linkPreconnect.rel = 'preconnect';
 linkPreconnect.href = window.location.origin;
 document.head.appendChild(linkPreconnect);
 
+// Add Open Graph meta data for better sharing
+const updateMetaTags = () => {
+  // Update title tag if needed
+  document.title = "EduPercentage Εκπαιδευτική Πλατφόρμα Προσομοιώσεων και Test";
+  
+  // Ensure Open Graph meta tags are updated
+  const ogTitleMeta = document.querySelector('meta[property="og:title"]');
+  if (ogTitleMeta) {
+    ogTitleMeta.setAttribute('content', 'EduPercentage Εκπαιδευτική Πλατφόρμα Προσομοιώσεων και Test');
+  }
+  
+  // Ensure Twitter meta tags are updated
+  const twitterTitleMeta = document.querySelector('meta[name="twitter:title"]');
+  if (twitterTitleMeta) {
+    twitterTitleMeta.setAttribute('content', 'EduPercentage Εκπαιδευτική Πλατφόρμα Προσομοιώσεων και Test');
+  }
+};
+
+// Update meta tags on app initialization
+updateMetaTags();
+
 // Mount app with optimized rendering
 createRoot(document.getElementById("root")!).render(<App />);

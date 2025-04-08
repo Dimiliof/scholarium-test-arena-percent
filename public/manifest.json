@@ -1,0 +1,25 @@
+
+{
+  "name": "EduPercentage",
+  "short_name": "EduPercentage",
+  "description": "Εκπαιδευτική πλατφόρμα προσομοιώσεων και τεστ για όλα τα σχολικά μαθήματα",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

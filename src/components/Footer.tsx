@@ -52,7 +52,6 @@ const Footer = () => {
             <h3 className="font-bold text-lg mb-4">Επικοινωνία</h3>
             <ul className="space-y-2 text-sm">
               <li className="text-gray-600">Email: <a href="mailto:dimitris.liofis@atsoglou.gr" className="text-primary hover:underline">dimitris.liofis@atsoglou.gr</a></li>
-              <li className="text-gray-600">Τηλέφωνο: +30 210 1234567</li>
             </ul>
           </div>
         </div>

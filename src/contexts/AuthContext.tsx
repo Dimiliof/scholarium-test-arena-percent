@@ -67,8 +67,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
+        
+        // Βεβαιωνόμαστε ότι ο χρήστης έχει ρόλο, και αν όχι, προσθέτουμε τον προεπιλεγμένο
+        if (!parsedUser.role) {
+          parsedUser.role = "student";
+          localStorage.setItem("user", JSON.stringify(parsedUser));
+        }
+        
         setUser(parsedUser);
         setIsAuthenticated(true);
+        
+        console.log("Φορτώθηκε ο χρήστης από το localStorage:", parsedUser);
       } catch (error) {
         console.error("Σφάλμα ανάλυσης αποθηκευμένου χρήστη:", error);
         localStorage.removeItem("user");
@@ -145,6 +154,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           localStorage.setItem("users", JSON.stringify(updatedUsers));
         }
         
+        console.log("Σύνδεση επιτυχής. Ρόλος χρήστη:", userWithoutPassword.role);
+        
         setUser(userWithoutPassword);
         setIsAuthenticated(true);
         localStorage.setItem("user", JSON.stringify(userWithoutPassword));
@@ -193,6 +204,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         password,
         role,
       };
+
+      console.log("Δημιουργία νέου χρήστη με ρόλο:", role);
 
       // Αποθήκευση στη λίστα χρηστών
       users.push(newUser);

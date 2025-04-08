@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, LogOut, Settings, Book, BookPlus, School, PlusCircle, Users, Shield, Wrench } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const UserMenu = () => {
   const { user, isAuthenticated, isAdmin, isTeacher, logout } = useAuth();
@@ -38,6 +39,36 @@ const UserMenu = () => {
     if (!user) return "??";
     return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
   };
+  
+  // Λεξικό για την απόδοση των ρόλων στα ελληνικά
+  const getRoleBadge = () => {
+    if (!user) return null;
+    
+    let color = "";
+    let label = "";
+    
+    switch (user.role) {
+      case "admin":
+        color = "bg-red-500";
+        label = "Διαχειριστής";
+        break;
+      case "teacher":
+        color = "bg-blue-500";
+        label = "Εκπαιδευτικός";
+        break;
+      default:
+        color = "bg-green-500";
+        label = "Μαθητής";
+    }
+    
+    return (
+      <Badge 
+        className={`${color} text-white text-xs absolute -bottom-1 -right-1 px-1 rounded-sm`}
+      >
+        {label}
+      </Badge>
+    );
+  };
 
   return (
     <DropdownMenu>
@@ -47,6 +78,7 @@ const UserMenu = () => {
             <AvatarImage src="" />
             <AvatarFallback>{getInitials()}</AvatarFallback>
           </Avatar>
+          {getRoleBadge()}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">

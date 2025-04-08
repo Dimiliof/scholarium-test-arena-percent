@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Loader2, Mail } from "lucide-react";
+import { AlertCircle, Loader2, Mail, User } from "lucide-react";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -55,10 +55,26 @@ const LoginPage = () => {
       const success = await login(values.email, values.password);
       
       if (success) {
-        uiToast({
-          title: "Επιτυχής σύνδεση",
-          description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
-        });
+        // Παίρνουμε το χρήστη από το localStorage
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          const roleText = user.role === "teacher" ? "Εκπαιδευτικός" : 
+                         user.role === "admin" ? "Διαχειριστής" : "Μαθητής";
+          
+          uiToast({
+            title: "Επιτυχής σύνδεση",
+            description: `Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά. Συνδεθήκατε ως ${roleText}.`,
+          });
+          
+          toast.success(`Συνδεθήκατε ως ${roleText}`);
+        } else {
+          uiToast({
+            title: "Επιτυχής σύνδεση",
+            description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
+          });
+        }
+        
         navigate("/");
       } else {
         setLoginError("Λάθος email ή κωδικός πρόσβασης. Παρακαλώ προσπαθήστε ξανά.");

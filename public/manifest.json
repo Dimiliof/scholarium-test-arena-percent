@@ -3,12 +3,35 @@
   "name": "EduPercentage",
   "short_name": "EduPercentage",
   "description": "Εκπαιδευτική πλατφόρμα προσομοιώσεων και τεστ για όλα τα σχολικά μαθήματα",
+  "id": "/",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f46e5",
   "orientation": "portrait-primary",
   "prefer_related_applications": false,
+  "categories": ["education", "productivity", "utilities"],
+  "screenshots": [
+    {
+      "src": "/logo.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Αρχική οθόνη της εφαρμογής EduPercentage"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ασκήσεις",
+      "url": "/quiz",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Εκπαιδευτικό Υλικό",
+      "url": "/resources",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    }
+  ],
   "icons": [
     {
       "src": "/logo.png",
@@ -21,6 +44,17 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=app.eduPercentage",
+      "id": "app.eduPercentage"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/eduPercentage/id1234567890"
     }
   ]
 }

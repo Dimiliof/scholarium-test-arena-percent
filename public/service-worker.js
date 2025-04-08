@@ -1,14 +1,15 @@
 
 // Service worker για την εφαρμογή EduPercentage PWA
 
-const CACHE_NAME = 'eduPercentage-v2';
+const CACHE_NAME = 'eduPercentage-v3';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
   '/logo.png',
   '/src/index.css',
-  '/src/main.tsx'
+  '/src/main.tsx',
+  '/lovable-uploads/c9f693b7-586d-4d3d-b6c2-c494a723965d.png' // Προσθήκη της νέας εικόνας
 ];
 
 // Εγκατάσταση Service Worker
@@ -52,7 +53,15 @@ self.addEventListener('fetch', event => {
 
             return response;
           }
-        );
+        ).catch(() => {
+          // Αν υπάρχει σφάλμα στο fetch, επιστρέφουμε μια σελίδα offline
+          // ή συνεχίζουμε κανονικά αν δεν μπορούμε να ανακτήσουμε την σελίδα
+          if (event.request.mode === 'navigate') {
+            return caches.match('/');
+          }
+          // Για άλλα αιτήματα, επιστρέφουμε κενή απάντηση
+          return new Response();
+        });
       })
   );
 });
@@ -74,5 +83,29 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => self.clients.claim()) // Παίρνει τον έλεγχο αμέσως σε όλα τα ανοιχτά παράθυρα
+  );
+});
+
+// Διαχείριση push notifications
+self.addEventListener('push', event => {
+  if (event.data) {
+    const data = event.data.json();
+    const options = {
+      body: data.body,
+      icon: '/logo.png',
+      badge: '/logo.png'
+    };
+    
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  }
+});
+
+// Διαχείριση κλικ στις ειδοποιήσεις
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow('/')
   );
 });

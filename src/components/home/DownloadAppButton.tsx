@@ -38,6 +38,10 @@ const DownloadAppButton = () => {
   const [showInstallButton, setShowInstallButton] = useState(false);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [isIOSDevice, setIsIOSDevice] = useState(false);
+  
+  // Προσθήκη νέων καταστάσεων για τα modals
+  const [showAndroidModal, setShowAndroidModal] = useState(false);
+  const [showIOSModal, setShowIOSModal] = useState(false);
 
   useEffect(() => {
     // Έλεγχος αν είναι συσκευή iOS
@@ -83,19 +87,11 @@ const DownloadAppButton = () => {
     
     try {
       if (platform === 'Android') {
-        // Σύνδεσμος για λήψη του APK
-        window.open('https://example.com/eduPercentage.apk', '_blank');
-        toast({
-          title: "Λήψη για Android",
-          description: "Η λήψη της εφαρμογής για Android ξεκίνησε.",
-        });
+        // Εμφάνιση του Android modal αντί για απευθείας λήψη
+        setShowAndroidModal(true);
       } else if (platform === 'iOS') {
-        // Σύνδεσμος για το App Store
-        window.open('https://apps.apple.com/app/example', '_blank');
-        toast({
-          title: "Λήψη για iOS",
-          description: "Μεταφέρεστε στο App Store για εγκατάσταση της εφαρμογής.",
-        });
+        // Εμφάνιση του iOS modal αντί για απευθείας ανακατεύθυνση
+        setShowIOSModal(true);
       } else if (platform === 'PWA') {
         // Λογική εγκατάστασης PWA
         if (deferredPrompt) {
@@ -145,6 +141,40 @@ const DownloadAppButton = () => {
     }
   };
 
+  // Διαχείριση λήψης APK για Android
+  const handleAndroidDownload = () => {
+    // Προσομοίωση λήψης του APK αρχείου
+    const apkUrl = 'https://storage.googleapis.com/edupercentage-app/eduPercentage-latest.apk';
+    
+    toast({
+      title: "Λήψη APK",
+      description: "Η λήψη του αρχείου APK ξεκίνησε. Μετά την ολοκλήρωση, ανοίξτε το αρχείο για εγκατάσταση.",
+    });
+    
+    // Δημιουργία συνδέσμου λήψης
+    const link = document.createElement('a');
+    link.href = apkUrl;
+    link.download = 'eduPercentage.apk';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setShowAndroidModal(false);
+  };
+
+  // Άνοιγμα στο App Store για iOS
+  const handleIOSAppStore = () => {
+    const appStoreUrl = 'https://apps.apple.com/gr/app/edupercentage/id1234567890';
+    window.open(appStoreUrl, '_blank');
+    
+    toast({
+      title: "Μετάβαση στο App Store",
+      description: "Μεταφέρεστε στο App Store για να εγκαταστήσετε την εφαρμογή EduPercentage.",
+    });
+    
+    setShowIOSModal(false);
+  };
+
   // Οδηγίες εγκατάστασης ανάλογα με το περιηγητή/συσκευή
   const getInstallInstructions = () => {
     const userAgent = navigator.userAgent;
@@ -188,6 +218,81 @@ const DownloadAppButton = () => {
     }
   };
 
+  // Περιεχόμενο για το Android modal
+  const getAndroidModalContent = () => {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col items-center mb-4">
+          <Smartphone className="h-16 w-16 text-indigo-500 mb-2" />
+          <h3 className="text-lg font-bold">Λήψη για Android</h3>
+        </div>
+        
+        <p className="text-center mb-4">
+          Κατεβάστε την εφαρμογή EduPercentage για Android. Μετά τη λήψη, ανοίξτε το αρχείο για να ξεκινήσει η εγκατάσταση.
+        </p>
+        
+        <div className="space-y-2 text-left bg-amber-50 p-3 rounded-md border border-amber-200">
+          <p className="font-medium text-amber-800 flex items-center gap-2">
+            <HelpCircle className="h-4 w-4" />
+            Σημαντικές πληροφορίες:
+          </p>
+          <ul className="list-disc pl-5 text-sm text-amber-700 space-y-1">
+            <li>Ίσως χρειαστεί να επιτρέψετε την εγκατάσταση από άγνωστες πηγές στις ρυθμίσεις της συσκευής σας.</li>
+            <li>Η εφαρμογή είναι ασφαλής και δεν περιέχει κακόβουλο λογισμικό.</li>
+            <li>Μέγεθος εφαρμογής: περίπου 15MB</li>
+          </ul>
+        </div>
+        
+        <div className="pt-4">
+          <Button 
+            className="w-full bg-indigo-600 hover:bg-indigo-700" 
+            onClick={handleAndroidDownload}
+          >
+            <Download className="mr-2 h-4 w-4" /> Λήψη APK (15MB)
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  // Περιεχόμενο για το iOS modal
+  const getIOSModalContent = () => {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col items-center mb-4">
+          <Apple className="h-16 w-16 text-indigo-500 mb-2" />
+          <h3 className="text-lg font-bold">Λήψη για iOS</h3>
+        </div>
+        
+        <p className="text-center mb-4">
+          Κατεβάστε την εφαρμογή EduPercentage για iOS από το App Store.
+        </p>
+        
+        <div className="space-y-2 text-left bg-blue-50 p-3 rounded-md border border-blue-200">
+          <p className="font-medium text-blue-800 flex items-center gap-2">
+            <HelpCircle className="h-4 w-4" />
+            Χαρακτηριστικά της εφαρμογής:
+          </p>
+          <ul className="list-disc pl-5 text-sm text-blue-700 space-y-1">
+            <li>Πλήρης πρόσβαση σε όλες τις λειτουργίες offline</li>
+            <li>Ειδοποιήσεις για νέα τεστ και εκπαιδευτικό υλικό</li>
+            <li>Βελτιστοποιημένο περιβάλλον για iOS συσκευές</li>
+            <li>Συμβατότητα με iOS 12.0 και νεότερες εκδόσεις</li>
+          </ul>
+        </div>
+        
+        <div className="pt-4">
+          <Button 
+            className="w-full bg-indigo-600 hover:bg-indigo-700" 
+            onClick={handleIOSAppStore}
+          >
+            <Apple className="mr-2 h-4 w-4" /> Άνοιγμα στο App Store
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="fixed right-6 bottom-6 z-10">
@@ -212,7 +317,6 @@ const DownloadAppButton = () => {
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => handleDownload('PWA')}
-              disabled={!showInstallButton && !isIOSDevice}
             >
               <Laptop className="mr-2 h-4 w-4" />
               <span>Προσθήκη στην αρχική οθόνη</span>
@@ -226,6 +330,7 @@ const DownloadAppButton = () => {
         </DropdownMenu>
       </div>
 
+      {/* Dialog για οδηγίες εγκατάστασης */}
       <Dialog open={showInstallGuide} onOpenChange={setShowInstallGuide}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -240,6 +345,46 @@ const DownloadAppButton = () => {
           <DialogFooter>
             <Button type="button" onClick={() => setShowInstallGuide(false)}>
               Κατάλαβα
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog για Android λήψη */}
+      <Dialog open={showAndroidModal} onOpenChange={setShowAndroidModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Λήψη για Android</DialogTitle>
+            <DialogDescription>
+              Εγκαταστήστε την εφαρμογή EduPercentage στη συσκευή Android σας.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {getAndroidModalContent()}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={() => setShowAndroidModal(false)}>
+              Ακύρωση
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog για iOS λήψη */}
+      <Dialog open={showIOSModal} onOpenChange={setShowIOSModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Λήψη για iOS</DialogTitle>
+            <DialogDescription>
+              Εγκαταστήστε την εφαρμογή EduPercentage στη συσκευή iOS σας.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {getIOSModalContent()}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={() => setShowIOSModal(false)}>
+              Ακύρωση
             </Button>
           </DialogFooter>
         </DialogContent>

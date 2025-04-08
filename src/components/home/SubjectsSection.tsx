@@ -151,6 +151,16 @@ interface SubjectsSectionProps {
 const SubjectsSection: React.FC<SubjectsSectionProps> = ({ subjects, isAuthenticated }) => {
   const [selectedSubject, setSelectedSubject] = useState('all');
 
+  const navigateToSubject = (subjectId: string) => {
+    if (subjectId === 'all') {
+      // When 'all' is selected, just update the state
+      setSelectedSubject(subjectId);
+    } else {
+      // For specific subjects, update state and allow the Link to navigate
+      setSelectedSubject(subjectId);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-12">
       <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
@@ -159,40 +169,52 @@ const SubjectsSection: React.FC<SubjectsSectionProps> = ({ subjects, isAuthentic
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {subjectsList.map((subject) => (
-          <Button
+          <Link 
             key={subject.id}
-            variant="outline"
-            className={cn(
-              "w-full flex flex-col items-center justify-center space-y-2 h-32 transition-all duration-300",
-              subject.id === 'all' 
-                ? "bg-blue-500 text-white hover:bg-blue-600 border-0"
-                : selectedSubject === subject.id 
-                  ? `${subject.color} text-white hover:opacity-90` 
-                  : "bg-white border hover:border-primary"
-            )}
-            onClick={() => setSelectedSubject(subject.id)}
+            to={subject.id === 'all' ? '/' : `/subject/${subject.id}`}
+            className="w-full"
+            onClick={(e) => {
+              if (subject.id === 'all') {
+                e.preventDefault();
+                navigateToSubject(subject.id);
+              } else {
+                navigateToSubject(subject.id);
+              }
+            }}
           >
-            {subject.id === 'all' ? (
-              <div className="flex flex-col items-center justify-center">
-                <subject.icon className="h-8 w-8 mb-4 text-white" />
-                <span className="text-lg font-medium text-center text-white">
-                  {subject.name}
-                </span>
-              </div>
-            ) : (
-              <>
-                <subject.icon 
-                  className={cn(
-                    "h-7 w-7", 
-                    selectedSubject === subject.id ? "text-white" : subject.color
-                  )} 
-                />
-                <span className="text-sm font-medium text-center">
-                  {subject.name}
-                </span>
-              </>
-            )}
-          </Button>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full flex flex-col items-center justify-center space-y-2 h-32 transition-all duration-300",
+                subject.id === 'all' 
+                  ? "bg-blue-500 text-white hover:bg-blue-600 border-0"
+                  : selectedSubject === subject.id 
+                    ? `${subject.color} text-white hover:opacity-90` 
+                    : "bg-white border hover:border-primary"
+              )}
+            >
+              {subject.id === 'all' ? (
+                <div className="flex flex-col items-center justify-center">
+                  <subject.icon className="h-8 w-8 mb-4 text-white" />
+                  <span className="text-lg font-medium text-center text-white">
+                    {subject.name}
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <subject.icon 
+                    className={cn(
+                      "h-7 w-7", 
+                      selectedSubject === subject.id ? "text-white" : subject.color
+                    )} 
+                  />
+                  <span className="text-sm font-medium text-center">
+                    {subject.name}
+                  </span>
+                </>
+              )}
+            </Button>
+          </Link>
         ))}
       </div>
     </div>

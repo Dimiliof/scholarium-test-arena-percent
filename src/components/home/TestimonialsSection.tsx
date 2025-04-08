@@ -6,6 +6,15 @@ import {
   Card, 
   CardContent
 } from '@/components/ui/card';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type Testimonial = {
   id: number;
@@ -87,36 +96,67 @@ const TestimonialsSection = () => {
           Δείτε τι λένε μαθητές γυμνασίου, εκπαιδευτικοί και γονείς για την εκπαιδευτική μας πλατφόρμα
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Εμφάνιση του grid για μεγάλες οθόνες */}
+        <div className="hidden lg:grid lg:grid-cols-4 gap-6">
           {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="hover-scale">
-              <CardContent className="p-6">
-                <div className="flex items-start mb-4">
-                  <Avatar className="h-10 w-10">
-                    {testimonial.avatar ? (
-                      <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-                    ) : null}
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {testimonial.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="ml-3">
-                    <p className="font-semibold">{testimonial.name}</p>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
-                  </div>
-                </div>
-                <p className="text-gray-700 italic">"{testimonial.content}"</p>
-                <div className="mt-4">
-                  <Badge variant="outline" className={getBadgeColor(testimonial.type)}>
-                    {getTypeLabel(testimonial.type)}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
           ))}
+        </div>
+
+        {/* Carousel για μικρές και μεσαίες οθόνες */}
+        <div className="lg:hidden">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              {testimonials.map((testimonial) => (
+                <CarouselItem key={testimonial.id} className="md:basis-1/2 pl-4">
+                  <TestimonialCard testimonial={testimonial} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center gap-2 mt-6">
+              <CarouselPrevious className="relative static left-0 right-auto translate-y-0" />
+              <CarouselNext className="relative static right-0 left-auto translate-y-0" />
+            </div>
+          </Carousel>
         </div>
       </div>
     </div>
+  );
+};
+
+// Δημιουργία ξεχωριστού component για την κάρτα μαρτυρίας
+const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
+  return (
+    <Card className="hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+      <CardContent className="p-6">
+        <div className="flex items-start mb-4">
+          <Avatar className="h-10 w-10">
+            {testimonial.avatar ? (
+              <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
+            ) : null}
+            <AvatarFallback className="bg-primary text-primary-foreground">
+              {testimonial.initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="ml-3">
+            <p className="font-semibold">{testimonial.name}</p>
+            <p className="text-sm text-gray-500">{testimonial.role}</p>
+          </div>
+        </div>
+        <p className="text-gray-700 italic">"{testimonial.content}"</p>
+        <div className="mt-4">
+          <Badge variant="outline" className={getBadgeColor(testimonial.type)}>
+            {getTypeLabel(testimonial.type)}
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

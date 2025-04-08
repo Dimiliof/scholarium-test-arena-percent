@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 
@@ -46,7 +45,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-300 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-600 text-sm">© 2025 ΕκπαιδευτικήΓωνιά. Με επιφύλαξη παντός δικαιώματος.</p>
+          <p className="text-gray-600 text-sm">© 2025 Liofis Dimitrios, MsC IT support. Με επιφύλαξη παντός δικαιώματος.</p>
           <div className="flex items-center mt-4 md:mt-0">
             <span className="text-gray-600 text-sm flex items-center">
               Φτιαγμένο με <Heart className="h-4 w-4 text-red-500 mx-1" /> για την εκπαίδευση

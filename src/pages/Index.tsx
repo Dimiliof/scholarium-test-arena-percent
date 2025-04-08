@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Separator } from '@/components/ui/separator';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,6 +20,13 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      
+      {/* Public School Banner */}
+      <div className="bg-green-100 py-3 text-center">
+        <p className="text-green-800 font-medium">
+          Δωρεάν εκπαιδευτική πλατφόρμα διαθέσιμη για όλα τα σχολεία της Ελλάδας
+        </p>
+      </div>
       
       {/* Hero Section */}
       <div className="gradient-bg text-white py-16 md:py-24">
@@ -118,6 +127,20 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-bold mb-3">Παντού και Πάντα</h3>
               <p className="text-gray-600">Πρόσβαση από όλες τις συσκευές, οποιαδήποτε στιγμή, ακόμα και εκτός σύνδεσης</p>
+            </div>
+          </div>
+          
+          <div className="mt-12 text-center">
+            <div className="inline-block bg-green-50 border border-green-200 rounded-lg p-6 max-w-3xl">
+              <h3 className="text-xl font-bold mb-3 text-green-800">Για Εκπαιδευτικούς & Σχολεία</h3>
+              <p className="text-gray-700 mb-4">
+                Η πλατφόρμα μας είναι διαθέσιμη δωρεάν για όλα τα σχολεία. 
+                Οι εκπαιδευτικοί μπορούν να προσθέσουν το δικό τους εκπαιδευτικό υλικό 
+                και να παρακολουθούν την πρόοδο των μαθητών τους.
+              </p>
+              <Button variant="outline" className="bg-green-600 text-white hover:bg-green-700 border-0">
+                Εγγραφή Σχολείου
+              </Button>
             </div>
           </div>
         </div>

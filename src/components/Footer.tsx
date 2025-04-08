@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 
@@ -11,6 +12,9 @@ const Footer = () => {
             <p className="text-gray-600 text-sm">
               Η εκπαιδευτική πλατφόρμα για μαθητές όλων των ηλικιών 
               που προσφέρει προσομοιώσεις και τεστ για όλα τα μαθήματα.
+            </p>
+            <p className="text-gray-600 text-sm mt-2 font-semibold">
+              Δημόσια πλατφόρμα διαθέσιμη για όλα τα σχολεία.
             </p>
           </div>
           
@@ -51,6 +55,9 @@ const Footer = () => {
               Φτιαγμένο με <Heart className="h-4 w-4 text-red-500 mx-1" /> για την εκπαίδευση
             </span>
           </div>
+        </div>
+        <div className="text-center mt-4">
+          <p className="text-gray-600 text-sm">Δωρεάν διάθεση για χρήση από όλα τα σχολεία της επικράτειας.</p>
         </div>
       </div>
     </footer>

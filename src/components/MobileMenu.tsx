@@ -10,7 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Menu, School } from 'lucide-react';
+import { Menu, School, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const MobileMenu = () => {
@@ -44,6 +44,18 @@ const MobileMenu = () => {
             <Link to="/resources" className="text-lg font-medium hover:text-primary">
               Εκπαιδευτικοί Πόροι
             </Link>
+            
+            {/* Σύνδεση edu4schools */}
+            <a 
+              href="https://www.edu4schools.gr/Account/Login?ReturnUrl=%2FNews%2FNews%3FforSchool%3DTrue%26init%3DTrue" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-lg font-medium text-blue-600 hover:text-blue-800 flex items-center"
+            >
+              <span>Edu4Schools</span>
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </a>
+            
             <div className="pt-2 pb-2">
               <p className="text-sm font-semibold text-muted-foreground mb-2">Μαθήματα</p>
               <div className="pl-2 flex flex-col space-y-2">

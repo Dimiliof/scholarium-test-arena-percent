@@ -14,6 +14,7 @@ import HomeCallToAction from '@/components/home/HomeCallToAction';
 import AddContentButton from '@/components/home/AddContentButton';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
 import QuizDemo from '@/components/home/QuizDemo';
+import SchoolIntegration from '@/components/home/SchoolIntegration';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -71,6 +72,19 @@ const Index = () => {
         isAuthenticated={isAuthenticated} 
       />
       <HomeFeaturesList />
+      
+      {/* School Integration Section */}
+      <motion.div 
+        className="py-12 bg-gradient-to-r from-blue-50 to-indigo-50"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <div className="container mx-auto px-4">
+          <SchoolIntegration />
+        </div>
+      </motion.div>
       
       {/* Quiz Demo Section */}
       <motion.div 

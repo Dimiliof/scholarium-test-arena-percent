@@ -90,7 +90,7 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
           url: resource.url || (resource.file ? URL.createObjectURL(resource.file) : ''),
           subject: resource.subject,
           gradeLevel: resource.gradeLevel,
-          authorName: user?.name || 'Ανώνυμος Εκπαιδευτικός',
+          authorName: user ? `${user.firstName} ${user.lastName}` : 'Ανώνυμος Εκπαιδευτικός',
           authorEmail: user?.email || '',
           dateAdded: new Date().toISOString().split('T')[0],
           downloads: 0

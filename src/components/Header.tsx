@@ -30,6 +30,9 @@ const Header = () => {
           <Link to="/" className="text-gray-700 hover:text-primary transition-colors font-medium">
             Αρχική
           </Link>
+          <Link to="/add-content" className="text-gray-700 hover:text-primary transition-colors font-medium">
+            Προσθήκη Υλικού
+          </Link>
           <Link to="/school-registration" className="text-gray-700 hover:text-primary transition-colors font-medium">
             Εγγραφή Σχολείου
           </Link>
@@ -64,6 +67,13 @@ const Header = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               Αρχική
+            </Link>
+            <Link 
+              to="/add-content" 
+              className="text-gray-700 hover:text-primary transition-colors font-medium py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Προσθήκη Υλικού
             </Link>
             <Link 
               to="/school-registration" 

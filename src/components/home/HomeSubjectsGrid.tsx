@@ -112,7 +112,7 @@ const HomeSubjectsGrid = ({ subjects, isAuthenticated }: HomeSubjectsGridProps) 
     );
   }
   
-  // Περνάμε το isAuthenticated στο SubjectsSection για να ελέγξουμε τι θα εμφανίσουμε
+  // Changed this line to pass the props correctly to SubjectsSection
   return <SubjectsSection subjects={subjects} isAuthenticated={isAuthenticated} />;
 };
 

@@ -4,14 +4,16 @@ import { Link } from 'react-router-dom';
 import { 
   BookOpen, 
   Book, 
-  Flask, 
+  FlaskConical, 
   ScrollText, 
   Landmark, 
   Code 
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Subject } from '@/lib/subjectsData';
 
+// Updated the list to use FlaskConical instead of Flask
 const subjectsList = [
   { 
     id: 'all', 
@@ -34,7 +36,7 @@ const subjectsList = [
   { 
     id: 'physics', 
     name: 'Φυσική', 
-    icon: Flask, 
+    icon: FlaskConical, 
     color: 'bg-red-500' 
   },
   { 
@@ -51,7 +53,12 @@ const subjectsList = [
   }
 ];
 
-const SubjectsSection = () => {
+interface SubjectsSectionProps {
+  subjects?: Subject[];
+  isAuthenticated?: boolean;
+}
+
+const SubjectsSection: React.FC<SubjectsSectionProps> = ({ subjects, isAuthenticated }) => {
   const [selectedSubject, setSelectedSubject] = useState('all');
 
   return (

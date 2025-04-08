@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -52,7 +51,6 @@ const Index = () => {
     navigate(`/quiz/${moduleId}/basic`);
   };
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -85,7 +83,6 @@ const Index = () => {
         isAuthenticated={isAuthenticated} 
       />
       
-      {/* ECDL Simulation Section */}
       <motion.div 
         className="py-12 bg-gradient-to-r from-gray-50 to-gray-100"
         variants={sectionVariants}
@@ -135,7 +132,6 @@ const Index = () => {
       
       <HomeFeaturesList />
       
-      {/* School Integration Section */}
       <motion.div 
         className="py-12 bg-gradient-to-r from-blue-50 to-indigo-50"
         variants={sectionVariants}
@@ -148,7 +144,6 @@ const Index = () => {
         </div>
       </motion.div>
       
-      {/* Quiz Demo Section */}
       <motion.div 
         className="py-16 bg-gray-50"
         variants={sectionVariants}

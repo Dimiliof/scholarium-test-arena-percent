@@ -167,6 +167,7 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
                 <SelectItem value="book">Βιβλίο</SelectItem>
                 <SelectItem value="video">Βίντεο</SelectItem>
                 <SelectItem value="link">Σύνδεσμος</SelectItem>
+                <SelectItem value="development">Ανάπτυξη</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -213,17 +214,22 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
           </div>
         </div>
         
-        {resource.type === 'link' ? (
+        {resource.type === 'link' || resource.type === 'development' ? (
           <div>
-            <Label htmlFor="url">URL Συνδέσμου</Label>
+            <Label htmlFor="url">URL {resource.type === 'link' ? 'Συνδέσμου' : 'Περιβάλλοντος Ανάπτυξης'}</Label>
             <Input
               id="url"
               name="url"
               type="url"
               value={resource.url}
               onChange={handleChange}
-              placeholder="https://example.com/resource"
+              placeholder={resource.type === 'link' ? "https://example.com/resource" : "https://github.com/username/repository"}
             />
+            {resource.type === 'development' && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Εισάγετε το URL του repository ή του περιβάλλοντος ανάπτυξης (π.χ. GitHub, CodeSandbox, Repl.it)
+              </p>
+            )}
           </div>
         ) : (
           <div>

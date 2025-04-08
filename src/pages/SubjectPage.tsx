@@ -1,4 +1,3 @@
-
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Header from '@/components/Header';
@@ -7,10 +6,102 @@ import { subjects } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, ClipboardCheck, Award, ChevronLeft } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { 
+  Table, 
+  TableBody, 
+  TableCaption, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+
+type LeaderboardStudent = {
+  id: number;
+  name: string;
+  avatarUrl?: string;
+  score: number;
+  completedTests: number;
+  lastActivity: string;
+};
+
+const mockLeaderboardData: LeaderboardStudent[] = [
+  {
+    id: 1,
+    name: "Μαρία Παπαδοπούλου",
+    score: 98,
+    completedTests: 15,
+    lastActivity: "23/04/2025"
+  },
+  {
+    id: 2,
+    name: "Γιώργος Αντωνίου",
+    score: 95,
+    completedTests: 12,
+    lastActivity: "22/04/2025"
+  },
+  {
+    id: 3,
+    name: "Ελένη Δημητρίου",
+    score: 92,
+    completedTests: 14,
+    lastActivity: "21/04/2025"
+  },
+  {
+    id: 4,
+    name: "Νίκος Γεωργίου",
+    score: 90,
+    completedTests: 13,
+    lastActivity: "20/04/2025"
+  },
+  {
+    id: 5,
+    name: "Σοφία Αλεξίου",
+    score: 87,
+    completedTests: 11,
+    lastActivity: "19/04/2025"
+  },
+  {
+    id: 6,
+    name: "Δημήτρης Βασιλείου",
+    score: 85,
+    completedTests: 10,
+    lastActivity: "18/04/2025"
+  },
+  {
+    id: 7,
+    name: "Αναστασία Κωνσταντίνου",
+    score: 82,
+    completedTests: 9,
+    lastActivity: "17/04/2025"
+  },
+  {
+    id: 8,
+    name: "Χρήστος Παπαδόπουλος",
+    score: 78,
+    completedTests: 8,
+    lastActivity: "16/04/2025"
+  },
+  {
+    id: 9,
+    name: "Κατερίνα Ιωάννου",
+    score: 76,
+    completedTests: 7,
+    lastActivity: "15/04/2025"
+  },
+  {
+    id: 10,
+    name: "Αντώνης Μιχαηλίδης",
+    score: 72,
+    completedTests: 6,
+    lastActivity: "14/04/2025"
+  }
+];
 
 const SubjectPage = () => {
   const { subjectId } = useParams<{ subjectId: string }>();
@@ -58,11 +149,24 @@ const SubjectPage = () => {
     (() => <span className="text-white text-3xl">?</span>)
     : () => null;
 
+  const getRankIcon = (position: number) => {
+    if (position === 0) return <Trophy className="h-5 w-5 text-amber-500" />;
+    if (position === 1) return <Medal className="h-5 w-5 text-gray-400" />;
+    if (position === 2) return <Medal className="h-5 w-5 text-amber-700" />;
+    return null;
+  };
+
+  const getScoreTextColor = (score: number) => {
+    if (score >= 90) return "text-green-600 font-bold";
+    if (score >= 80) return "text-blue-600 font-medium";
+    if (score >= 70) return "text-amber-600";
+    return "text-gray-600";
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      {/* Subject Header */}
       <div className={`${subject?.color} py-10 text-white`}>
         <div className="container mx-auto px-4">
           <Link to="/" className="inline-flex items-center text-white/80 hover:text-white mb-6">
@@ -82,13 +186,13 @@ const SubjectPage = () => {
         </div>
       </div>
       
-      {/* Tabs */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" onValueChange={setActiveTab} value={activeTab}>
-          <TabsList className="grid w-full md:w-auto grid-cols-3 mb-8">
+          <TabsList className="grid w-full md:w-auto grid-cols-4 mb-8">
             <TabsTrigger value="overview">Επισκόπηση</TabsTrigger>
             <TabsTrigger value="practice">Εξάσκηση</TabsTrigger>
             <TabsTrigger value="tests">Διαγωνίσματα</TabsTrigger>
+            <TabsTrigger value="leaderboard">Κατάταξη</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview">
@@ -230,6 +334,82 @@ const SubjectPage = () => {
                     <Link to={`/quiz/${subject.id}/full`}>
                       <Button className="w-full">Έναρξη</Button>
                     </Link>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="leaderboard">
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Πίνακας Κατάταξης</h2>
+              
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableCaption>Οι κορυφαίοι μαθητές στο μάθημα {subject.name}</TableCaption>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12 text-center">Θέση</TableHead>
+                        <TableHead>Μαθητής</TableHead>
+                        <TableHead className="text-center">Βαθμολογία</TableHead>
+                        <TableHead className="text-center hidden md:table-cell">Διαγωνίσματα</TableHead>
+                        <TableHead className="hidden md:table-cell">Τελευταία Δραστηριότητα</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {mockLeaderboardData.map((student, index) => (
+                        <TableRow key={student.id} className={index < 3 ? "bg-muted/30" : ""}>
+                          <TableCell className="text-center font-medium">
+                            <div className="flex justify-center items-center">
+                              {getRankIcon(index) || (index + 1)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={student.avatarUrl} />
+                                <AvatarFallback className="bg-primary/10 text-primary">
+                                  {student.name.split(' ').map(n => n[0]).join('')}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium">{student.name}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className={`text-center ${getScoreTextColor(student.score)}`}>
+                            {student.score}/100
+                          </TableCell>
+                          <TableCell className="text-center hidden md:table-cell">
+                            {student.completedTests}
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell text-muted-foreground">
+                            {student.lastActivity}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              <div className="mt-8">
+                <Card className="bg-muted/20 border-dashed">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-primary/10 p-2 rounded-full">
+                          <User className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <div className="text-sm text-muted-foreground">Η κατάταξή σου</div>
+                          <div className="font-medium">15η θέση</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-muted-foreground">Βαθμολογία</div>
+                        <div className="font-medium text-blue-600">68/100</div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>

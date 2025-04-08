@@ -28,7 +28,7 @@ const AddContentPage = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [contentType, setContentType] = useState<'question' | 'resource'>('question');
   const { addQuestion, isLoading: isAdding } = useQuestionManagement();
-  const initialQuizType: QuizType = "basic";
+  const initialQuizType: QuizType = QuizType.BASIC;
   
   useEffect(() => {
     const isVerified = localStorage.getItem('educatorVerified') === 'true';

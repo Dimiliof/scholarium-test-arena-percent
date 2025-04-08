@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -131,7 +130,6 @@ const QuizPage = () => {
     
     setIsLoading(true);
     
-    // Convert string quizType to QuizType enum for getQuestions function
     let quizTypeEnum: QuizType;
     
     switch(quizType) {
@@ -157,7 +155,6 @@ const QuizPage = () => {
         quizTypeEnum = QuizType.BASIC;
     }
     
-    // Ανάκτηση ερωτήσεων από το useQuestionManagement hook
     const availableQuestions = getQuestions(subjectId, quizTypeEnum);
     
     if (availableQuestions.length === 0) {
@@ -282,7 +279,6 @@ const QuizPage = () => {
     );
   }
 
-  // Εμφάνιση μηνύματος όταν δεν υπάρχουν διαθέσιμες ερωτήσεις
   if (questions.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">

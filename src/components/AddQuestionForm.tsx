@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -80,7 +79,7 @@ export function AddQuestionForm({
         optionC: initialData.options[2],
         optionD: initialData.options[3],
         correctAnswer: initialData.correctAnswer.toString() as "0" | "1" | "2" | "3",
-        quizType: initialQuizType,
+        quizType: initialQuizType.toString() as "basic" | "intermediate" | "advanced" | "quick" | "medium" | "full",
       }
     : {
         question: "",
@@ -88,7 +87,7 @@ export function AddQuestionForm({
         optionB: "",
         optionC: "",
         optionD: "",
-        quizType: initialQuizType,
+        quizType: initialQuizType.toString() as "basic" | "intermediate" | "advanced" | "quick" | "medium" | "full",
       };
   
   const form = useForm<QuestionFormValues>({
@@ -105,9 +104,9 @@ export function AddQuestionForm({
     };
     
     if (isEditing) {
-      editQuestion(subjectId, questionData, data.quizType, initialQuizType);
+      editQuestion(subjectId, questionData, data.quizType as unknown as QuizType, initialQuizType);
     } else {
-      addQuestion(subjectId, questionData, data.quizType);
+      addQuestion(subjectId, questionData, data.quizType as unknown as QuizType);
     }
     
     if (onSuccess) {

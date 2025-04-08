@@ -62,13 +62,13 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
       return;
     }
     
-    if (resource.type !== 'link' && !resource.file && !resource.url) {
+    if (resource.type !== 'link' && resource.type !== 'development' && !resource.file && !resource.url) {
       toast.error('Παρακαλώ ανεβάστε ένα αρχείο ή εισάγετε ένα URL');
       return;
     }
     
-    if (resource.type === 'link' && !resource.url) {
-      toast.error('Παρακαλώ εισάγετε ένα URL για τον σύνδεσμο');
+    if ((resource.type === 'link' || resource.type === 'development') && !resource.url) {
+      toast.error(`Παρακαλώ εισάγετε ένα URL για ${resource.type === 'link' ? 'τον σύνδεσμο' : 'το περιβάλλον ανάπτυξης'}`);
       return;
     }
     

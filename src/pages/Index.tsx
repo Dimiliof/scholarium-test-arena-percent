@@ -114,9 +114,7 @@ const Index = () => {
       </motion.div>
       
       <TestimonialsSection />
-      <HomeCallToAction 
-        onCreateAccount={handleCreateAccount} 
-      />
+      <HomeCallToAction onCreateAccount={handleCreateAccount} />
       
       {isAuthenticated && <AddContentButton />}
       

@@ -4,7 +4,12 @@ import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 
-const HomeCallToAction = () => {
+// Define the props interface to accept onCreateAccount
+interface HomeCallToActionProps {
+  onCreateAccount?: () => void;
+}
+
+const HomeCallToAction = ({ onCreateAccount }: HomeCallToActionProps) => {
   const { isAuthenticated, isTeacher } = useAuth();
   
   return (
@@ -20,7 +25,11 @@ const HomeCallToAction = () => {
           {!isAuthenticated ? (
             <>
               <Link to="/register-type">
-                <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+                <Button 
+                  size="lg" 
+                  className="bg-white text-primary hover:bg-gray-100"
+                  onClick={onCreateAccount}
+                >
                   Εγγραφή Τώρα
                 </Button>
               </Link>

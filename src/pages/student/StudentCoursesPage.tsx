@@ -89,8 +89,7 @@ const StudentCoursesPage = () => {
   };
 
   const getSubjectImage = (subjectId: string) => {
-    const subject = subjects.find(s => s.id === subjectId);
-    return subject?.imageUrl || '/placeholder.svg';
+    return '/placeholder.svg';
   };
 
   const getStatusColor = (status: string) => {

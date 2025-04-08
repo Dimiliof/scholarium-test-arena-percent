@@ -11,11 +11,11 @@ const AboutPage = () => {
       
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">Σχετικά με την ΕκπαιδευτικήΓωνιά</h1>
+          <h1 className="text-3xl font-bold mb-6">Σχετικά με το EduPercentage</h1>
           
           <div className="prose prose-lg max-w-none">
             <p className="text-lg">
-              Η ΕκπαιδευτικήΓωνιά είναι μια εκπαιδευτική πλατφόρμα που δημιουργήθηκε με σκοπό 
+              Το EduPercentage είναι μια εκπαιδευτική πλατφόρμα που δημιουργήθηκε με σκοπό 
               να παρέχει δωρεάν πρόσβαση σε εκπαιδευτικό υλικό για όλα τα σχολεία της Ελλάδας.
             </p>
             

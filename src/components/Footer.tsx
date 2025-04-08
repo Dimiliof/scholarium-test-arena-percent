@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +17,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">ΕκπαιδευτικήΓωνιά</h3>
+            <h3 className="font-bold text-lg mb-4">EduPercentage</h3>
             <p className="text-gray-600 text-sm">
               Η εκπαιδευτική πλατφόρμα για μαθητές όλων των ηλικιών 
               που προσφέρει προσομοιώσεις και τεστ για όλα τα μαθήματα.

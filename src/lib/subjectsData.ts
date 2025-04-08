@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { ScrollText, Calculator, BookOpen, Landmark, Cross, Users, 
-  FlaskConical, Atom, Leaf, Wrench, Music, Heart, Globe } from 'lucide-react';
+  FlaskConical, Atom, Leaf, Wrench, Music, Heart, Globe, Computer } from 'lucide-react';
 
 export interface Subject {
   id: string;
@@ -20,7 +19,6 @@ export interface QuizQuestion {
   correctAnswer: number;
 }
 
-// Definition of sample questions for each subject
 export const sampleQuestions: Record<string, QuizQuestion[]> = {
   'mathematics': [
     {
@@ -106,7 +104,7 @@ export const sampleQuestions: Record<string, QuizQuestion[]> = {
     },
     {
       id: 3,
-      question: 'Ποια μάχη θεωρείται καθοριστική για την έκβαση του Β΄ Παγκοσμίου Πολέμου στην Ευρώπη;',
+      question: 'Ποια μάχη θεωρείται καθοριστική για την έκβαση ��ου Β΄ Παγκοσμίου Πολέμου στην Ευρώπη;',
       options: ['Μάχη της Αγγλίας', 'Μάχη του Στάλινγκραντ', 'Μάχη των Αρδεννών', 'Απόβαση στη Νορμανδία'],
       correctAnswer: 1
     },
@@ -287,5 +285,14 @@ export const subjects: Subject[] = [
     description: 'Μελέτη της Γης, των εδαφών, των χαρακτηριστικών και των πληθυσμών της',
     availableTests: 22,
     availableMaterials: 40
+  },
+  { 
+    id: 'computer-science', 
+    name: 'Πληροφορική', 
+    icon: Computer, 
+    color: 'bg-blue-700',
+    description: 'Μελέτη των υπολογιστών, της επιστήμης των υπολογιστών και της τεχνολογίας πληροφοριών',
+    availableTests: 30,
+    availableMaterials: 55
   }
 ];

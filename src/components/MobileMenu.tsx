@@ -10,7 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Menu, School } from 'lucide-react';
+import { Menu, School, BookOpen, BookText, FileText, Video, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const MobileMenu = () => {
@@ -41,9 +41,32 @@ const MobileMenu = () => {
             <Link to="/" className="text-lg font-medium hover:text-primary">
               Αρχική
             </Link>
-            <Link to="/resources" className="text-lg font-medium hover:text-primary">
+            <Link to="/resources" className="text-lg font-medium hover:text-primary flex items-center">
+              <BookOpen className="h-5 w-5 mr-2 text-primary" />
               Εκπαιδευτικοί Πόροι
             </Link>
+            
+            {/* Εκπαιδευτικοί Πόροι - Υποκατηγορίες */}
+            <div className="pt-1 pb-2 pl-7">
+              <div className="flex flex-col space-y-2 text-muted-foreground">
+                <Link to="/resources?type=book" className="flex items-center text-sm hover:text-primary">
+                  <BookText className="h-4 w-4 mr-2" />
+                  Βιβλία
+                </Link>
+                <Link to="/resources?type=document" className="flex items-center text-sm hover:text-primary">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Έγγραφα
+                </Link>
+                <Link to="/resources?type=video" className="flex items-center text-sm hover:text-primary">
+                  <Video className="h-4 w-4 mr-2" />
+                  Βίντεο
+                </Link>
+                <Link to="/resources?type=link" className="flex items-center text-sm hover:text-primary">
+                  <Link2 className="h-4 w-4 mr-2" />
+                  Σύνδεσμοι
+                </Link>
+              </div>
+            </div>
             
             {/* Μαθήματα */}
             <div className="pt-2 pb-2">

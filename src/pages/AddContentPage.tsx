@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, AlertCircle, Mail, Smartphone } from 'lucide-react';
+import { Check, AlertCircle, Mail, Smartphone, BookText } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { subjects } from '@/lib/subjectsData';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { AddQuestionForm, QuizType } from '@/components/AddQuestionForm';
+import AddResourceForm from '@/components/resources/AddResourceForm';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from '@/components/ui/input';
@@ -25,6 +27,7 @@ const AddContentPage = () => {
   const [phoneInput, setPhoneInput] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [contentType, setContentType] = useState<'question' | 'resource'>('question');
   const { addQuestion, isLoading: isAdding } = useQuestionManagement();
   const initialQuizType: QuizType = "basic";
   
@@ -60,6 +63,14 @@ const AddContentPage = () => {
     toast({
       title: "Επιτυχής προσθήκη!",
       description: "Η ερώτηση προστέθηκε επιτυχώς στο σύστημα.",
+      variant: "default",
+    });
+  };
+
+  const handleResourceAdded = () => {
+    toast({
+      title: "Επιτυχής προσθήκη!",
+      description: "Ο εκπαιδευτικός πόρος προστέθηκε επιτυχώς στο σύστημα.",
       variant: "default",
     });
   };
@@ -308,6 +319,15 @@ const AddContentPage = () => {
               </Button>
             </div>
             
+            <div className="mb-6">
+              <Tabs defaultValue="question" onValueChange={(value) => setContentType(value as 'question' | 'resource')}>
+                <TabsList className="mb-4">
+                  <TabsTrigger value="question">Ερωτήσεις / Κουίζ</TabsTrigger>
+                  <TabsTrigger value="resource">Εκπαιδευτικοί Πόροι</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            
             <p className="text-lg mb-6">Επιλέξτε το μάθημα στο οποίο θέλετε να προσθέσετε υλικό:</p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -344,15 +364,30 @@ const AddContentPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle>
-                  {subjects.find(s => s.id === selectedSubject)?.name} - Προσθήκη Νέας Ερώτησης
+                  {contentType === 'question' ? (
+                    <>
+                      {subjects.find(s => s.id === selectedSubject)?.name} - Προσθήκη Νέας Ερώτησης
+                    </>
+                  ) : (
+                    <>
+                      {subjects.find(s => s.id === selectedSubject)?.name} - Προσθήκη Εκπαιδευτικού Πόρου
+                    </>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <AddQuestionForm 
-                  subjectId={selectedSubject}
-                  onSuccess={handleQuestionAdded}
-                  initialQuizType={initialQuizType}
-                />
+                {contentType === 'question' ? (
+                  <AddQuestionForm 
+                    subjectId={selectedSubject}
+                    onSuccess={handleQuestionAdded}
+                    initialQuizType={initialQuizType}
+                  />
+                ) : (
+                  <AddResourceForm 
+                    onSuccess={handleResourceAdded}
+                    selectedSubject={selectedSubject}
+                  />
+                )}
               </CardContent>
             </Card>
           </div>

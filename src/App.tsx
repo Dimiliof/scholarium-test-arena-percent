@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,13 +35,11 @@ import ConverterPage from "./pages/tools/ConverterPage";
 import PeriodicTablePage from "./pages/tools/PeriodicTablePage";
 import FormulasPage from "./pages/tools/FormulasPage";
 
-// Εισαγωγή των σελίδων για μαθητές
+import ResourcesPage from "./pages/ResourcesPage";
+
 import StudentCoursesPage from "./pages/student/StudentCoursesPage";
 import StudentEnrollPage from "./pages/student/StudentEnrollPage";
 import StudentResultsPage from "./pages/student/StudentResultsPage";
-
-// Θα χρειαστούμε και μια σελίδα διαχείρισης τάξης για τους καθηγητές
-// Αυτή θα πρέπει να υλοποιηθεί αργότερα
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -131,13 +128,13 @@ const App = () => (
             <Route path="/school-registration" element={<SchoolRegistration />} />
             <Route path="/it-support-login" element={<ITSupportLoginPage />} />
             
-            {/* Εργαλεία */}
+            <Route path="/resources" element={<ResourcesPage />} />
+            
             <Route path="/tools/calculator" element={<CalculatorPage />} />
             <Route path="/tools/converter" element={<ConverterPage />} />
             <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
             <Route path="/tools/formulas" element={<FormulasPage />} />
             
-            {/* Σελίδες μαθητών */}
             <Route path="/student/courses" element={<StudentRoute><StudentCoursesPage /></StudentRoute>} />
             <Route path="/student/enroll" element={<StudentRoute><StudentEnrollPage /></StudentRoute>} />
             <Route path="/student/results" element={<StudentRoute><StudentResultsPage /></StudentRoute>} />
@@ -148,7 +145,6 @@ const App = () => (
             
             <Route path="/add-content" element={<TeacherRoute><AddContentPage /></TeacherRoute>} />
             <Route path="/teacher-dashboard" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
-            {/* Νέα διαδρομή για τη διαχείριση τάξης */}
             <Route path="/classroom/:classroomId" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
             
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />

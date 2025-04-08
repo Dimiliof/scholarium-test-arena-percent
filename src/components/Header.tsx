@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import UserMenu from "@/components/UserMenu";
-import { School } from 'lucide-react';
+import { School, BookOpen, BookText, Video, Link2 } from 'lucide-react';
 import MobileMenu from "@/components/MobileMenu";
 
 const Header = () => {
@@ -65,6 +65,24 @@ const Header = () => {
                   </ListItem>
                   <ListItem href="/subject/physics" title="Φυσική">
                     Πειράματα και προσομοιώσεις
+                  </ListItem>
+                  <ListItem href="/resources" title="Εκπαιδευτικοί Πόροι">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      Βιβλία
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <BookText className="h-4 w-4" />
+                      Σημειώσεις
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Video className="h-4 w-4" />
+                      Βίντεο
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Link2 className="h-4 w-4" />
+                      Χρήσιμοι σύνδεσμοι
+                    </div>
                   </ListItem>
                 </ul>
               </NavigationMenuContent>

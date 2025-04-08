@@ -1,28 +1,26 @@
-
 import { useState } from 'react';
 import { QuizQuestion, sampleQuestions } from '@/lib/subjectsData';
 import { toast } from 'sonner';
+import { QuizType } from '@/components/AddQuestionForm';
 
 interface QuestionManagementResult {
-  addQuestion: (subjectId: string, question: QuizQuestion, quizType: string) => void;
-  deleteQuestion: (subjectId: string, questionId: number, quizType: string) => void;
-  editQuestion: (subjectId: string, question: QuizQuestion, quizType: string, oldQuizType?: string) => void;
-  getQuestions: (subjectId: string, quizType: string) => QuizQuestion[];
+  addQuestion: (subjectId: string, question: QuizQuestion, quizType: QuizType) => void;
+  deleteQuestion: (subjectId: string, questionId: number, quizType: QuizType) => void;
+  editQuestion: (subjectId: string, question: QuizQuestion, quizType: QuizType, oldQuizType?: QuizType) => void;
+  getQuestions: (subjectId: string, quizType: QuizType) => QuizQuestion[];
   isLoading: boolean;
 }
 
 export function useQuestionManagement(): QuestionManagementResult {
   const [isLoading, setIsLoading] = useState(false);
   
-  const addQuestion = (subjectId: string, question: QuizQuestion, quizType: string) => {
+  const addQuestion = (subjectId: string, question: QuizQuestion, quizType: QuizType) => {
     setIsLoading(true);
     
     try {
-      // Δημιουργία ή ανάκτηση των ερωτήσεων για το συγκεκριμένο μάθημα και τύπο κουίζ
       const storageKey = `quiz_${subjectId}_${quizType}`;
       let existingQuestions = [];
       
-      // Έλεγχος αν υπάρχουν ήδη ερωτήσεις στο localStorage
       const storedQuestions = localStorage.getItem(storageKey);
       if (storedQuestions) {
         try {
@@ -33,24 +31,19 @@ export function useQuestionManagement(): QuestionManagementResult {
         }
       }
       
-      // Προσθήκη της νέας ερώτησης
       existingQuestions.push(question);
       
-      // Αποθήκευση στο localStorage
       localStorage.setItem(storageKey, JSON.stringify(existingQuestions));
       
-      // Ενημέρωση των sampleQuestions για άμεση εμφάνιση στην εφαρμογή
       if (!sampleQuestions[subjectId]) {
         sampleQuestions[subjectId] = [];
       }
       
-      // Προσθήκη της ερώτησης στο sampleQuestions
       sampleQuestions[subjectId].push(question);
       
       console.log(`Ερώτηση προστέθηκε στο μάθημα ${subjectId} και τύπο ${quizType}:`, question);
       console.log(`Συνολικές ερωτήσεις για ${subjectId}:`, sampleQuestions[subjectId]);
       
-      // Εμφάνιση μηνύματος επιτυχίας
       toast.success("Η ερώτηση προστέθηκε επιτυχώς!", {
         description: `Η ερώτηση προστέθηκε επιτυχώς στο ${quizType} του μαθήματος.`,
         duration: 4000,
@@ -66,24 +59,20 @@ export function useQuestionManagement(): QuestionManagementResult {
     }
   };
 
-  const deleteQuestion = (subjectId: string, questionId: number, quizType: string) => {
+  const deleteQuestion = (subjectId: string, questionId: number, quizType: QuizType) => {
     setIsLoading(true);
     
     try {
       const storageKey = `quiz_${subjectId}_${quizType}`;
       
-      // Ανάκτηση ερωτήσεων από το localStorage
       const storedQuestions = localStorage.getItem(storageKey);
       if (storedQuestions) {
         let questions: QuizQuestion[] = JSON.parse(storedQuestions);
         
-        // Αφαίρεση της ερώτησης
         questions = questions.filter(q => q.id !== questionId);
         
-        // Αποθήκευση στο localStorage
         localStorage.setItem(storageKey, JSON.stringify(questions));
         
-        // Ενημέρωση των sampleQuestions
         if (sampleQuestions[subjectId]) {
           sampleQuestions[subjectId] = sampleQuestions[subjectId].filter(q => q.id !== questionId);
         }
@@ -100,43 +89,35 @@ export function useQuestionManagement(): QuestionManagementResult {
     }
   };
 
-  const editQuestion = (subjectId: string, question: QuizQuestion, quizType: string, oldQuizType?: string) => {
+  const editQuestion = (subjectId: string, question: QuizQuestion, quizType: QuizType, oldQuizType?: QuizType) => {
     setIsLoading(true);
     
     try {
-      // Εάν έχει αλλάξει ο τύπος του κουίζ, πρέπει να διαγράψουμε την ερώτηση από τον παλιό τύπο
       if (oldQuizType && oldQuizType !== quizType) {
         deleteQuestion(subjectId, question.id, oldQuizType);
       }
       
       const storageKey = `quiz_${subjectId}_${quizType}`;
       
-      // Ανάκτηση ερωτήσεων από το localStorage
       const storedQuestions = localStorage.getItem(storageKey);
       let questions: QuizQuestion[] = [];
       
       if (storedQuestions) {
         questions = JSON.parse(storedQuestions);
         
-        // Έλεγχος αν η ερώτηση υπάρχει ήδη
         const existingIndex = questions.findIndex(q => q.id === question.id);
         
         if (existingIndex !== -1) {
-          // Ενημέρωση υπάρχουσας ερώτησης
           questions[existingIndex] = question;
         } else {
-          // Προσθήκη νέας ερώτησης
           questions.push(question);
         }
       } else {
-        // Καμία υπάρχουσα ερώτηση, προσθήκη της πρώτης
         questions = [question];
       }
       
-      // Αποθήκευση στο localStorage
       localStorage.setItem(storageKey, JSON.stringify(questions));
       
-      // Ενημέρωση των sampleQuestions
       if (!sampleQuestions[subjectId]) {
         sampleQuestions[subjectId] = [];
       }
@@ -159,7 +140,7 @@ export function useQuestionManagement(): QuestionManagementResult {
     }
   };
 
-  const getQuestions = (subjectId: string, quizType: string): QuizQuestion[] => {
+  const getQuestions = (subjectId: string, quizType: QuizType): QuizQuestion[] => {
     try {
       const storageKey = `quiz_${subjectId}_${quizType}`;
       const storedQuestions = localStorage.getItem(storageKey);

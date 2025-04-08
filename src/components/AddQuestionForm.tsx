@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -17,6 +18,9 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { QuizQuestion } from "@/lib/subjectsData";
 import { useQuestionManagement } from "@/hooks/useQuestionManagement";
+
+// Ορίζουμε τον τύπο για το quizType ως enum για να αποφύγουμε το πρόβλημα
+export type QuizType = "basic" | "intermediate" | "advanced" | "quick" | "medium" | "full";
 
 const questionSchema = z.object({
   question: z.string().min(5, {
@@ -48,7 +52,7 @@ interface AddQuestionFormProps {
   subjectId: string;
   onSuccess?: () => void;
   initialData?: QuizQuestion;
-  initialQuizType?: string;
+  initialQuizType?: QuizType; // Χρησιμοποιούμε τον νέο τύπο QuizType
 }
 
 export function AddQuestionForm({ 
@@ -68,7 +72,7 @@ export function AddQuestionForm({
         optionC: initialData.options[2],
         optionD: initialData.options[3],
         correctAnswer: initialData.correctAnswer.toString() as "0" | "1" | "2" | "3",
-        quizType: initialQuizType,
+        quizType: initialQuizType as QuizType, // Βεβαιωνόμαστε ότι είναι σωστός τύπος
       }
     : {
         question: "",
@@ -76,7 +80,7 @@ export function AddQuestionForm({
         optionB: "",
         optionC: "",
         optionD: "",
-        quizType: initialQuizType,
+        quizType: initialQuizType as QuizType, // Βεβαιωνόμαστε ότι είναι σωστός τύπος
       };
   
   const form = useForm<QuestionFormValues>({

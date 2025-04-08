@@ -8,7 +8,7 @@ import { useQuestionManagement } from '@/hooks/useQuestionManagement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { AddQuestionForm } from '@/components/AddQuestionForm';
+import { AddQuestionForm, QuizType } from '@/components/AddQuestionForm';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ const AddContentPage = () => {
   const [otpCode, setOtpCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const { addQuestion, isLoading: isAdding } = useQuestionManagement();
+  const initialQuizType: QuizType = "basic";
   
   useEffect(() => {
     const isVerified = localStorage.getItem('educatorVerified') === 'true';
@@ -350,6 +351,7 @@ const AddContentPage = () => {
                 <AddQuestionForm 
                   subjectId={selectedSubject}
                   onSuccess={handleQuestionAdded}
+                  initialQuizType={initialQuizType}
                 />
               </CardContent>
             </Card>

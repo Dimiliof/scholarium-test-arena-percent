@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +14,7 @@ import { Menu, School } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const MobileMenu = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isTeacher } = useAuth();
   const isMobile = useIsMobile();
 
   if (!isMobile) return null;
@@ -78,7 +79,7 @@ const MobileMenu = () => {
             <Link to="/about" className="text-lg font-medium hover:text-primary">
               Σχετικά
             </Link>
-            {isAuthenticated && (
+            {isAuthenticated && isTeacher && (
               <Link to="/add-content" className="text-lg font-medium hover:text-primary">
                 Προσθήκη Υλικού
               </Link>

@@ -3,8 +3,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AddContentButton = () => {
+  const { isAuthenticated, isTeacher } = useAuth();
+  
+  // Εμφάνιση του κουμπιού μόνο για εκπαιδευτικούς και διαχειριστές
+  if (!isAuthenticated || !isTeacher) {
+    return null;
+  }
+  
   return (
     <div className="fixed bottom-10 right-10 z-50">
       <Link to="/add-content">

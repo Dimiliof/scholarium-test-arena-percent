@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,13 +9,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HomeHero from '@/components/home/HomeHero';
 import HomeSubjectsGrid from '@/components/home/HomeSubjectsGrid';
-import HomeFeaturesList from '@/components/home/HomeFeaturesList';
 import HomeCallToAction from '@/components/home/HomeCallToAction';
 import AddContentButton from '@/components/home/AddContentButton';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
-import QuizDemo from '@/components/home/QuizDemo';
-import SchoolIntegration from '@/components/home/SchoolIntegration';
-import EcdlVideoDemo from '@/components/home/EcdlVideoDemo';
+import SchoolIntegrationSection from '@/components/home/SchoolIntegrationSection';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -39,17 +37,6 @@ const Index = () => {
     navigate('/register');
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
-  };
-
   const sectionVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
@@ -62,14 +49,18 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      
       <HomeHero 
         onStartNow={handleStartNow} 
         onLearnMore={handleLearnMore} 
       />
-      <HomeSubjectsGrid 
-        subjects={subjects} 
-        isAuthenticated={isAuthenticated} 
-      />
+      
+      <div id="subjects-section">
+        <HomeSubjectsGrid 
+          subjects={subjects} 
+          isAuthenticated={isAuthenticated} 
+        />
+      </div>
       
       <motion.div 
         className="py-12 bg-gradient-to-r from-blue-50 to-indigo-50"
@@ -79,39 +70,7 @@ const Index = () => {
         viewport={{ once: true, amount: 0.3 }}
       >
         <div className="container mx-auto px-4">
-          <SchoolIntegration />
-        </div>
-      </motion.div>
-      
-      <motion.div 
-        className="py-16 bg-gray-50"
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-      >
-        <div className="container mx-auto px-4">
-          <motion.h2 
-            className="text-2xl md:text-3xl font-bold text-center mb-4"
-            variants={sectionVariants}
-          >
-            Δοκιμάστε την πλατφόρμα μας
-          </motion.h2>
-          <motion.p 
-            className="text-gray-600 text-center mb-8 max-w-2xl mx-auto"
-            variants={sectionVariants}
-          >
-            Κάντε ένα σύντομο τεστ για να δείτε πώς λειτουργεί η εκπαιδευτική μας πλατφόρμα
-          </motion.p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            <div>
-              <QuizDemo />
-            </div>
-            <div>
-              <EcdlVideoDemo />
-            </div>
-          </div>
+          <SchoolIntegrationSection />
         </div>
       </motion.div>
       

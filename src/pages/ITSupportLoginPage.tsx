@@ -17,13 +17,45 @@ const ITSupportLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login, fixAdminEmail } = useAuth();
+  const { login, fixAdminEmail, makeUserTeacherAndAdmin } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // Ελέγχουμε ειδικά για τον διαχειριστή με hardcoded διαπιστευτήρια
+      if (email === "liofisdimitris@gmail.com" && password === "Skatadi21!") {
+        console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
+        
+        // Διόρθωση των δικαιωμάτων του διαχειριστή
+        await makeUserTeacherAndAdmin(email);
+        
+        // Δημιουργία του αντικειμένου χρήστη για την τοπική αποθήκευση
+        const adminUser = {
+          id: "admin-special-id",
+          firstName: "Διαχειριστής",
+          lastName: "Συστήματος",
+          email: email,
+          role: "admin",
+          roles: ["admin", "teacher"]
+        };
+        
+        // Αποθήκευση στο localStorage
+        localStorage.setItem("user", JSON.stringify(adminUser));
+        
+        // Ειδοποίηση και ανακατεύθυνση
+        toast({
+          title: "Επιτυχής σύνδεση",
+          description: "Καλωσήρθατε στο IT Support, Διαχειριστή.",
+        });
+        
+        navigate("/it-support");
+        setIsLoading(false);
+        return;
+      }
+      
+      // Η κανονική ροή σύνδεσης για άλλους χρήστες
       // Πρώτα δοκιμάζουμε να διορθώσουμε το email διαχειριστή
       if (email === "liofisdimitris@gmail.com") {
         const fixed = await fixAdminEmail(email);
@@ -37,7 +69,7 @@ const ITSupportLoginPage = () => {
         // Ελέγχουμε αν ο χρήστης είναι διαχειριστής
         const user = JSON.parse(localStorage.getItem("user") || "{}");
         
-        if (user.role === "admin") {
+        if (user.role === "admin" || (user.roles && user.roles.includes("admin"))) {
           navigate("/it-support");
           toast({
             title: "Επιτυχής σύνδεση",

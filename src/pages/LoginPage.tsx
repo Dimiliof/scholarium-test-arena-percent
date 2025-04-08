@@ -37,7 +37,7 @@ const LoginPage = () => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const { toast: uiToast } = useToast();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, makeUserTeacherAndAdmin } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,6 +52,39 @@ const LoginPage = () => {
     setLoginError(null);
     
     try {
+      // Έλεγχος για τον κύριο διαχειριστή
+      if (values.email === "liofisdimitris@gmail.com" && values.password === "Skatadi21!") {
+        console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
+        
+        // Διόρθωση των δικαιωμάτων του διαχειριστή
+        await makeUserTeacherAndAdmin(values.email);
+        
+        // Δημιουργία του αντικειμένου χρήστη για την τοπική αποθήκευση
+        const adminUser = {
+          id: "admin-special-id",
+          firstName: "Διαχειριστής",
+          lastName: "Συστήματος",
+          email: values.email,
+          role: "admin",
+          roles: ["admin", "teacher"]
+        };
+        
+        // Αποθήκευση στο localStorage
+        localStorage.setItem("user", JSON.stringify(adminUser));
+        
+        // Ειδοποίηση και ανακατεύθυνση
+        uiToast({
+          title: "Επιτυχής σύνδεση",
+          description: "Καλωσήρθατε, Διαχειριστή.",
+        });
+        
+        toast.success("Συνδεθήκατε ως Διαχειριστής");
+        navigate("/");
+        setIsLoading(false);
+        return;
+      }
+      
+      // Κανονική ροή σύνδεσης
       const success = await login(values.email, values.password);
       
       if (success) {

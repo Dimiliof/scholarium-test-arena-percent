@@ -1,19 +1,6 @@
 
-// Απλή απεικόνιση του motion API από framer-motion 
-// Χρησιμοποιούμε απλώς το children όπως είναι
-
 import React from 'react';
+import { motion as framerMotion } from 'framer-motion';
 
-interface MotionProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-export const motion = {
-  div: ({ children, className }: MotionProps) => (
-    <div className={className}>{children}</div>
-  ),
-  button: ({ children, className }: MotionProps) => (
-    <button className={className}>{children}</button>
-  ),
-};
+// Re-export framer-motion components
+export const motion = framerMotion;

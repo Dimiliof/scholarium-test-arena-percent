@@ -22,12 +22,15 @@
     
     <link rel="icon" href="/logo.png" type="image/png" />
     <link rel="apple-touch-icon" href="/logo.png" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
     
     <!-- Preload critical assets -->
     <link rel="preload" href="/src/index.css" as="style" />
     <!-- Ορισμός χρώματος θέματος για κινητά -->
     <meta name="theme-color" content="#4f46e5" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="EduPercentage" />
   </head>
 
   <body>
@@ -40,13 +43,18 @@
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/service-worker.js')
             .then(registration => {
-              console.log('ServiceWorker registered successfully:', registration.scope);
+              console.log('ServiceWorker καταχωρήθηκε επιτυχώς:', registration.scope);
             })
             .catch(error => {
-              console.log('ServiceWorker registration failed:', error);
+              console.log('Η καταχώρηση του ServiceWorker απέτυχε:', error);
             });
         });
       }
     </script>
+    <noscript>
+      <div style="padding: 20px; text-align: center; background-color: #f8d7da; color: #721c24; margin: 20px;">
+        Για να λειτουργήσει σωστά αυτή η εφαρμογή, παρακαλούμε ενεργοποιήστε την JavaScript στον περιηγητή σας.
+      </div>
+    </noscript>
   </body>
 </html>

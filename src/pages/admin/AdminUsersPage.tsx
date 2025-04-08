@@ -26,11 +26,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users, Search, UserX, ShieldCheck } from "lucide-react";
+import { Users, Search, UserX, ShieldCheck, BookOpen } from "lucide-react";
 
 const AdminUsersPage = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isAdmin, getAllUsers, fixAdminEmail } = useAuth();
+  const { user, isAuthenticated, isAdmin, getAllUsers, makeUserTeacherAndAdmin } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -58,7 +58,10 @@ const AdminUsersPage = () => {
     
     // Εφαρμογή φίλτρου ρόλου
     if (roleFilter !== 'all') {
-      filteredList = filteredList.filter(user => user.role === roleFilter);
+      filteredList = filteredList.filter(user => 
+        user.role === roleFilter || 
+        (user.roles && user.roles.includes(roleFilter))
+      );
     }
     
     // Εφαρμογή φίλτρου αναζήτησης
@@ -74,19 +77,19 @@ const AdminUsersPage = () => {
     setFilteredUsers(filteredList);
   }, [users, searchTerm, roleFilter]);
 
-  // Διόρθωση του ρόλου του διαχειριστή
+  // Διόρθωση του ρόλου του διαχειριστή και εκπαιδευτικού
   const handleFixAdminRole = async () => {
     setIsLoading(true);
     const adminEmail = "liofisdimitris@gmail.com";
-    const success = await fixAdminEmail(adminEmail);
+    const success = await makeUserTeacherAndAdmin(adminEmail);
     
     if (success) {
       uiToast({
         title: "Επιτυχής ενημέρωση",
-        description: `Ο χρήστης ${adminEmail} ορίστηκε ως διαχειριστής επιτυχώς.`,
+        description: `Ο χρήστης ${adminEmail} ορίστηκε ως διαχειριστής και εκπαιδευτικός επιτυχώς.`,
       });
       
-      toast.success("Ο διαχειριστής ορίστηκε επιτυχώς!", {
+      toast.success("Ο διπλός ρόλος ορίστηκε επιτυχώς!", {
         position: "top-center",
       });
       
@@ -99,6 +102,47 @@ const AdminUsersPage = () => {
       });
     }
     setIsLoading(false);
+  };
+
+  // Συνάρτηση για εμφάνιση των ρόλων του χρήστη
+  const getUserRoleBadges = (user: User) => {
+    const badges = [];
+    
+    // Αν έχει πολλαπλούς ρόλους, τους εμφανίζουμε όλους
+    if (user.roles && user.roles.length > 0) {
+      return (
+        <div className="flex flex-wrap gap-1">
+          {user.roles.includes('admin') && (
+            <Badge variant="destructive">
+              Διαχειριστής
+            </Badge>
+          )}
+          {user.roles.includes('teacher') && (
+            <Badge variant="default">
+              Εκπαιδευτικός
+            </Badge>
+          )}
+          {user.roles.includes('student') && (
+            <Badge variant="outline">
+              Μαθητής
+            </Badge>
+          )}
+        </div>
+      );
+    } else {
+      // Διαφορετικά, εμφανίζουμε τον κύριο ρόλο
+      return (
+        <Badge 
+          variant={
+            user.role === "admin" ? "destructive" : 
+            user.role === "teacher" ? "default" : "outline"
+          }
+        >
+          {user.role === "admin" ? "Διαχειριστής" :
+           user.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής"}
+        </Badge>
+      );
+    }
   };
 
   // Αν ο χρήστης δεν είναι διαχειριστής, δεν εμφανίζουμε τίποτα
@@ -129,7 +173,8 @@ const AdminUsersPage = () => {
               disabled={isLoading}
             >
               <ShieldCheck className="h-4 w-4" />
-              {isLoading ? "Ορισμός..." : "Όρισε Διαχειριστή"}
+              <BookOpen className="h-4 w-4" />
+              {isLoading ? "Ορισμός..." : "Όρισε Διαχειριστή & Εκπαιδευτικό"}
             </Button>
           </div>
         </div>
@@ -208,15 +253,7 @@ const AdminUsersPage = () => {
                       <TableCell>{user.lastName}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
-                        <Badge 
-                          variant={
-                            user.role === "admin" ? "destructive" : 
-                            user.role === "teacher" ? "default" : "outline"
-                          }
-                        >
-                          {user.role === "admin" ? "Διαχειριστής" :
-                           user.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής"}
-                        </Badge>
+                        {getUserRoleBadges(user)}
                       </TableCell>
                     </TableRow>
                   ))

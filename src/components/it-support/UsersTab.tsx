@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, ShieldCheck } from "lucide-react";
+import { Users, ShieldCheck, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -12,26 +12,26 @@ type UsersTabProps = {
 };
 
 const UsersTab = ({ onAction }: UsersTabProps) => {
-  const { fixAdminEmail } = useAuth();
+  const { fixAdminEmail, makeUserTeacherAndAdmin } = useAuth();
   const { toast: uiToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFixAdmin = async () => {
     setIsLoading(true);
     const adminEmail = "liofisdimitris@gmail.com";
-    const success = await fixAdminEmail(adminEmail);
+    const success = await makeUserTeacherAndAdmin(adminEmail);
     
     if (success) {
       uiToast({
         title: "Επιτυχής ενημέρωση",
-        description: `Ο χρήστης ${adminEmail} ορίστηκε ως διαχειριστής επιτυχώς.`,
+        description: `Ο χρήστης ${adminEmail} ορίστηκε ως διαχειριστής και εκπαιδευτικός επιτυχώς.`,
       });
       
-      toast.success("Ο διαχειριστής ορίστηκε επιτυχώς!", {
+      toast.success("Ορισμός διπλού ρόλου επιτυχής!", {
         position: "top-center",
       });
       
-      onAction("Όρισμός διαχειριστή");
+      onAction("Όρισμός διπλού ρόλου");
     } else {
       uiToast({
         variant: "destructive",
@@ -68,12 +68,13 @@ const UsersTab = ({ onAction }: UsersTabProps) => {
         </Button>
         <Button 
           variant="outline" 
-          className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+          className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 mb-2"
           onClick={handleFixAdmin}
           disabled={isLoading}
         >
           <ShieldCheck className="h-4 w-4 mr-2" />
-          {isLoading ? "Ορισμός..." : "Όρισε Διαχειριστή"}
+          <BookOpen className="h-4 w-4 mr-2" />
+          {isLoading ? "Ορισμός..." : "Όρισε Διαχειριστή & Εκπαιδευτικό"}
         </Button>
       </CardContent>
     </Card>

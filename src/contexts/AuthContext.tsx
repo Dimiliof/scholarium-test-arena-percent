@@ -10,6 +10,7 @@ type RegisterData = {
   classYear?: string;
   termsAccepted: boolean;
   role?: "teacher" | "student";
+  roles?: string[]; // Προσθήκη υποστήριξης για πολλαπλούς ρόλους
 };
 
 // Τύπος χρήστη
@@ -19,6 +20,7 @@ export type User = {
   lastName: string;
   email: string;
   role: "admin" | "teacher" | "student";
+  roles?: string[]; // Προσθήκη πεδίου για πολλαπλούς ρόλους
   profileImage?: string | null;
 };
 
@@ -44,6 +46,7 @@ type AuthContextType = {
   getAllUsers: () => User[];
   loginRecords: LoginRecord[];
   fixAdminEmail: (email: string) => Promise<boolean>;
+  makeUserTeacherAndAdmin: (email: string) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -59,6 +62,7 @@ const AuthContext = createContext<AuthContextType>({
   getAllUsers: () => [],
   loginRecords: [],
   fixAdminEmail: async () => false,
+  makeUserTeacherAndAdmin: async () => false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -79,8 +83,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
       setIsAuthenticated(true);
-      setIsAdmin(parsedUser.role === "admin");
-      setIsTeacher(parsedUser.role === "teacher");
+      setIsAdmin(parsedUser.role === "admin" || (parsedUser.roles && parsedUser.roles.includes("admin")));
+      setIsTeacher(parsedUser.role === "teacher" || (parsedUser.roles && parsedUser.roles.includes("teacher")));
     }
     
     // Φόρτωση των καταγραφών σύνδεσης
@@ -155,22 +159,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
-  // Λειτουργία διόρθωσης ρόλου για συγκεκριμένο email
-  const fixAdminEmail = async (email: string): Promise<boolean> => {
+  // Μέθοδος για ορισμό χρήστη ως διαχειριστή και εκπαιδευτικό ταυτόχρονα
+  const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> => {
     try {
       const storedUsers = localStorage.getItem("users");
       if (!storedUsers) {
-        // Αν δεν υπάρχουν χρήστες, δημιουργούμε τον διαχειριστή
-        const newAdmin = {
+        // Αν δεν υπάρχουν χρήστες, δημιουργούμε νέο με διπλό ρόλο
+        const newUser = {
           id: Math.random().toString(36).substring(2, 15),
           firstName: "Διαχειριστής",
-          lastName: "Συστήματος",
+          lastName: "Εκπαιδευτικός",
           email: email,
           password: "admin12345",
           role: "admin" as const,
+          roles: ["admin", "teacher"],
         };
-        localStorage.setItem("users", JSON.stringify([newAdmin]));
-        console.log("Δημιουργήθηκε αρχικός διαχειριστής:", newAdmin);
+        localStorage.setItem("users", JSON.stringify([newUser]));
+        console.log("Δημιουργήθηκε χρήστης με διπλό ρόλο:", newUser);
         return true;
       }
       
@@ -180,24 +185,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updatedUsers = users.map((u: User & { password?: string }) => {
         if (u.email === email) {
           userFound = true;
-          console.log(`Ο χρήστης ${email} βρέθηκε. Ενημέρωση ρόλου σε admin.`);
-          return { ...u, role: "admin" as const };
+          console.log(`Ο χρήστης ${email} βρέθηκε. Ενημέρωση σε διαχειριστή και εκπαιδευτικό.`);
+          return { 
+            ...u, 
+            role: "admin" as const, 
+            roles: ["admin", "teacher"]
+          };
         }
         return u;
       });
       
       if (!userFound) {
         // Αν δεν υπάρχει ο χρήστης, τον δημιουργούμε
-        console.log(`Ο χρήστης ${email} δεν βρέθηκε. Δημιουργία νέου διαχειριστή.`);
-        const newAdmin = {
+        console.log(`Ο χρήστης ${email} δεν βρέθηκε. Δημιουργία νέου με διπλό ρόλο.`);
+        const newUser = {
           id: Math.random().toString(36).substring(2, 15),
           firstName: "Διαχειριστής",
-          lastName: "Συστήματος",
+          lastName: "Εκπαιδευτικός",
           email: email,
           password: "admin12345",
           role: "admin" as const,
+          roles: ["admin", "teacher"],
         };
-        updatedUsers.push(newAdmin);
+        updatedUsers.push(newUser);
       }
       
       localStorage.setItem("users", JSON.stringify(updatedUsers));
@@ -205,14 +215,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Αν ο συνδεδεμένος χρήστης είναι αυτός που ενημερώνουμε, ενημερώνουμε και το user state
       if (user && user.email === email) {
-        const updatedUser: User = { ...user, role: "admin" as const };
+        const updatedUser: User = { 
+          ...user, 
+          role: "admin" as const,
+          roles: ["admin", "teacher"]
+        };
         setUser(updatedUser);
         setIsAdmin(true);
+        setIsTeacher(true);
         localStorage.setItem("user", JSON.stringify(updatedUser));
-        console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης");
+        console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης με διπλό ρόλο");
       }
       
       return true;
+    } catch (error) {
+      console.error("Σφάλμα κατά την ενημέρωση του ρόλου:", error);
+      return false;
+    }
+  };
+  
+  // Τροποποίηση της μεθόδου fixAdminEmail για να παρέχει και ρόλο εκπαιδευτικού
+  const fixAdminEmail = async (email: string): Promise<boolean> => {
+    try {
+      // Καλούμε απευθείας τη νέα μέθοδο για να ορίσουμε και τους δύο ρόλους
+      return await makeUserTeacherAndAdmin(email);
     } catch (error) {
       console.error("Σφάλμα κατά την ενημέρωση του ρόλου:", error);
       return false;
@@ -234,8 +260,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(userWithoutPassword);
       localStorage.setItem("user", JSON.stringify(userWithoutPassword));
       setIsAuthenticated(true);
-      setIsAdmin(user.role === "admin");
-      setIsTeacher(user.role === "teacher");
+      
+      // Ελέγχουμε και για τους πολλαπλούς ρόλους
+      setIsAdmin(user.role === "admin" || (user.roles && user.roles.includes("admin")));
+      setIsTeacher(user.role === "teacher" || (user.roles && user.roles.includes("teacher")));
       
       // Καταγραφή της σύνδεσης
       const loginRecord: LoginRecord = {
@@ -385,7 +413,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         changePassword,
         getAllUsers,
         loginRecords,
-        fixAdminEmail
+        fixAdminEmail,
+        makeUserTeacherAndAdmin
       }}
     >
       {children}

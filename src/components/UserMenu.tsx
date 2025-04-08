@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -40,14 +39,22 @@ const UserMenu = () => {
     return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
   };
   
-  // Λεξικό για την απόδοση των ρόλων στα ελληνικά
   const getRoleBadge = () => {
     if (!user) return null;
+    
+    if (user.roles && user.roles.length > 1) {
+      return (
+        <Badge 
+          className="bg-purple-500 text-white text-xs absolute -bottom-1 -right-1 px-1 rounded-sm"
+        >
+          {user.roles.length} ρόλοι
+        </Badge>
+      );
+    }
     
     let color = "";
     let label = "";
     
-    // Διορθώνουμε την αναγνώριση των ρόλων
     switch (user.role) {
       case "admin":
         color = "bg-red-500";
@@ -69,6 +76,24 @@ const UserMenu = () => {
         {label}
       </Badge>
     );
+  };
+  
+  const getRoles = () => {
+    if (!user) return "Άγνωστος ρόλος";
+    
+    if (user.roles && user.roles.length > 0) {
+      return user.roles.map(role => {
+        switch(role) {
+          case "admin": return "Διαχειριστής";
+          case "teacher": return "Εκπαιδευτικός";
+          case "student": return "Μαθητής";
+          default: return role;
+        }
+      }).join(", ");
+    }
+    
+    return user.role === "admin" ? "Διαχειριστής" : 
+           user.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής";
   };
 
   return (
@@ -95,8 +120,7 @@ const UserMenu = () => {
               {user?.email}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              {user?.role === "admin" ? "Διαχειριστής" : 
-               user?.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής"}
+              {getRoles()}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -114,7 +138,6 @@ const UserMenu = () => {
           </Link>
         </DropdownMenuItem>
 
-        {/* Μενού για εκπαιδευτικούς */}
         {isTeacher && (
           <>
             <DropdownMenuItem asChild>
@@ -132,7 +155,6 @@ const UserMenu = () => {
           </>
         )}
 
-        {/* Μενού για διαχειριστές */}
         {isAdmin && (
           <>
             <DropdownMenuSeparator />

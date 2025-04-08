@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./contexts/AuthContext";
+
 import Index from "./pages/Index";
 import SubjectPage from "./pages/SubjectPage";
 import QuizPage from "./pages/QuizPage";
@@ -21,11 +21,11 @@ import PrivacyPage from "./pages/PrivacyPage";
 import ContactPage from "./pages/ContactPage";
 import ProfilePage from "./pages/ProfilePage";
 
-// Admin Pages
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminLoginsPage from "./pages/admin/AdminLoginsPage";
+import ITSupportLoginPage from "./pages/ITSupportLoginPage";
+import ITSupportPage from "./pages/ITSupportPage";
 
-// Tool Pages
 import CalculatorPage from "./pages/tools/CalculatorPage";
 import ConverterPage from "./pages/tools/ConverterPage";
 import PeriodicTablePage from "./pages/tools/PeriodicTablePage";
@@ -42,7 +42,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Protected route component για χρήστες
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
@@ -53,7 +52,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Protected route component για εκπαιδευτικούς
 const TeacherRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isTeacher } = useAuth();
   
@@ -68,7 +66,6 @@ const TeacherRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Protected route component για διαχειριστές
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isAdmin } = useAuth();
   
@@ -91,7 +88,6 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/subject/:subjectId" element={<SubjectPage />} />
             <Route path="/quiz/:subjectId/:quizType" element={<QuizPage />} />
@@ -102,25 +98,22 @@ const App = () => (
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/school-registration" element={<SchoolRegistration />} />
+            <Route path="/it-support-login" element={<ITSupportLoginPage />} />
             
-            {/* Tool Routes - Publicly Accessible */}
             <Route path="/tools/calculator" element={<CalculatorPage />} />
             <Route path="/tools/converter" element={<ConverterPage />} />
             <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
             <Route path="/tools/formulas" element={<FormulasPage />} />
             
-            {/* Protected Routes - User */}
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             
-            {/* Protected Routes - Teacher */}
             <Route path="/add-content" element={<TeacherRoute><AddContentPage /></TeacherRoute>} />
             <Route path="/teacher-dashboard" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
             
-            {/* Protected Routes - Admin */}
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/logins" element={<AdminRoute><AdminLoginsPage /></AdminRoute>} />
+            <Route path="/it-support" element={<AdminRoute><ITSupportPage /></AdminRoute>} />
             
-            {/* Catch-all - Not Found */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

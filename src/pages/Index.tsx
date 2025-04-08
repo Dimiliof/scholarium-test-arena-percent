@@ -1,4 +1,5 @@
 
+import React from 'react'; // Add this import
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";

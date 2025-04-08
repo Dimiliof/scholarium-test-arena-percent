@@ -1,12 +1,26 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, BookOpen, Filter, User, Users, BookCopy } from 'lucide-react';
+import { 
+  Plus, 
+  Pencil, 
+  Trash2, 
+  BookOpen, 
+  Filter, 
+  User, 
+  Users, 
+  BookCopy, 
+  GraduationCap,
+  School,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+  X
+} from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { 
   Table, 
   TableBody, 
@@ -37,10 +51,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { subjects } from '@/lib/subjectsData';
-import { QuizQuestion } from '@/lib/subjectsData';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
@@ -74,6 +90,18 @@ type EnrolledStudent = {
   progress: number;
 };
 
+type ClassRoom = {
+  id: number;
+  name: string;
+  grade: 'Α_ΓΥΜΝΑΣΙΟΥ' | 'Β_ΓΥΜΝΑΣΙΟΥ' | 'Γ_ΓΥΜΝΑΣΙΟΥ' | 'Α_ΛΥΚΕΙΟΥ' | 'Β_ΛΥΚΕΙΟΥ' | 'Γ_ΛΥΚΕΙΟΥ';
+  subjectId: string;
+  teacherId: number;
+  studentCount: number;
+  createdAt: string;
+  status: 'active' | 'archived';
+  description?: string;
+};
+
 const quizTypeLabels: Record<string, string> = {
   'basic': 'Βασικές Ασκήσεις',
   'intermediate': 'Ενδιάμεσες Ασκήσεις',
@@ -82,6 +110,20 @@ const quizTypeLabels: Record<string, string> = {
   'medium': 'Διαγώνισμα 30 λεπτών',
   'full': 'Διαγώνισμα Εφ\' Όλης της Ύλης',
 };
+
+const gradeLabels: Record<string, string> = {
+  'Α_ΓΥΜΝΑΣΙΟΥ': 'Α\' Γυμνασίου',
+  'Β_ΓΥΜΝΑΣΙΟΥ': 'Β\' Γυμνασίου',
+  'Γ_ΓΥΜΝΑΣΙΟΥ': 'Γ\' Γυμνασίου',
+  'Α_ΛΥΚΕΙΟΥ': 'Α\' Λυκείου',
+  'Β_ΛΥΚΕΙΟΥ': 'Β\' Λυκείου',
+  'Γ_ΛΥΚΕΙΟΥ': 'Γ\' Λυκείου',
+};
+
+const gradeOptions = Object.entries(gradeLabels).map(([value, label]) => ({
+  value,
+  label
+}));
 
 const TeacherDashboardPage = () => {
   const navigate = useNavigate();
@@ -95,7 +137,6 @@ const TeacherDashboardPage = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState('questions');
   
-  // Νέες μεταβλητές κατάστασης για τους μαθητές και τα αποτελέσματα
   const [students, setStudents] = useState<EnrolledStudent[]>([]);
   const [results, setResults] = useState<StudentResult[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState<boolean>(true);
@@ -105,18 +146,38 @@ const TeacherDashboardPage = () => {
   const [resultSearchTerm, setResultSearchTerm] = useState<string>('');
   const [selectedResultSubject, setSelectedResultSubject] = useState<string>('all');
 
+  const [classrooms, setClassrooms] = useState<ClassRoom[]>([]);
+  const [isLoadingClassrooms, setIsLoadingClassrooms] = useState<boolean>(true);
+  const [selectedClassGrade, setSelectedClassGrade] = useState<string>('all');
+  const [selectedClassSubject, setSelectedClassSubject] = useState<string>('all');
+  const [classSearchTerm, setClassSearchTerm] = useState<string>('');
+  const [selectedClass, setSelectedClass] = useState<ClassRoom | null>(null);
+  const [deleteClassDialogOpen, setDeleteClassDialogOpen] = useState<boolean>(false);
+  const [isAddClassDialogOpen, setIsAddClassDialogOpen] = useState<boolean>(false);
+  
+  const [newClass, setNewClass] = useState<{
+    name: string;
+    grade: string;
+    subjectId: string;
+    description: string;
+  }>({
+    name: '',
+    grade: 'Α_ΓΥΜΝΑΣΙΟΥ',
+    subjectId: '',
+    description: '',
+  });
+
   useEffect(() => {
-    // Φόρτωση περιεχομένου, μαθητών και αποτελεσμάτων
     loadTeacherContent();
     loadEnrolledStudents();
     loadStudentResults();
+    loadClassrooms();
   }, [user?.id]);
 
   const loadTeacherContent = () => {
     setIsLoading(true);
     
     try {
-      // Συγκέντρωση όλων των ερωτήσεων από το localStorage
       let allContent: TeacherContent[] = [];
       
       for (const subject of subjects) {
@@ -144,7 +205,6 @@ const TeacherDashboardPage = () => {
         }
       }
       
-      // Ταξινόμηση με βάση την ημερομηνία (πιο πρόσφατες πρώτα)
       allContent.sort((a, b) => b.id - a.id);
       
       setContent(allContent);
@@ -159,7 +219,6 @@ const TeacherDashboardPage = () => {
   const loadEnrolledStudents = () => {
     setIsLoadingStudents(true);
     
-    // Προσωρινά δημιουργούμε κάποια δεδομένα για τους εγγεγραμμένους μαθητές
     const mockStudents: EnrolledStudent[] = [
       {
         id: 1,
@@ -208,12 +267,10 @@ const TeacherDashboardPage = () => {
       }
     ];
     
-    // Αποθήκευση των δεδομένων στο localStorage αν δεν υπάρχουν
     if (!localStorage.getItem('enrolled_students')) {
       localStorage.setItem('enrolled_students', JSON.stringify(mockStudents));
     }
     
-    // Φόρτωση των δεδομένων από το localStorage
     const storedStudents = localStorage.getItem('enrolled_students');
     if (storedStudents) {
       try {
@@ -231,7 +288,6 @@ const TeacherDashboardPage = () => {
   const loadStudentResults = () => {
     setIsLoadingResults(true);
     
-    // Προσωρινά δημιουργούμε κάποια δεδομένα για τα αποτελέσματα των μαθητών
     const mockResults: StudentResult[] = [
       {
         id: 1,
@@ -285,12 +341,10 @@ const TeacherDashboardPage = () => {
       }
     ];
     
-    // Αποθήκευση των δεδομένων στο localStorage αν δεν υπάρχουν
     if (!localStorage.getItem('student_results')) {
       localStorage.setItem('student_results', JSON.stringify(mockResults));
     }
     
-    // Φόρτωση των δεδομένων από το localStorage
     const storedResults = localStorage.getItem('student_results');
     if (storedResults) {
       try {
@@ -305,8 +359,167 @@ const TeacherDashboardPage = () => {
     setIsLoadingResults(false);
   };
 
+  const loadClassrooms = () => {
+    setIsLoadingClassrooms(true);
+    
+    const mockClassrooms: ClassRoom[] = [
+      {
+        id: 1,
+        name: "Μαθηματικά Α' Γυμνασίου - Τμήμα 1",
+        grade: "Α_ΓΥΜΝΑΣΙΟΥ",
+        subjectId: "mathematics",
+        teacherId: 1,
+        studentCount: 25,
+        createdAt: "01/09/2024",
+        status: "active",
+        description: "Τμήμα μαθηματικών για μαθητές Α' Γυμνασίου"
+      },
+      {
+        id: 2,
+        name: "Φυσική Β' Γυμνασίου - Τμήμα 1",
+        grade: "Β_ΓΥΜΝΑΣΙΟΥ",
+        subjectId: "physics",
+        teacherId: 1,
+        studentCount: 22,
+        createdAt: "01/09/2024",
+        status: "active",
+        description: "Βασικές αρχές φυσικής για μαθητές Β' Γυμνασίου"
+      },
+      {
+        id: 3,
+        name: "Λογοτεχνία Γ' Γυμνασίου",
+        grade: "Γ_ΓΥΜΝΑΣΙΟΥ",
+        subjectId: "literature",
+        teacherId: 1,
+        studentCount: 28,
+        createdAt: "05/09/2024",
+        status: "active",
+        description: "Μαθήματα λογοτεχνίας για την Γ' Γυμνασίου"
+      },
+      {
+        id: 4,
+        name: "Άλγεβρα Α' Λυκείου",
+        grade: "Α_ΛΥΚΕΙΟΥ",
+        subjectId: "mathematics",
+        teacherId: 1,
+        studentCount: 18,
+        createdAt: "02/09/2024",
+        status: "active",
+        description: "Προχωρημένα μαθηματικά για την Α' Λυκείου"
+      },
+      {
+        id: 5,
+        name: "Χημεία Β' Λυκείου - Εργαστήριο",
+        grade: "Β_ΛΥΚΕΙΟΥ",
+        subjectId: "chemistry",
+        teacherId: 1,
+        studentCount: 15,
+        createdAt: "03/09/2024",
+        status: "active",
+        description: "Εργαστηριακά μαθήματα χημείας"
+      },
+      {
+        id: 6,
+        name: "Μαθηματικά Γ' Λυκείου - Προετοιμασία Πανελλαδικών",
+        grade: "Γ_ΛΥΚΕΙΟΥ",
+        subjectId: "mathematics",
+        teacherId: 1,
+        studentCount: 12,
+        createdAt: "01/09/2024",
+        status: "active",
+        description: "Εντατικά μαθήματα προετοιμασίας για τις πανελλαδικές"
+      }
+    ];
+    
+    if (!localStorage.getItem('classrooms')) {
+      localStorage.setItem('classrooms', JSON.stringify(mockClassrooms));
+    }
+    
+    const storedClassrooms = localStorage.getItem('classrooms');
+    
+    if (storedClassrooms) {
+      try {
+        const parsedClassrooms: ClassRoom[] = JSON.parse(storedClassrooms);
+        setClassrooms(parsedClassrooms);
+      } catch (e) {
+        console.error("Σφάλμα κατά την ανάγνωση των τάξεων:", e);
+        setClassrooms([]);
+      }
+    }
+    
+    setIsLoadingClassrooms(false);
+  };
+
+  const handleAddClass = () => {
+    if (!newClass.name || !newClass.subjectId) {
+      toast.error("Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία");
+      return;
+    }
+
+    try {
+      const storedClassrooms = localStorage.getItem('classrooms');
+      let currentClassrooms: ClassRoom[] = [];
+      
+      if (storedClassrooms) {
+        currentClassrooms = JSON.parse(storedClassrooms);
+      }
+      
+      const newClassData: ClassRoom = {
+        id: Date.now(),
+        name: newClass.name,
+        grade: newClass.grade as any,
+        subjectId: newClass.subjectId,
+        teacherId: user?.id || 1,
+        studentCount: 0,
+        createdAt: new Date().toLocaleDateString('el-GR'),
+        status: 'active',
+        description: newClass.description
+      };
+      
+      const updatedClassrooms = [...currentClassrooms, newClassData];
+      
+      localStorage.setItem('classrooms', JSON.stringify(updatedClassrooms));
+      setClassrooms(updatedClassrooms);
+      
+      setNewClass({
+        name: '',
+        grade: 'Α_ΓΥΜΝΑΣΙΟΥ',
+        subjectId: '',
+        description: '',
+      });
+      
+      setIsAddClassDialogOpen(false);
+      toast.success("Η τάξη δημιουργήθηκε με επιτυχία");
+    } catch (error) {
+      console.error("Σφάλμα κατά τη δημιουργία τάξης:", error);
+      toast.error("Σφάλμα κατά τη δημιουργία της τάξης");
+    }
+  };
+
+  const handleDeleteClass = () => {
+    if (!selectedClass) return;
+    
+    try {
+      const storedClassrooms = localStorage.getItem('classrooms');
+      
+      if (storedClassrooms) {
+        const currentClassrooms: ClassRoom[] = JSON.parse(storedClassrooms);
+        const updatedClassrooms = currentClassrooms.filter(c => c.id !== selectedClass.id);
+        
+        localStorage.setItem('classrooms', JSON.stringify(updatedClassrooms));
+        setClassrooms(updatedClassrooms);
+        toast.success("Η τάξη διαγράφηκε επιτυχώς");
+      }
+    } catch (error) {
+      console.error("Σφάλμα κατά τη διαγραφή της τάξης:", error);
+      toast.error("Σφάλμα κατά τη διαγραφή της τάξης");
+    } finally {
+      setSelectedClass(null);
+      setDeleteClassDialogOpen(false);
+    }
+  };
+
   const handleEdit = (item: TeacherContent) => {
-    // Για τώρα, θα κάνουμε μόνο περιήγηση στη σελίδα προσθήκης περιεχομένου
     navigate('/add-content');
   };
 
@@ -328,7 +541,6 @@ const TeacherDashboardPage = () => {
         
         localStorage.setItem(storageKey, JSON.stringify(updatedQuestions));
         
-        // Ενημέρωση της λίστας περιεχομένου
         setContent(content.filter(c => c.id !== selectedItem.id));
         
         toast.success("Η ερώτηση διαγράφηκε επιτυχώς");
@@ -367,6 +579,15 @@ const TeacherDashboardPage = () => {
     return matchesSubject && matchesSearch;
   });
 
+  const filteredClassrooms = classrooms.filter(classroom => {
+    const matchesGrade = selectedClassGrade === 'all' || classroom.grade === selectedClassGrade;
+    const matchesSubject = selectedClassSubject === 'all' || classroom.subjectId === selectedClassSubject;
+    const matchesSearch = classroom.name.toLowerCase().includes(classSearchTerm.toLowerCase()) ||
+                          (classroom.description || '').toLowerCase().includes(classSearchTerm.toLowerCase());
+    
+    return matchesGrade && matchesSubject && matchesSearch;
+  });
+
   const getSubjectName = (subjectId: string) => {
     const subject = subjects.find(s => s.id === subjectId);
     return subject ? subject.name : 'Άγνωστο';
@@ -398,19 +619,19 @@ const TeacherDashboardPage = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold">Πίνακας Εκπαιδευτικού</h1>
-            <p className="text-muted-foreground">Διαχειριστείτε τις ερωτήσεις, τους μαθητές και τα αποτελέσματα</p>
+            <p className="text-muted-foreground">Διαχειριστείτε τις ερωτήσεις, τους μαθητές, τις τάξεις και τα αποτελέσματα</p>
           </div>
           
           <div className="flex gap-3">
             <Button onClick={() => navigate('/add-content')} className="flex items-center gap-2">
               <Plus size={16} />
-              <span>Προσθήκη Νέας Ερώτησης</span>
+              <span>Προσθήκη Ερώτησης</span>
             </Button>
           </div>
         </div>
         
         <Tabs defaultValue="questions" value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="grid grid-cols-3 w-full md:w-[500px]">
+          <TabsList className="grid grid-cols-4 md:w-auto w-full">
             <TabsTrigger value="questions" className="flex items-center gap-2">
               <BookCopy className="h-4 w-4" />
               <span>Ερωτήσεις</span>
@@ -419,13 +640,16 @@ const TeacherDashboardPage = () => {
               <Users className="h-4 w-4" />
               <span>Μαθητές</span>
             </TabsTrigger>
+            <TabsTrigger value="classrooms" className="flex items-center gap-2">
+              <School className="h-4 w-4" />
+              <span>Τάξεις</span>
+            </TabsTrigger>
             <TabsTrigger value="results" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
+              <GraduationCap className="h-4 w-4" />
               <span>Αποτελέσματα</span>
             </TabsTrigger>
           </TabsList>
           
-          {/* Tab Περιεχομένου Ερωτήσεων */}
           <TabsContent value="questions">
             <Card className="mb-8">
               <CardHeader>
@@ -542,7 +766,6 @@ const TeacherDashboardPage = () => {
             </Card>
           </TabsContent>
           
-          {/* Tab Μαθητών */}
           <TabsContent value="students">
             <Card className="mb-8">
               <CardHeader>
@@ -640,7 +863,211 @@ const TeacherDashboardPage = () => {
             </Card>
           </TabsContent>
           
-          {/* Tab Αποτελεσμάτων */}
+          <TabsContent value="classrooms">
+            <Card className="mb-8">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div>
+                  <CardTitle>Φίλτρα Αναζήτησης Τάξεων</CardTitle>
+                  <CardDescription>Φιλτράρετε τις τάξεις με βάση τα παρακάτω κριτήρια</CardDescription>
+                </div>
+                <Button onClick={() => setIsAddClassDialogOpen(true)} className="flex items-center gap-2">
+                  <Plus size={16} />
+                  <span>Νέα Τάξη</span>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="classGrade">Βαθμίδα</Label>
+                    <Select value={selectedClassGrade} onValueChange={setSelectedClassGrade}>
+                      <SelectTrigger id="classGrade">
+                        <SelectValue placeholder="Όλες οι βαθμίδες" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Όλες οι βαθμίδες</SelectItem>
+                        {Object.entries(gradeLabels).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="classSubject">Μάθημα</Label>
+                    <Select value={selectedClassSubject} onValueChange={setSelectedClassSubject}>
+                      <SelectTrigger id="classSubject">
+                        <SelectValue placeholder="Όλα τα μαθήματα" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Όλα τα μθήματα</SelectItem>
+                        {subjects.map(subject => (
+                          <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="classSearch">Αναζήτηση</Label>
+                    <Input 
+                      id="classSearch"
+                      placeholder="Αναζήτηση τάξεων..." 
+                      value={classSearchTerm}
+                      onChange={(e) => setClassSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+              {isLoadingClassrooms ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <Card key={i} className="shadow-sm">
+                    <CardHeader className="pb-2">
+                      <div className="h-6 w-3/4 bg-muted animate-pulse rounded mb-2"></div>
+                      <div className="h-4 w-1/2 bg-muted animate-pulse rounded"></div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-4 w-full bg-muted animate-pulse rounded mb-2"></div>
+                      <div className="h-4 w-3/4 bg-muted animate-pulse rounded mb-2"></div>
+                      <div className="h-4 w-2/3 bg-muted animate-pulse rounded"></div>
+                    </CardContent>
+                    <CardFooter className="flex justify-between pt-2">
+                      <div className="h-9 w-20 bg-muted animate-pulse rounded"></div>
+                      <div className="h-9 w-20 bg-muted animate-pulse rounded"></div>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : filteredClassrooms.length === 0 ? (
+                <div className="col-span-3 flex flex-col items-center justify-center py-12 text-center">
+                  <School className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Δεν βρέθηκαν τάξεις</h3>
+                  <p className="text-muted-foreground mb-4">
+                    {classrooms.length > 0 
+                      ? 'Δοκιμάστε να αλλάξετε τα φίλτρα αναζήτησης'
+                      : 'Δεν έχετε δημιουργήσει καμία ηλεκτρονική τάξη ακόμα'
+                    }
+                  </p>
+                  <Button onClick={() => setIsAddClassDialogOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Δημιουργία Τάξης
+                  </Button>
+                </div>
+              ) : (
+                filteredClassrooms.map((classroom) => (
+                  <Card key={classroom.id} className="shadow-sm hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">{classroom.name}</CardTitle>
+                          <CardDescription className="flex items-center mt-1">
+                            <span className="mr-2">{gradeLabels[classroom.grade]}</span>
+                            <Badge variant={classroom.status === 'active' ? 'default' : 'secondary'}>
+                              {classroom.status === 'active' ? 'Ενεργή' : 'Αρχειοθετημένη'}
+                            </Badge>
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex items-center text-sm text-muted-foreground">
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          <span>{getSubjectName(classroom.subjectId)}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                          <Users className="h-4 w-4 mr-2" />
+                          <span>{classroom.studentCount} μαθητές</span>
+                        </div>
+                        {classroom.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                            {classroom.description}
+                          </p>
+                        )}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex justify-between pt-2 border-t">
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/classroom/${classroom.id}`}>
+                          Διαχείριση
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => {
+                          setSelectedClass(classroom);
+                          setDeleteClassDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))
+              )}
+            </div>
+
+            {filteredClassrooms.length > 0 && (
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableCaption>Λίστα με τις ηλεκτρονικές τάξεις σας</TableCaption>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Όνομα Τάξης</TableHead>
+                        <TableHead>Βαθμίδα</TableHead>
+                        <TableHead>Μάθημα</TableHead>
+                        <TableHead>Μαθητές</TableHead>
+                        <TableHead>Κατάσταση</TableHead>
+                        <TableHead>Ημ/νία Δημιουργίας</TableHead>
+                        <TableHead className="text-right">Ενέργειες</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredClassrooms.map((classroom) => (
+                        <TableRow key={classroom.id}>
+                          <TableCell className="font-medium">{classroom.name}</TableCell>
+                          <TableCell>{gradeLabels[classroom.grade]}</TableCell>
+                          <TableCell>{getSubjectName(classroom.subjectId)}</TableCell>
+                          <TableCell>{classroom.studentCount}</TableCell>
+                          <TableCell>
+                            <Badge variant={classroom.status === 'active' ? 'default' : 'secondary'}>
+                              {classroom.status === 'active' ? 'Ενεργή' : 'Αρχειοθετημένη'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{classroom.createdAt}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button variant="outline" size="sm" asChild>
+                                <Link to={`/classroom/${classroom.id}`}>
+                                  <Pencil className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="text-destructive hover:bg-destructive/10"
+                                onClick={() => {
+                                  setSelectedClass(classroom);
+                                  setDeleteClassDialogOpen(true);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+          
           <TabsContent value="results">
             <Card className="mb-8">
               <CardHeader>
@@ -728,7 +1155,6 @@ const TeacherDashboardPage = () => {
         </Tabs>
       </main>
       
-      {/* Dialog επιβεβαίωσης διαγραφής */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -744,6 +1170,107 @@ const TeacherDashboardPage = () => {
             <Button variant="destructive" onClick={confirmDelete}>
               Διαγραφή
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={deleteClassDialogOpen} onOpenChange={setDeleteClassDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Διαγραφή Τάξης</DialogTitle>
+            <DialogDescription>
+              Είστε βέβαιοι ότι θέλετε να διαγράψετε την τάξη "{selectedClass?.name}";<br />
+              Η ενέργεια αυτή δεν μπορεί να αναιρεθεί και όλα τα δεδομένα της τάξης θα χαθούν.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteClassDialogOpen(false)}>
+              Ακύρωση
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteClass}>
+              Διαγραφή
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isAddClassDialogOpen} onOpenChange={setIsAddClassDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Δημιουργία Νέας Τάξης</DialogTitle>
+            <DialogDescription>
+              Συμπληρώστε τα παρακάτω στοιχεία για να δημιουργήσετε μια νέα ηλεκτρονική τάξη.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="className" className="text-right">
+                Όνομα Τάξης *
+              </Label>
+              <Input
+                id="className"
+                placeholder="π.χ. Μαθηματικά Α' Γυμνασίου - Τμήμα 1"
+                value={newClass.name}
+                onChange={(e) => setNewClass({...newClass, name: e.target.value})}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="classGrade" className="text-right">
+                Βαθμίδα *
+              </Label>
+              <Select 
+                value={newClass.grade} 
+                onValueChange={(value) => setNewClass({...newClass, grade: value})}
+              >
+                <SelectTrigger id="classGrade">
+                  <SelectValue placeholder="Επιλέξτε βαθμίδα" />
+                </SelectTrigger>
+                <SelectContent>
+                  {gradeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="classSubject" className="text-right">
+                Μάθημα *
+              </Label>
+              <Select 
+                value={newClass.subjectId} 
+                onValueChange={(value) => setNewClass({...newClass, subjectId: value})}
+              >
+                <SelectTrigger id="classSubject">
+                  <SelectValue placeholder="Επιλέξτε μάθημα" />
+                </SelectTrigger>
+                <SelectContent>
+                  {subjects.map((subject) => (
+                    <SelectItem key={subject.id} value={subject.id}>
+                      {subject.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="classDescription" className="text-right">
+                Περιγραφή
+              </Label>
+              <Textarea
+                id="classDescription"
+                placeholder="Προαιρετική περιγραφή της τάξης..."
+                value={newClass.description}
+                onChange={(e) => setNewClass({...newClass, description: e.target.value})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddClassDialogOpen(false)}>
+              Ακύρωση
+            </Button>
+            <Button onClick={handleAddClass}>Δημιουργία Τάξης</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

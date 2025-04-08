@@ -41,6 +41,9 @@ import StudentCoursesPage from "./pages/student/StudentCoursesPage";
 import StudentEnrollPage from "./pages/student/StudentEnrollPage";
 import StudentResultsPage from "./pages/student/StudentResultsPage";
 
+// Θα χρειαστούμε και μια σελίδα διαχείρισης τάξης για τους καθηγητές
+// Αυτή θα πρέπει να υλοποιηθεί αργότερα
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -145,6 +148,8 @@ const App = () => (
             
             <Route path="/add-content" element={<TeacherRoute><AddContentPage /></TeacherRoute>} />
             <Route path="/teacher-dashboard" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
+            {/* Νέα διαδρομή για τη διαχείριση τάξης */}
+            <Route path="/classroom/:classroomId" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
             
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/logins" element={<AdminRoute><AdminLoginsPage /></AdminRoute>} />

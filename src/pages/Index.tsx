@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -6,15 +7,18 @@ import SubjectCard from '@/components/SubjectCard';
 import { subjects } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   
   const filteredSubjects = subjects.filter(subject => 
     subject.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -90,33 +94,76 @@ const Index = () => {
       <div id="subjects-section" className="container mx-auto px-4 py-12 md:py-16">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">Διαθέσιμα Μαθήματα</h2>
         
-        {/* Search Bar */}
-        <div className="max-w-md mx-auto mb-12 relative">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Αναζήτηση μαθήματος..."
-              className="pl-10 py-6"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-        
-        {/* Subjects Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredSubjects.map((subject) => (
-            <SubjectCard key={subject.id} subject={subject} />
-          ))}
-        </div>
-        
-        {filteredSubjects.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-xl text-gray-500">Δεν βρέθηκαν μαθήματα με αυτό το όνομα</p>
-            <Button className="mt-4" onClick={() => setSearchTerm('')}>
-              Εμφάνιση όλων των μαθημάτων
-            </Button>
+        {isAuthenticated ? (
+          // Εμφάνιση πλήρων καρτών μαθημάτων για συνδεδεμένους χρήστες
+          <>
+            {/* Search Bar */}
+            <div className="max-w-md mx-auto mb-12 relative">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Αναζήτηση μαθήματος..."
+                  className="pl-10 py-6"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            {/* Subjects Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filteredSubjects.map((subject) => (
+                <SubjectCard key={subject.id} subject={subject} />
+              ))}
+            </div>
+            
+            {filteredSubjects.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-xl text-gray-500">Δεν βρέθηκαν μαθήματα με αυτό το όνομα</p>
+                <Button className="mt-4" onClick={() => setSearchTerm('')}>
+                  Εμφάνιση όλων των μαθημάτων
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          // Απλή λίστα μαθημάτων για μη συνδεδεμένους χρήστες
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-gray-50 p-8 rounded-lg border border-gray-200 mb-8">
+              <div className="flex items-center mb-6">
+                <Lock className="h-6 w-6 mr-2 text-primary" />
+                <h3 className="text-xl font-medium">Συνδεθείτε για πρόσβαση στο πλήρες υλικό</h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                Για να αποκτήσετε πλήρη πρόσβαση στο εκπαιδευτικό υλικό, τα διαγωνίσματα και τις 
+                προσομοιώσεις, παρακαλούμε συνδεθείτε ή δημιουργήστε ένα λογαριασμό.
+              </p>
+              <div className="flex gap-4">
+                <Link to="/login">
+                  <Button variant="outline">Σύνδεση</Button>
+                </Link>
+                <Link to="/register">
+                  <Button className="bg-primary">Εγγραφή</Button>
+                </Link>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+              {subjects.map((subject) => (
+                <div key={subject.id} className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`w-8 h-8 rounded-full ${subject.color} flex items-center justify-center text-white`}>
+                      {subject.icon}
+                    </div>
+                    <h3 className="font-medium">{subject.name}</h3>
+                  </div>
+                  <Badge variant="outline" className="bg-gray-100">
+                    Απαιτείται σύνδεση
+                  </Badge>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -181,19 +228,21 @@ const Index = () => {
         </div>
       </div>
       
-      <div className="flex justify-center mb-8">
-        <Link to="/add-content">
-          <Button className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-plus">
-              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="12" x2="12" y1="18" y2="12"/>
-              <line x1="9" x2="15" y1="15" y2="15"/>
-            </svg>
-            Προσθήκη Υλικού
-          </Button>
-        </Link>
-      </div>
+      {isAuthenticated && (
+        <div className="flex justify-center mb-8">
+          <Link to="/add-content">
+            <Button className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-plus">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" x2="12" y1="18" y2="12"/>
+                <line x1="9" x2="15" y1="15" y2="15"/>
+              </svg>
+              Προσθήκη Υλικού
+            </Button>
+          </Link>
+        </div>
+      )}
       
       <Footer />
     </div>

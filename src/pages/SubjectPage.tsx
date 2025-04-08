@@ -177,7 +177,7 @@ const SubjectPage = () => {
                 <Card className="card-hover">
                   <CardContent className="p-6">
                     <h3 className="font-bold text-lg mb-2">Ενδιάμεσες Ασκήσεις</h3>
-                    <p className="text-gray-600 mb-4">Ασκήσεις μεσαίου επ��πέδου για εμβάθυνση γνώσεων</p>
+                    <p className="text-gray-600 mb-4">Ασκήσεις μεσαίου επιπέδου για εμβάθυνση γνώσεων</p>
                     <Link to={`/quiz/${subject.id}/intermediate`}>
                       <Button className="w-full">Έναρξη</Button>
                     </Link>

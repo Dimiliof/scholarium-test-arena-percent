@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, ClipboardCheck, Award, ChevronLeft } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 
 const SubjectPage = () => {
   const { subjectId } = useParams<{ subjectId: string }>();
@@ -32,12 +33,18 @@ const SubjectPage = () => {
     );
   }
 
+  // Δυναμική εύρεση του κατάλληλου εικονιδίου
+  const IconComponent = subject ? 
+    (LucideIcons as Record<string, React.FC<{ className?: string }>>)[subject.icon] || 
+    (() => <span className="text-white text-3xl">?</span>)
+    : () => null;
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
       {/* Subject Header */}
-      <div className={`${subject.color} py-10 text-white`}>
+      <div className={`${subject?.color} py-10 text-white`}>
         <div className="container mx-auto px-4">
           <Link to="/" className="inline-flex items-center text-white/80 hover:text-white mb-6">
             <ChevronLeft className="h-4 w-4 mr-1" />
@@ -45,12 +52,12 @@ const SubjectPage = () => {
           </Link>
           
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center text-5xl">
-              {subject.icon}
+            <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center">
+              <IconComponent className="h-12 w-12 text-white" />
             </div>
             <div className="text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl font-bold mb-3">{subject.name}</h1>
-              <p className="text-xl text-white/90 max-w-2xl">{subject.description}</p>
+              <h1 className="text-3xl md:text-4xl font-bold mb-3">{subject?.name}</h1>
+              <p className="text-xl text-white/90 max-w-2xl">{subject?.description}</p>
             </div>
           </div>
         </div>

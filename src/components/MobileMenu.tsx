@@ -45,6 +45,7 @@ const MobileMenu = () => {
               Εκπαιδευτικοί Πόροι
             </Link>
             
+            {/* Μαθήματα */}
             <div className="pt-2 pb-2">
               <p className="text-sm font-semibold text-muted-foreground mb-2">Μαθήματα</p>
               <div className="pl-2 flex flex-col space-y-2">
@@ -60,6 +61,7 @@ const MobileMenu = () => {
               </div>
             </div>
             
+            {/* Λογοτεχνία */}
             <div className="pt-2 pb-2">
               <p className="text-sm font-semibold text-muted-foreground mb-2">Λογοτεχνία</p>
               <div className="pl-2 flex flex-col space-y-2">
@@ -78,6 +80,7 @@ const MobileMenu = () => {
               </div>
             </div>
             
+            {/* Εργαλεία */}
             <div className="pt-2 pb-2">
               <p className="text-sm font-semibold text-muted-foreground mb-2">Εργαλεία</p>
               <div className="pl-2 flex flex-col space-y-2">
@@ -95,6 +98,25 @@ const MobileMenu = () => {
                 </Link>
               </div>
             </div>
+
+            {/* Επιλογές για μαθητές */}
+            {isAuthenticated && !isTeacher && !isAdmin && (
+              <div className="pt-2 pb-2">
+                <p className="text-sm font-semibold text-muted-foreground mb-2">Μαθητικό Προφίλ</p>
+                <div className="pl-2 flex flex-col space-y-2">
+                  <Link to="/student/courses" className="text-lg font-medium hover:text-primary">
+                    Τα Μαθήματά μου
+                  </Link>
+                  <Link to="/student/enroll" className="text-lg font-medium hover:text-primary">
+                    Εγγραφή σε Μάθημα
+                  </Link>
+                  <Link to="/student/results" className="text-lg font-medium hover:text-primary">
+                    Τα Αποτελέσματά μου
+                  </Link>
+                </div>
+              </div>
+            )}
+
             <Link to="/about" className="text-lg font-medium hover:text-primary">
               Σχετικά
             </Link>

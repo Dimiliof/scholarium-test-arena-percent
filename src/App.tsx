@@ -36,11 +36,16 @@ import ConverterPage from "./pages/tools/ConverterPage";
 import PeriodicTablePage from "./pages/tools/PeriodicTablePage";
 import FormulasPage from "./pages/tools/FormulasPage";
 
-// Εισαγωγή των νέων σελίδων εργαλείων λογοτεχνίας
+// Εισαγωγή των σελίδων εργαλείων λογοτεχνίας
 import LiteratureSourceFinderPage from "./pages/tools/literature/LiteratureSourceFinderPage";
 import LiteratureAuthorsPage from "./pages/tools/literature/LiteratureAuthorsPage";
 import LiteratureResearchPage from "./pages/tools/literature/LiteratureResearchPage";
 import LiteraturePeriodsPage from "./pages/tools/literature/LiteraturePeriodsPage";
+
+// Εισαγωγή των νέων σελίδων για τους μαθητές
+import StudentCoursesPage from "./pages/student/StudentCoursesPage";
+import StudentEnrollPage from "./pages/student/StudentEnrollPage";
+import StudentResultsPage from "./pages/student/StudentResultsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,6 +77,21 @@ const TeacherRoute = ({ children }: { children: React.ReactNode }) => {
   
   // Επιτρέπουμε πρόσβαση και στους διαχειριστές
   if (!isTeacher && !isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+const StudentRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // Επιτρέπουμε πρόσβαση μόνο στους μαθητές
+  if (isTeacher || isAdmin) {
     return <Navigate to="/" replace />;
   }
   
@@ -120,11 +140,16 @@ const App = () => (
             <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
             <Route path="/tools/formulas" element={<FormulasPage />} />
             
-            {/* Νέα εργαλεία λογοτεχνίας */}
+            {/* Εργαλεία λογοτεχνίας */}
             <Route path="/tools/literature/source-finder" element={<LiteratureSourceFinderPage />} />
             <Route path="/tools/literature/authors" element={<LiteratureAuthorsPage />} />
             <Route path="/tools/literature/research" element={<LiteratureResearchPage />} />
             <Route path="/tools/literature/periods" element={<LiteraturePeriodsPage />} />
+            
+            {/* Σελίδες μαθητών */}
+            <Route path="/student/courses" element={<StudentRoute><StudentCoursesPage /></StudentRoute>} />
+            <Route path="/student/enroll" element={<StudentRoute><StudentEnrollPage /></StudentRoute>} />
+            <Route path="/student/results" element={<StudentRoute><StudentResultsPage /></StudentRoute>} />
             
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/edit-profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />

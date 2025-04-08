@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, LogOut, Settings, Book, BookPlus, School, PlusCircle, Users, Shield, Wrench } from "lucide-react";
+import { User, LogOut, Settings, Book, BookPlus, School, PlusCircle, Users, Shield, Wrench, GraduationCap, BookOpen, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const UserMenu = () => {
@@ -146,9 +146,37 @@ const UserMenu = () => {
           </Link>
         </DropdownMenuItem>
 
+        {/* Επιλογές μόνο για μαθητές */}
+        {isStudent && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs">Μαθήματα</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link to="/student/courses" className="cursor-pointer flex w-full items-center">
+                <BookOpen className="mr-2 h-4 w-4" />
+                <span>Τα Μαθήματά μου</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/student/enroll" className="cursor-pointer flex w-full items-center">
+                <GraduationCap className="mr-2 h-4 w-4" />
+                <span>Εγγραφή σε Μάθημα</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/student/results" className="cursor-pointer flex w-full items-center">
+                <Award className="mr-2 h-4 w-4" />
+                <span>Τα Αποτελέσματά μου</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
         {/* Επιλογές μόνο για εκπαιδευτικούς */}
         {isTeacher && (
           <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs">Διδασκαλία</DropdownMenuLabel>
             <DropdownMenuItem asChild>
               <Link to="/teacher-dashboard" className="cursor-pointer flex w-full items-center">
                 <School className="mr-2 h-4 w-4" />

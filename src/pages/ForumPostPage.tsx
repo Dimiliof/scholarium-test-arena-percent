@@ -80,7 +80,19 @@ const mockForumData = {
       subjectId: 'literature',
       replies: []
     }
-  ]
+  ],
+  // Empty arrays for the rest of the subjects to ensure they're recognized
+  'art': [],
+  'physical-education': [],
+  'music': [],
+  'technology': [],
+  'geography': [],
+  'civics': [],
+  'religion': [],
+  'emotional-education': [],
+  'ancient-greek-language': [],
+  'modern-greek': [],
+  'history': []
 };
 
 // Flatten posts for easier lookup

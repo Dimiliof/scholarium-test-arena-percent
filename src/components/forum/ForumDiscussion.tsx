@@ -74,7 +74,19 @@ const mockForumData = {
       content: 'Θα ήθελα βοήθεια στην ανάλυση του ποιήματος "Ιθάκη" του Καβάφη.',
       replies: []
     }
-  ]
+  ],
+  // Adding empty arrays for the missing subjects
+  'art': [],
+  'physical-education': [],
+  'music': [],
+  'technology': [],
+  'geography': [],
+  'civics': [],
+  'religion': [],
+  'emotional-education': [],
+  'ancient-greek-language': [],
+  'modern-greek': [],
+  'history': []
 };
 
 interface ForumDiscussionProps {
@@ -89,9 +101,7 @@ const ForumDiscussion: React.FC<ForumDiscussionProps> = ({ subjectId }) => {
   const subject = subjectId ? subjects.find(s => s.id === subjectId) : null;
   
   // Get posts for the current subject or return an empty array if not found
-  const posts = subjectId && mockForumData[subjectId as keyof typeof mockForumData] 
-    ? mockForumData[subjectId as keyof typeof mockForumData] 
-    : [];
+  const posts = subjectId ? (mockForumData[subjectId as keyof typeof mockForumData] || []) : [];
   
   const handleSubmitPost = (postData: { title: string; content: string }) => {
     // In a real app, we would send this to an API

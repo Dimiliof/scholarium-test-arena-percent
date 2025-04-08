@@ -21,6 +21,8 @@ import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import ContactPage from "./pages/ContactPage";
 import ProfilePage from "./pages/ProfilePage";
+import EditProfilePage from "./pages/EditProfilePage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminLoginsPage from "./pages/admin/AdminLoginsPage";
@@ -107,6 +109,8 @@ const App = () => (
             <Route path="/tools/formulas" element={<FormulasPage />} />
             
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/edit-profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
+            <Route path="/change-password" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
             
             <Route path="/add-content" element={<TeacherRoute><AddContentPage /></TeacherRoute>} />
             <Route path="/teacher-dashboard" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />

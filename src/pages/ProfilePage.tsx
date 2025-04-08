@@ -1,12 +1,12 @@
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ProfilePage = () => {
   const { user, isAuthenticated } = useAuth();
@@ -38,20 +38,28 @@ const ProfilePage = () => {
               <Card>
                 <CardContent className="pt-6 flex flex-col items-center">
                   <Avatar className="h-24 w-24 mb-4">
-                    <AvatarFallback className="text-xl bg-primary text-primary-foreground">
-                      {initials}
-                    </AvatarFallback>
+                    {user.profileImage ? (
+                      <AvatarImage src={user.profileImage} alt={user.firstName} />
+                    ) : (
+                      <AvatarFallback className="text-xl bg-primary text-primary-foreground">
+                        {initials}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <h2 className="text-xl font-bold">{user.firstName} {user.lastName}</h2>
                   <p className="text-muted-foreground">{user.email}</p>
                   
                   <div className="w-full mt-6">
-                    <Button variant="outline" className="w-full mb-2">
-                      Επεξεργασία Προφίλ
-                    </Button>
-                    <Button variant="outline" className="w-full">
-                      Αλλαγή Κωδικού
-                    </Button>
+                    <Link to="/edit-profile">
+                      <Button variant="outline" className="w-full mb-2">
+                        Επεξεργασία Προφίλ
+                      </Button>
+                    </Link>
+                    <Link to="/change-password">
+                      <Button variant="outline" className="w-full">
+                        Αλλαγή Κωδικού
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>

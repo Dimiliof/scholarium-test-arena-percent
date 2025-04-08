@@ -76,8 +76,11 @@ const UserMenu = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar>
-            <AvatarImage src="" />
-            <AvatarFallback>{getInitials()}</AvatarFallback>
+            {user?.profileImage ? (
+              <AvatarImage src={user.profileImage} alt={user.firstName} />
+            ) : (
+              <AvatarFallback>{getInitials()}</AvatarFallback>
+            )}
           </Avatar>
           {getRoleBadge()}
         </Button>
@@ -102,6 +105,12 @@ const UserMenu = () => {
           <Link to="/profile" className="cursor-pointer flex w-full items-center">
             <User className="mr-2 h-4 w-4" />
             <span>Το προφίλ μου</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/edit-profile" className="cursor-pointer flex w-full items-center">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Επεξεργασία προφίλ</span>
           </Link>
         </DropdownMenuItem>
 

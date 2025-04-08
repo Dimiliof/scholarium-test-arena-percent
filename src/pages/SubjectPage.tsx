@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, ClipboardCheck, Award, ChevronLeft } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 const SubjectPage = () => {
   const { subjectId } = useParams<{ subjectId: string }>();
@@ -35,7 +36,7 @@ const SubjectPage = () => {
 
   // Δυναμική εύρεση του κατάλληλου εικονιδίου
   const IconComponent = subject ? 
-    (LucideIcons as Record<string, React.FC<{ className?: string }>>)[subject.icon] || 
+    (LucideIcons[subject.icon as keyof typeof LucideIcons] as LucideIcon) || 
     (() => <span className="text-white text-3xl">?</span>)
     : () => null;
 

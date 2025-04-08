@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Subject } from '@/lib/subjectsData';
 import * as LucideIcons from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 interface SubjectCardProps {
   subject: Subject;
@@ -10,7 +11,7 @@ interface SubjectCardProps {
 
 const SubjectCard = ({ subject }: SubjectCardProps) => {
   // Δυναμική εύρεση του κατάλληλου εικονιδίου
-  const IconComponent = (LucideIcons as Record<string, React.FC<{ className?: string }>>)[subject.icon] || 
+  const IconComponent = LucideIcons[subject.icon as keyof typeof LucideIcons] as LucideIcon || 
     (() => <span className="text-white text-xl">?</span>);
 
   return (

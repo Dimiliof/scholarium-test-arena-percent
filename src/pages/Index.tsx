@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { subjects } from '@/lib/subjectsData';
 import { motion } from "framer-motion";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -18,6 +19,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
+  const isMobile = useIsMobile();
   
   const handleStartNow = () => {
     const subjectsSection = document.getElementById('subjects-section');
@@ -63,7 +65,7 @@ const Index = () => {
       </div>
       
       <motion.div 
-        className="py-12 bg-gradient-to-r from-blue-50 to-indigo-50"
+        className={`py-8 ${isMobile ? 'px-4' : 'py-12'} bg-gradient-to-r from-blue-50 to-indigo-50`}
         variants={sectionVariants}
         initial="hidden"
         whileInView="visible"

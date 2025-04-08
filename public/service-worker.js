@@ -1,7 +1,7 @@
 
 // Service worker για την εφαρμογή EduPercentage PWA
 
-const CACHE_NAME = 'eduPercentage-v4';
+const CACHE_NAME = 'eduPercentage-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -94,7 +94,10 @@ self.addEventListener('push', event => {
     const options = {
       body: data.body,
       icon: '/logo.png',
-      badge: '/logo.png'
+      badge: '/logo.png',
+      data: {
+        url: data.url || '/'
+      }
     };
     
     event.waitUntil(
@@ -106,7 +109,24 @@ self.addEventListener('push', event => {
 // Διαχείριση κλικ στις ειδοποιήσεις
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  event.waitUntil(
-    clients.openWindow('/')
-  );
+  
+  if (event.notification.data && event.notification.data.url) {
+    event.waitUntil(
+      clients.openWindow(event.notification.data.url)
+    );
+  } else {
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+});
+
+// Προσθήκη λειτουργικότητας για περιοδική συγχρονισμό δεδομένων
+self.addEventListener('periodicsync', event => {
+  if (event.tag === 'update-content') {
+    event.waitUntil(
+      // Εδώ θα προσθέταμε κώδικα για συγχρονισμό περιεχομένου
+      console.log('Εκτέλεση περιοδικού συγχρονισμού')
+    );
+  }
 });

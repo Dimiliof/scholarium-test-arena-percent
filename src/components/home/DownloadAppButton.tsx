@@ -87,11 +87,29 @@ const DownloadAppButton = () => {
     
     try {
       if (platform === 'Android') {
-        // Εμφάνιση του Android modal αντί για απευθείας λήψη
-        setShowAndroidModal(true);
+        // Έλεγχος αν είναι Android app ή PWA σε Android
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        if (isStandalone && /Android/.test(navigator.userAgent)) {
+          toast({
+            title: "Είστε ήδη στην εφαρμογή",
+            description: "Χρησιμοποιείτε ήδη την εφαρμογή Android.",
+          });
+        } else {
+          // Εμφάνιση του Android modal
+          setShowAndroidModal(true);
+        }
       } else if (platform === 'iOS') {
-        // Εμφάνιση του iOS modal αντί για απευθείας ανακατεύθυνση
-        setShowIOSModal(true);
+        // Έλεγχος αν είναι iOS app ή PWA σε iOS
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        if (isStandalone && /iPad|iPhone|iPod/.test(navigator.userAgent)) {
+          toast({
+            title: "Είστε ήδη στην εφαρμογή",
+            description: "Χρησιμοποιείτε ήδη την εφαρμογή iOS.",
+          });
+        } else {
+          // Εμφάνιση του iOS modal
+          setShowIOSModal(true);
+        }
       } else if (platform === 'PWA') {
         // Λογική εγκατάστασης PWA
         if (deferredPrompt) {
@@ -141,33 +159,58 @@ const DownloadAppButton = () => {
     }
   };
 
-  // Διαχείριση λήψης APK για Android - Διορθωμένη έκδοση
+  // Διαχείριση λήψης APK για Android
   const handleAndroidDownload = () => {
-    // Δημιουργία πραγματικού συνδέσμου λήψης
+    // Σύνδεσμος για το Play Store
+    const playStoreUrl = 'https://play.google.com/store/apps/details?id=app.edupercentage';
+    
+    // Σύνδεσμος για άμεση λήψη APK
     const apkUrl = 'https://edupercentage.s3.eu-central-1.amazonaws.com/releases/eduPercentage-latest.apk';
     
-    // Εμφάνιση toast για ενημέρωση χρήστη
-    toast({
-      title: "Λήψη APK",
-      description: "Η λήψη του αρχείου APK ξεκίνησε. Μετά την ολοκλήρωση, ανοίξτε το αρχείο για εγκατάσταση.",
-    });
+    // Έλεγχος αν η εφαρμογή είναι εγκατεστημένη ή αν τρέχει ως PWA
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     
-    // Δημιουργία του συνδέσμου λήψης προγραμματιστικά
-    const link = document.createElement('a');
-    link.href = apkUrl;
-    link.download = 'eduPercentage.apk';
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    
-    // Κάνουμε "κλικ" στο σύνδεσμο για να ξεκινήσει η λήψη
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Εναλλακτικό fallback για συσκευές που δεν υποστηρίζουν την αυτόματη λήψη
-    setTimeout(() => {
-      window.open(apkUrl, '_blank', 'noopener,noreferrer');
-    }, 300);
+    if (/Samsung|SM-|SAMSUNG/.test(navigator.userAgent)) {
+      // Για συσκευές Samsung δοκιμάζουμε πρώτα το Galaxy Store
+      try {
+        window.location.href = 'samsungapps://ProductDetail/app.edupercentage';
+        setTimeout(() => {
+          // Fallback στο Play Store αν δεν ανοίξει το Galaxy Store
+          window.open(playStoreUrl, '_blank');
+        }, 1000);
+      } catch (e) {
+        window.open(playStoreUrl, '_blank');
+      }
+    } else {
+      // Άλλες συσκευές Android
+      if (/Android/.test(navigator.userAgent)) {
+        // Άνοιγμα στο Play Store
+        window.open(playStoreUrl, '_blank');
+        
+        toast({
+          title: "Μετάβαση στο Play Store",
+          description: "Ανοίγει το Google Play Store για εγκατάσταση της εφαρμογής EduPercentage.",
+        });
+      } else {
+        // Για desktop υπολογιστές που θέλουν να κατεβάσουν το APK
+        toast({
+          title: "Λήψη APK",
+          description: "Η λήψη του αρχείου APK ξεκίνησε. Μετά την ολοκλήρωση, μεταφέρετε το στην Android συσκευή σας.",
+        });
+        
+        // Δημιουργία του συνδέσμου λήψης προγραμματιστικά
+        const link = document.createElement('a');
+        link.href = apkUrl;
+        link.download = 'eduPercentage.apk';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        
+        // Κάνουμε "κλικ" στο σύνδεσμο για να ξεκινήσει η λήψη
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
     
     // Κλείσιμο του modal μετά την ενέργεια
     setShowAndroidModal(false);
@@ -175,7 +218,7 @@ const DownloadAppButton = () => {
 
   // Άνοιγμα στο App Store για iOS
   const handleIOSAppStore = () => {
-    const appStoreUrl = 'https://apps.apple.com/gr/app/edupercentage/id1234567890';
+    const appStoreUrl = 'https://apps.apple.com/app/edupercentage/id1234567890';
     window.open(appStoreUrl, '_blank');
     
     toast({
@@ -320,7 +363,7 @@ const DownloadAppButton = () => {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuItem onClick={() => handleDownload('Android')}>
               <Smartphone className="mr-2 h-4 w-4" />
-              <span>Android (.apk)</span>
+              <span>Android (Play Store)</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleDownload('iOS')}>
               <Apple className="mr-2 h-4 w-4" />

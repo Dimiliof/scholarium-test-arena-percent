@@ -2,7 +2,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.c892c6890dd640ada5c591e03b7cd24f',
+  appId: 'app.edupercentage',
   appName: 'EduPercentage',
   webDir: 'dist',
   bundledWebRuntime: false,
@@ -23,25 +23,25 @@ const config: CapacitorConfig = {
       style: "LIGHT",
       backgroundColor: "#4f46e5"
     },
-    // Προσθήκη ρυθμίσεων για την εγκατάσταση και το κατέβασμα της εφαρμογής
     PushNotifications: {
       presentationOptions: ["badge", "sound", "alert"]
     }
   },
   android: {
-    flavor: "adhoc",
+    flavor: "production",
     buildOptions: {
-      keystorePath: null,
-      keystorePassword: null,
-      keystoreAlias: null,
-      keystoreAliasPassword: null,
+      keystorePath: "edupercentage.keystore",
+      keystorePassword: "edupercentage",
+      keystoreAlias: "edupercentage",
+      keystoreAliasPassword: "edupercentage",
       releaseType: "AAB"
     }
   },
   ios: {
     contentInset: "always",
     scheme: "EduPercentage",
-    limitsNavigationsToAppBoundDomains: true
+    limitsNavigationsToAppBoundDomains: true,
+    backgroundColor: "#ffffff"
   }
 };
 

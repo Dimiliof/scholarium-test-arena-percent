@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -138,9 +137,11 @@ const Index = () => {
                 Οι εκπαιδευτικοί μπορούν να προσθέσουν το δικό τους εκπαιδευτικό υλικό 
                 και να παρακολουθούν την πρόοδο των μαθητών τους.
               </p>
-              <Button variant="outline" className="bg-green-600 text-white hover:bg-green-700 border-0">
-                Εγγραφή Σχολείου
-              </Button>
+              <Link to="/school-registration">
+                <Button variant="outline" className="bg-green-600 text-white hover:bg-green-700 border-0">
+                  Εγγραφή Σχολείου
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

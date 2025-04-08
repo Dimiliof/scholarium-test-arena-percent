@@ -5,6 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -40,8 +43,10 @@ const formSchema = z.object({
 
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [registerError, setRegisterError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,29 +61,28 @@ const RegisterPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
+    setRegisterError(null);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const success = await register(
+        values.firstName,
+        values.lastName,
+        values.email,
+        values.password
+      );
       
-      console.log("Registration data:", values);
-      
-      // Successful registration toast
-      toast({
-        title: "Επιτυχής εγγραφή",
-        description: "Ο λογαριασμός σας δημιουργήθηκε επιτυχώς. Μπορείτε να συνδεθείτε τώρα.",
-      });
-      
-      // Redirect to login page
-      navigate("/login");
+      if (success) {
+        toast({
+          title: "Επιτυχής εγγραφή",
+          description: "Ο λογαριασμός σας δημιουργήθηκε επιτυχώς. Είστε τώρα συνδεδεμένοι.",
+        });
+        navigate("/");
+      } else {
+        setRegisterError("Το email που εισάγατε χρησιμοποιείται ήδη. Παρακαλώ χρησιμοποιήστε ένα διαφορετικό email.");
+      }
     } catch (error) {
       console.error("Registration error:", error);
-      
-      toast({
-        title: "Σφάλμα εγγραφής",
-        description: "Παρουσιάστηκε σφάλμα κατά την εγγραφή. Παρακαλώ προσπαθήστε ξανά.",
-        variant: "destructive",
-      });
+      setRegisterError("Παρουσιάστηκε σφάλμα κατά την εγγραφή. Παρακαλώ προσπαθήστε ξανά.");
     } finally {
       setIsLoading(false);
     }
@@ -98,6 +102,16 @@ const RegisterPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {registerError && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Σφάλμα</AlertTitle>
+                  <AlertDescription>
+                    {registerError}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -30,8 +33,10 @@ const formSchema = z.object({
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,29 +48,23 @@ const LoginPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
+    setLoginError(null);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const success = await login(values.email, values.password);
       
-      console.log("Login attempt:", values);
-      
-      // Successful login toast
-      toast({
-        title: "Επιτυχής σύνδεση",
-        description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
-      });
-      
-      // Redirect to home page
-      navigate("/");
+      if (success) {
+        toast({
+          title: "Επιτυχής σύνδεση",
+          description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
+        });
+        navigate("/");
+      } else {
+        setLoginError("Λάθος email ή κωδικός πρόσβασης. Παρακαλώ προσπαθήστε ξανά.");
+      }
     } catch (error) {
       console.error("Login error:", error);
-      
-      toast({
-        title: "Σφάλμα σύνδεσης",
-        description: "Παρουσιάστηκε σφάλμα κατά τη σύνδεση. Παρακαλώ προσπαθήστε ξανά.",
-        variant: "destructive",
-      });
+      setLoginError("Παρουσιάστηκε σφάλμα κατά τη σύνδεση. Παρακαλώ προσπαθήστε ξανά.");
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +84,16 @@ const LoginPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {loginError && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Σφάλμα</AlertTitle>
+                  <AlertDescription>
+                    {loginError}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField

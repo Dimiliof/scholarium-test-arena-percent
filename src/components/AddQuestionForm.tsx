@@ -19,8 +19,15 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { QuizQuestion } from "@/lib/subjectsData";
 import { useQuestionManagement } from "@/hooks/useQuestionManagement";
 
-// Ορίζουμε τον τύπο για το quizType ως enum για να αποφύγουμε το πρόβλημα
-export type QuizType = "basic" | "intermediate" | "advanced" | "quick" | "medium" | "full";
+// Ορίζουμε τον τύπο για το quizType ως enum για να είναι διαθέσιμο ως τιμή και ως τύπος
+export enum QuizType {
+  BASIC = "basic",
+  INTERMEDIATE = "intermediate",
+  ADVANCED = "advanced",
+  QUICK = "quick",
+  MEDIUM = "medium",
+  FULL = "full"
+}
 
 const questionSchema = z.object({
   question: z.string().min(5, {
@@ -46,20 +53,21 @@ const questionSchema = z.object({
   }),
 });
 
+// Τώρα χρησιμοποιούμε το enum για τον τύπο
 type QuestionFormValues = z.infer<typeof questionSchema>;
 
 interface AddQuestionFormProps {
   subjectId: string;
   onSuccess?: () => void;
   initialData?: QuizQuestion;
-  initialQuizType?: QuizType; // Χρησιμοποιούμε τον νέο τύπο QuizType
+  initialQuizType?: QuizType; // Χρησιμοποιούμε το enum
 }
 
 export function AddQuestionForm({ 
   subjectId, 
   onSuccess, 
   initialData, 
-  initialQuizType = "basic" 
+  initialQuizType = QuizType.BASIC  // Προεπιλεγμένη τιμή από το enum
 }: AddQuestionFormProps) {
   const { addQuestion, editQuestion, isLoading } = useQuestionManagement();
   const isEditing = !!initialData;
@@ -72,7 +80,7 @@ export function AddQuestionForm({
         optionC: initialData.options[2],
         optionD: initialData.options[3],
         correctAnswer: initialData.correctAnswer.toString() as "0" | "1" | "2" | "3",
-        quizType: initialQuizType as QuizType, // Βεβαιωνόμαστε ότι είναι σωστός τύπος
+        quizType: initialQuizType,
       }
     : {
         question: "",
@@ -80,7 +88,7 @@ export function AddQuestionForm({
         optionB: "",
         optionC: "",
         optionD: "",
-        quizType: initialQuizType as QuizType, // Βεβαιωνόμαστε ότι είναι σωστός τύπος
+        quizType: initialQuizType,
       };
   
   const form = useForm<QuestionFormValues>({

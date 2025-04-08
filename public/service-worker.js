@@ -1,5 +1,5 @@
 
-// Service worker for EduPercentage PWA
+// Service worker για την εφαρμογή EduPercentage PWA
 
 const CACHE_NAME = 'eduPercentage-v1';
 const urlsToCache = [
@@ -13,7 +13,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Άνοιγμα cache');
         return cache.addAll(urlsToCache);
       })
   );
@@ -23,7 +23,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Cache hit - return response
+        // Cache hit - επιστροφή απάντησης
         if (response) {
           return response;
         }

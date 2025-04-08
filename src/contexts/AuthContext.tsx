@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (u.email === adminEmail && u.role !== "admin") {
           needsUpdate = true;
           console.log(`Διόρθωση ρόλου για τον διαχειριστή ${adminEmail} από ${u.role} σε admin`);
-          return { ...u, role: "admin" };
+          return { ...u, role: "admin" as const };
         }
         return u;
       });
@@ -138,7 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updatedUsers = users.map((u: User) => {
         if (u.email === email) {
           userFound = true;
-          return { ...u, role: "admin" };
+          return { ...u, role: "admin" as const };
         }
         return u;
       });
@@ -149,7 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Αν ο συνδεδεμένος χρήστης είναι αυτός που ενημερώνουμε, ενημερώνουμε και το user state
       if (user && user.email === email) {
-        const updatedUser = { ...user, role: "admin" };
+        const updatedUser: User = { ...user, role: "admin" };
         setUser(updatedUser);
         setIsAdmin(true);
         localStorage.setItem("user", JSON.stringify(updatedUser));

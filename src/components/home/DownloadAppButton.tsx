@@ -36,9 +36,22 @@ const DownloadAppButton = () => {
         window.open('https://apps.apple.com/app/example', '_blank');
       } else if (platform === 'Web') {
         // Λογική για PWA εγκατάσταση
-        if ('serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window) {
-          console.log('Η εφαρμογή μπορεί να εγκατασταθεί ως PWA');
-          // Εδώ θα μπορούσε να προστεθεί λογική για την εμφάνιση του PWA prompt
+        if ('serviceWorker' in navigator && window.deferredPrompt) {
+          window.deferredPrompt.prompt();
+          window.deferredPrompt.userChoice.then((choiceResult: any) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('Ο χρήστης αποδέχτηκε την εγκατάσταση του PWA');
+            } else {
+              console.log('Ο χρήστης απέρριψε την εγκατάσταση του PWA');
+            }
+            window.deferredPrompt = null;
+          });
+        } else {
+          console.log('Το PWA δεν μπορεί να εγκατασταθεί ή έχει ήδη εγκατασταθεί');
+          toast({
+            title: "Πληροφορία",
+            description: "Για προσθήκη στην αρχική οθόνη, χρησιμοποιήστε την επιλογή 'Προσθήκη στην αρχική οθόνη' του προγράμματος περιήγησης.",
+          });
         }
       }
     }, 1000);

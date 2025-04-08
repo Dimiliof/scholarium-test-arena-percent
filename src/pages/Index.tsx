@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,11 +16,35 @@ import TestimonialsSection from '@/components/home/TestimonialsSection';
 import SchoolIntegrationSection from '@/components/home/SchoolIntegrationSection';
 import DownloadAppButton from '@/components/home/DownloadAppButton';
 
+// Add PWA installation prompt
+declare global {
+  interface Window {
+    deferredPrompt: any;
+  }
+}
+
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
+  
+  // Προσθήκη event listener για το PWA installation prompt
+  React.useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      // Αποτρέπουμε το Chrome από το να εμφανίσει αυτόματα το prompt
+      e.preventDefault();
+      // Αποθηκεύουμε το event για να το χρησιμοποιήσουμε αργότερα
+      window.deferredPrompt = e;
+      console.log('Το PWA μπορεί να εγκατασταθεί');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
   
   const handleStartNow = () => {
     const subjectsSection = document.getElementById('subjects-section');
@@ -81,8 +106,9 @@ const Index = () => {
       
       <div className="fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center pb-4">
         {isAuthenticated && <AddContentButton />}
-        <DownloadAppButton />
       </div>
+      
+      <DownloadAppButton />
       
       <Footer />
     </div>

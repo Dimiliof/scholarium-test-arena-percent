@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 
@@ -42,7 +41,7 @@ const Footer = () => {
           <div>
             <h3 className="font-bold text-lg mb-4">Επικοινωνία</h3>
             <ul className="space-y-2 text-sm">
-              <li className="text-gray-600">Email: info@ekpaidevtiki-gonia.gr</li>
+              <li className="text-gray-600">Email: dimitris.liofis@atsoglou.gr</li>
               <li className="text-gray-600">Τηλέφωνο: +30 210 1234567</li>
             </ul>
           </div>

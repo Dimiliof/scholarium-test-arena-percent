@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -24,15 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users, Search, UserX } from "lucide-react";
+import { Users, Search, UserX, ShieldCheck } from "lucide-react";
 
 const AdminUsersPage = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isAdmin, getAllUsers } = useAuth();
+  const { user, isAuthenticated, isAdmin, getAllUsers, fixAdminEmail } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const { toast } = useToast();
 
   // Έλεγχος αν ο χρήστης είναι διαχειριστής
   useEffect(() => {
@@ -40,9 +42,13 @@ const AdminUsersPage = () => {
       navigate('/');
     } else {
       // Φόρτωση των χρηστών
-      setUsers(getAllUsers());
+      loadUsers();
     }
-  }, [isAuthenticated, isAdmin, navigate, getAllUsers]);
+  }, [isAuthenticated, isAdmin, navigate]);
+
+  const loadUsers = () => {
+    setUsers(getAllUsers());
+  };
 
   // Φιλτράρισμα των χρηστών βάσει των κριτηρίων αναζήτησης
   useEffect(() => {
@@ -66,6 +72,26 @@ const AdminUsersPage = () => {
     setFilteredUsers(filteredList);
   }, [users, searchTerm, roleFilter]);
 
+  // Διόρθωση του ρόλου του διαχειριστή
+  const handleFixAdminRole = async () => {
+    const adminEmail = "liofisdimitris@gmail.com";
+    const success = await fixAdminEmail(adminEmail);
+    
+    if (success) {
+      toast({
+        title: "Επιτυχής ενημέρωση",
+        description: `Ο χρήστης ${adminEmail} ορίστηκε ως διαχειριστής επιτυχώς.`,
+      });
+      loadUsers(); // Επαναφόρτωση χρηστών για να εμφανιστούν οι αλλαγές
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Σφάλμα",
+        description: "Προέκυψε πρόβλημα κατά την ενημέρωση του ρόλου.",
+      });
+    }
+  };
+
   // Αν ο χρήστης δεν είναι διαχειριστής, δεν εμφανίζουμε τίποτα
   if (!isAuthenticated || !isAdmin) {
     return null;
@@ -85,6 +111,16 @@ const AdminUsersPage = () => {
             <p className="text-muted-foreground">
               Προβολή και διαχείριση των χρηστών της πλατφόρμας
             </p>
+          </div>
+          <div className="mt-4 md:mt-0">
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+              onClick={handleFixAdminRole}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Όρισε Διαχειριστή
+            </Button>
           </div>
         </div>
         

@@ -43,6 +43,7 @@ type AuthContextType = {
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
   getAllUsers: () => User[];
   loginRecords: LoginRecord[];
+  fixAdminEmail: (email: string) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -57,6 +58,7 @@ const AuthContext = createContext<AuthContextType>({
   changePassword: async () => false,
   getAllUsers: () => [],
   loginRecords: [],
+  fixAdminEmail: async () => false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -69,6 +71,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loginRecords, setLoginRecords] = useState<LoginRecord[]>([]);
 
   useEffect(() => {
+    // Διόρθωση του email του διαχειριστή κατά την εκκίνηση
+    fixAdminEmailOnStartup();
+    
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
@@ -84,6 +89,78 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoginRecords(JSON.parse(storedRecords));
     }
   }, []);
+  
+  // Διόρθωση του email του διαχειριστή κατά την εκκίνηση
+  const fixAdminEmailOnStartup = () => {
+    const adminEmail = "liofisdimitris@gmail.com";
+    const storedUsers = localStorage.getItem("users");
+    
+    if (storedUsers) {
+      const users = JSON.parse(storedUsers);
+      let needsUpdate = false;
+      
+      const updatedUsers = users.map((u: User) => {
+        if (u.email === adminEmail && u.role !== "admin") {
+          needsUpdate = true;
+          console.log(`Διόρθωση ρόλου για τον διαχειριστή ${adminEmail} από ${u.role} σε admin`);
+          return { ...u, role: "admin" };
+        }
+        return u;
+      });
+      
+      if (needsUpdate) {
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+        console.log("Ενημερώθηκε η λίστα χρηστών για τον διαχειριστή");
+        
+        // Αν ο συνδεδεμένος χρήστης είναι ο διαχειριστής, ενημερώνουμε και αυτόν
+        const currentUser = localStorage.getItem("user");
+        if (currentUser) {
+          const parsedUser = JSON.parse(currentUser);
+          if (parsedUser.email === adminEmail) {
+            parsedUser.role = "admin";
+            localStorage.setItem("user", JSON.stringify(parsedUser));
+            console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης-διαχειριστής");
+          }
+        }
+      }
+    }
+  };
+  
+  // Λειτουργία διόρθωσης ρόλου για συγκεκριμένο email
+  const fixAdminEmail = async (email: string): Promise<boolean> => {
+    try {
+      const storedUsers = localStorage.getItem("users");
+      if (!storedUsers) return false;
+      
+      const users = JSON.parse(storedUsers);
+      let userFound = false;
+      
+      const updatedUsers = users.map((u: User) => {
+        if (u.email === email) {
+          userFound = true;
+          return { ...u, role: "admin" };
+        }
+        return u;
+      });
+      
+      if (!userFound) return false;
+      
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      
+      // Αν ο συνδεδεμένος χρήστης είναι αυτός που ενημερώνουμε, ενημερώνουμε και το user state
+      if (user && user.email === email) {
+        const updatedUser = { ...user, role: "admin" };
+        setUser(updatedUser);
+        setIsAdmin(true);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Σφάλμα κατά την ενημέρωση του ρόλου:", error);
+      return false;
+    }
+  };
 
   const login = async (email: string, password: string) => {
     const storedUsers = localStorage.getItem("users");
@@ -235,7 +312,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateUserProfile,
         changePassword,
         getAllUsers,
-        loginRecords
+        loginRecords,
+        fixAdminEmail
       }}
     >
       {children}

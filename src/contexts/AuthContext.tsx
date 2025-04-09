@@ -1,53 +1,9 @@
+
 import React, { createContext, useState, useEffect, useContext } from "react";
-
-// Τύπος δεδομένων για την εγγραφή
-type RegisterData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password?: string;
-  school?: string;
-  classYear?: string;
-  termsAccepted: boolean;
-  role?: "teacher" | "student";
-  roles?: string[]; // Προσθήκη υποστήριξης για πολλαπλούς ρόλους
-};
-
-// Τύπος χρήστη
-export type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: "admin" | "teacher" | "student";
-  roles?: string[]; // Προσθήκη πεδίου για πολλαπλούς ρόλους
-  profileImage?: string | null;
-};
-
-// Τύπος καταγραφής σύνδεσης
-export type LoginRecord = {
-  userId: string;
-  userName: string;
-  email: string;
-  role: string;
-  timestamp: number;
-};
-
-type AuthContextType = {
-  user: User | null;
-  isAuthenticated: boolean;
-  isAdmin: boolean;
-  isTeacher: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (userData: RegisterData) => Promise<boolean>;
-  logout: () => void;
-  updateUserProfile: (updatedUser: User) => Promise<boolean>;
-  changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
-  getAllUsers: () => User[];
-  loginRecords: LoginRecord[];
-  fixAdminEmail: (email: string) => Promise<boolean>;
-  makeUserTeacherAndAdmin: (email: string) => Promise<boolean>;
-};
+import { AuthContextType, User, RegisterData, LoginRecord } from "../types/auth";
+import { checkIsAdmin, checkIsTeacher, getUserFromLocalStorage } from "../utils/authUtils";
+import { fixAdminEmailOnStartup, fixAdminEmail, makeUserTeacherAndAdmin } from "../utils/adminUtils";
+import { useUserOperations } from "../hooks/useUserOperations";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -73,18 +29,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
   const [loginRecords, setLoginRecords] = useState<LoginRecord[]>([]);
+  
+  const userOperations = useUserOperations();
 
   useEffect(() => {
     // Διόρθωση του email του διαχειριστή κατά την εκκίνηση
     fixAdminEmailOnStartup();
     
-    const storedUser = localStorage.getItem("user");
+    const storedUser = getUserFromLocalStorage();
     if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
+      setUser(storedUser);
       setIsAuthenticated(true);
-      setIsAdmin(parsedUser.role === "admin" || (parsedUser.roles && parsedUser.roles.includes("admin")));
-      setIsTeacher(parsedUser.role === "teacher" || (parsedUser.roles && parsedUser.roles.includes("teacher")));
+      setIsAdmin(checkIsAdmin(storedUser));
+      setIsTeacher(checkIsTeacher(storedUser));
     }
     
     // Φόρτωση των καταγραφών σύνδεσης
@@ -93,230 +50,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoginRecords(JSON.parse(storedRecords));
     }
   }, []);
-  
-  // Διόρθωση του email του διαχειριστή κατά την εκκίνηση
-  const fixAdminEmailOnStartup = () => {
-    const adminEmail = "liofisdimitris@gmail.com";
-    const storedUsers = localStorage.getItem("users");
-    
-    if (storedUsers) {
-      const users = JSON.parse(storedUsers);
-      let needsUpdate = false;
-      
-      const updatedUsers = users.map((u: User) => {
-        if (u.email === adminEmail) {
-          needsUpdate = true;
-          console.log(`Διόρθωση ρόλου για τον διαχειριστή ${adminEmail} από ${u.role} σε admin`);
-          return { ...u, role: "admin" as const };
-        }
-        return u;
-      });
-      
-      if (needsUpdate) {
-        localStorage.setItem("users", JSON.stringify(updatedUsers));
-        console.log("Ενημερώθηκε η λίστα χρηστών για τον διαχειριστή");
-        
-        // Αν ο συνδεδεμένος χρήστης είναι ο διαχειριστής, ενημερώνουμε και αυτόν
-        const currentUser = localStorage.getItem("user");
-        if (currentUser) {
-          const parsedUser = JSON.parse(currentUser);
-          if (parsedUser.email === adminEmail) {
-            parsedUser.role = "admin";
-            localStorage.setItem("user", JSON.stringify(parsedUser));
-            console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης-διαχειριστής");
-          }
-        }
-      } else {
-        // Αν δεν υπάρχει ο διαχειριστής, τον δημιουργούμε
-        const adminExists = users.some((u: User) => u.email === adminEmail);
-        if (!adminExists) {
-          console.log("Ο διαχειριστής δεν υπάρχει, τον δημιουργούμε");
-          const newAdmin = {
-            id: Math.random().toString(36).substring(2, 15),
-            firstName: "Διαχειριστής",
-            lastName: "Συστήματος",
-            email: adminEmail,
-            password: "admin12345",
-            role: "admin" as const,
-          };
-          users.push(newAdmin);
-          localStorage.setItem("users", JSON.stringify(users));
-          console.log("Δημιουργήθηκε ο διαχειριστής:", newAdmin);
-        }
-      }
-    } else {
-      // Αν δεν υπάρχουν χρήστες, δημιουργούμε τον διαχειριστή
-      const newAdmin = {
-        id: Math.random().toString(36).substring(2, 15),
-        firstName: "Διαχειριστής",
-        lastName: "Συστήματος",
-        email: adminEmail,
-        password: "admin12345",
-        role: "admin" as const,
-      };
-      localStorage.setItem("users", JSON.stringify([newAdmin]));
-      console.log("Δημιουργήθηκε αρχικός διαχειριστής:", newAdmin);
-    }
-  };
-  
-  // Μέθοδος για ορισμό χρήστη ως διαχειριστή και εκπαιδευτικό ταυτόχρονα
-  const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> => {
-    try {
-      const storedUsers = localStorage.getItem("users");
-      if (!storedUsers) {
-        // Αν δεν υπάρχουν χρήστες, δημιουργούμε νέο με διπλό ρόλο
-        const newUser = {
-          id: Math.random().toString(36).substring(2, 15),
-          firstName: "Διαχειριστής",
-          lastName: "Εκπαιδευτικός",
-          email: email,
-          password: "admin12345",
-          role: "admin" as const,
-          roles: ["admin", "teacher"],
-        };
-        localStorage.setItem("users", JSON.stringify([newUser]));
-        console.log("Δημιουργήθηκε χρήστης με διπλό ρόλο:", newUser);
-        return true;
-      }
-      
-      const users = JSON.parse(storedUsers);
-      let userFound = false;
-      
-      const updatedUsers = users.map((u: User & { password?: string }) => {
-        if (u.email === email) {
-          userFound = true;
-          console.log(`Ο χρήστης ${email} βρέθηκε. Ενημέρωση σε διαχειριστή και εκπαιδευτικό.`);
-          return { 
-            ...u, 
-            role: "admin" as const, 
-            roles: ["admin", "teacher"]
-          };
-        }
-        return u;
-      });
-      
-      if (!userFound) {
-        // Αν δεν υπάρχει ο χρήστης, τον δημιουργούμε
-        console.log(`Ο χρήστης ${email} δεν βρέθηκε. Δημιουργία νέου με διπλό ρόλο.`);
-        const newUser = {
-          id: Math.random().toString(36).substring(2, 15),
-          firstName: "Διαχειριστής",
-          lastName: "Εκπαιδευτικός",
-          email: email,
-          password: "admin12345",
-          role: "admin" as const,
-          roles: ["admin", "teacher"],
-        };
-        updatedUsers.push(newUser);
-      }
-      
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
-      console.log("Η λίστα χρηστών ενημερώθηκε επιτυχώς");
-      
-      // Αν ο συνδεδεμένος χρήστης είναι αυτός που ενημερώνουμε, ενημερώνουμε και το user state
-      if (user && user.email === email) {
-        const updatedUser: User = { 
-          ...user, 
-          role: "admin" as const,
-          roles: ["admin", "teacher"]
-        };
-        setUser(updatedUser);
-        setIsAdmin(true);
-        setIsTeacher(true);
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης με διπλό ρόλο");
-      }
-      
-      return true;
-    } catch (error) {
-      console.error("Σφάλμα κατά την ενημέρωση του ρόλου:", error);
-      return false;
-    }
-  };
-  
-  // Τροποποίηση της μεθόδου fixAdminEmail για να παρέχει και ρόλο εκπαιδευτικού
-  const fixAdminEmail = async (email: string): Promise<boolean> => {
-    try {
-      // Καλούμε απευθείας τη νέα μέθοδο για να ορίσουμε και τους δύο ρόλους
-      return await makeUserTeacherAndAdmin(email);
-    } catch (error) {
-      console.error("Σφάλμα κατά την ενημέρωση του ρόλου:", error);
-      return false;
-    }
-  };
 
   const login = async (email: string, password: string) => {
-    const storedUsers = localStorage.getItem("users");
-    if (!storedUsers) return false;
-
-    const users = JSON.parse(storedUsers);
-    const user = users.find((u: User & { password?: string }) => u.email === email && u.password === password);
-
-    if (user) {
-      // Αφαιρούμε τον κωδικό πριν αποθηκεύσουμε τον χρήστη στο state
-      const userWithoutPassword = { ...user };
-      delete userWithoutPassword.password;
-      
-      setUser(userWithoutPassword);
-      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
-      setIsAuthenticated(true);
-      
-      // Ελέγχουμε και για τους πολλαπλούς ρόλους
-      setIsAdmin(user.role === "admin" || (user.roles && user.roles.includes("admin")));
-      setIsTeacher(user.role === "teacher" || (user.roles && user.roles.includes("teacher")));
-      
-      // Καταγραφή της σύνδεσης
-      const loginRecord: LoginRecord = {
-        userId: user.id,
-        userName: `${user.firstName} ${user.lastName}`,
-        email: user.email,
-        role: user.role,
-        timestamp: Date.now(),
-      };
-      
-      const records = [...loginRecords, loginRecord];
-      setLoginRecords(records);
-      localStorage.setItem("loginRecords", JSON.stringify(records));
-      
-      return true;
+    const success = await userOperations.login(email, password, loginRecords, setLoginRecords);
+    
+    if (success) {
+      const storedUser = getUserFromLocalStorage();
+      if (storedUser) {
+        setUser(storedUser);
+        setIsAuthenticated(true);
+        setIsAdmin(checkIsAdmin(storedUser));
+        setIsTeacher(checkIsTeacher(storedUser));
+      }
     }
-
-    return false;
+    
+    return success;
   };
 
   const register = async (userData: RegisterData) => {
-    try {
-      // Ελέγχουμε αν το email υπάρχει ήδη
-      const storedUsers = localStorage.getItem("users");
-      let users = [];
-      
-      if (storedUsers) {
-        users = JSON.parse(storedUsers);
-        const existingUser = users.find((u: User) => u.email === userData.email);
-        if (existingUser) {
-          return false; // Το email υπάρχει ήδη
-        }
-      }
-      
-      // Καθορίζουμε τον ρόλο (αν δεν έχει καθοριστεί, ο προεπιλεγμένος είναι "student")
-      const role = userData.role || "student";
-      
-      const newUser = {
-        id: Math.random().toString(36).substring(2, 15),
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        email: userData.email,
-        password: userData.password,
-        role: role as "admin" | "teacher" | "student",
-      };
-
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
-      return true;
-    } catch (error) {
-      console.error("Registration error:", error);
-      return false;
-    }
+    return await userOperations.register(userData);
   };
 
   const logout = () => {
@@ -327,76 +79,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("user");
   };
   
-  // Ενημέρωση προφίλ χρήστη
   const updateUserProfile = async (updatedUser: User) => {
-    try {
-      // Σε μια πραγματική εφαρμογή, θα στέλναμε τα δεδομένα στον server
-      // Για την προσομοίωση, ενημερώνουμε απλά το localStorage
-      
-      // Διατηρούμε τους άλλους χρήστες και επικαιροποιούμε μόνο τον τρέχοντα
-      const usersString = localStorage.getItem("users");
-      if (usersString) {
-        const users = JSON.parse(usersString);
-        const updatedUsers = users.map((u: User) => 
-          u.id === updatedUser.id ? updatedUser : u
-        );
-        localStorage.setItem("users", JSON.stringify(updatedUsers));
-      }
-      
-      // Ενημερώνουμε τον τρέχοντα χρήστη
+    const success = await userOperations.updateUserProfile(updatedUser);
+    
+    if (success) {
       setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      
-      console.log("Το προφίλ ενημερώθηκε με επιτυχία:", updatedUser);
-      
-      return true;
-    } catch (error) {
-      console.error("Σφάλμα κατά την ενημέρωση του προφίλ:", error);
-      return false;
+      setIsAdmin(checkIsAdmin(updatedUser));
+      setIsTeacher(checkIsTeacher(updatedUser));
     }
+    
+    return success;
   };
   
-  // Αλλαγή κωδικού πρόσβασης
   const changePassword = async (currentPassword: string, newPassword: string) => {
-    if (!user) return false;
-    
-    try {
-      // Σε μια πραγματική εφαρμογή, θα στέλναμε τα δεδομένα στον server για επικύρωση
-      // και αλλαγή κωδικού
-      
-      // Για την προσομοίωση, ελέγχουμε τον τρέχοντα κωδικό και ενημερώνουμε τον νέο
-      const usersString = localStorage.getItem("users");
-      if (!usersString) return false;
-      
-      const users = JSON.parse(usersString);
-      const userIndex = users.findIndex((u: User & { password: string }) => 
-        u.id === user.id && u.password === currentPassword
-      );
-      
-      if (userIndex === -1) {
-        console.error("Λάθος τρέχων κωδικός");
-        return false;
-      }
-      
-      // Ενημερώνουμε τον κωδικό
-      users[userIndex].password = newPassword;
-      localStorage.setItem("users", JSON.stringify(users));
-      
-      console.log("Ο κωδικός άλλαξε με επιτυχία");
-      
-      return true;
-    } catch (error) {
-      console.error("Σφάλμα κατά την αλλαγή κωδικού:", error);
-      return false;
-    }
+    return await userOperations.changePassword(currentPassword, newPassword, user);
   };
   
-  // Λήψη όλων των χρηστών (για διαχειριστές)
   const getAllUsers = () => {
-    const storedUsers = localStorage.getItem("users");
-    if (!storedUsers) return [];
+    return userOperations.getAllUsers();
+  };
+
+  const handleFixAdminEmail = async (email: string) => {
+    return await fixAdminEmail(email);
+  };
+
+  const handleMakeUserTeacherAndAdmin = async (email: string) => {
+    const success = await makeUserTeacherAndAdmin(email);
     
-    return JSON.parse(storedUsers);
+    if (success && user && user.email === email) {
+      const updatedUser = {
+        ...user,
+        role: "admin" as const,
+        roles: ["admin", "teacher"]
+      };
+      setUser(updatedUser);
+      setIsAdmin(true);
+      setIsTeacher(true);
+    }
+    
+    return success;
   };
 
   return (
@@ -413,8 +134,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         changePassword,
         getAllUsers,
         loginRecords,
-        fixAdminEmail,
-        makeUserTeacherAndAdmin
+        fixAdminEmail: handleFixAdminEmail,
+        makeUserTeacherAndAdmin: handleMakeUserTeacherAndAdmin
       }}
     >
       {children}

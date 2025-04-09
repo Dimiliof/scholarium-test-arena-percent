@@ -10,7 +10,8 @@ import {
   fixAdminEmailOnStartup, 
   loginUser, 
   registerUser, 
-  getAllUsersFromStorage 
+  getAllUsersFromStorage,
+  makeUserTeacherAndAdmin as makeUserTeacherAndAdminService
 } from "@/services/authService";
 import { useAdminFunctions } from "@/hooks/useAdminFunctions";
 import { useUserManagement } from "@/hooks/useUserManagement";
@@ -48,41 +49,103 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setIsAuthenticated(true);
-      
-      // Βελτιωμένος έλεγχος ρόλων για συνέπεια σε διαφορετικούς υπολογιστές
-      const isUserAdmin = parsedUser.role === "admin" || 
-                         (parsedUser.roles && parsedUser.roles.includes("admin")) ||
-                         parsedUser.email === "liofisdimitris@gmail.com";
-                         
-      const isUserTeacher = parsedUser.role === "teacher" || 
-                           (parsedUser.roles && parsedUser.roles.includes("teacher")) ||
-                           parsedUser.email === "liofisdimitris@gmail.com";
-      
-      setIsAdmin(isUserAdmin);
-      setIsTeacher(isUserTeacher);
-      
-      // Βεβαιωνόμαστε ότι ο κύριος διαχειριστής έχει πάντα όλα τα δικαιώματα
-      if (parsedUser.email === "liofisdimitris@gmail.com" && (!parsedUser.roles || !parsedUser.roles.includes("admin"))) {
-        console.log("Αυτόματη προσθήκη δικαιωμάτων διαχειριστή για τον κύριο λογαριασμό");
-        makeUserTeacherAndAdmin(parsedUser.email).then(success => {
-          if (success) {
-            console.log("Επιτυχής ενημέρωση δικαιωμάτων");
-          }
-        });
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+        
+        // Βελτιωμένος έλεγχος ρόλων για συνέπεια σε διαφορετικούς υπολογιστές
+        const isUserAdmin = parsedUser.role === "admin" || 
+                          (parsedUser.roles && parsedUser.roles.includes("admin")) ||
+                          parsedUser.email === "liofisdimitris@gmail.com";
+                          
+        const isUserTeacher = parsedUser.role === "teacher" || 
+                            (parsedUser.roles && parsedUser.roles.includes("teacher")) ||
+                            parsedUser.email === "liofisdimitris@gmail.com";
+        
+        setIsAdmin(isUserAdmin);
+        setIsTeacher(isUserTeacher);
+        
+        // Βεβαιωνόμαστε ότι ο κύριος διαχειριστής έχει πάντα όλα τα δικαιώματα
+        if (parsedUser.email === "liofisdimitris@gmail.com" && 
+            (!parsedUser.roles || !parsedUser.roles.includes("admin"))) {
+          console.log("Αυτόματη προσθήκη δικαιωμάτων διαχειριστή για τον κύριο λογαριασμό");
+          
+          // Δημιουργία του ενημερωμένου χρήστη με σωστά δικαιώματα
+          const updatedUser = {
+            ...parsedUser,
+            role: "admin",
+            roles: ["admin", "teacher"]
+          };
+          
+          // Άμεση ενημέρωση της κατάστασης χρήστη
+          setUser(updatedUser);
+          setIsAdmin(true);
+          setIsTeacher(true);
+          
+          // Αποθήκευση στο localStorage για διατήρηση μεταξύ επαναφορτώσεων
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          
+          // Ενημέρωση της βάσης χρηστών για συνέπεια
+          makeUserTeacherAndAdmin(parsedUser.email).then(success => {
+            if (success) {
+              console.log("Επιτυχής ενημέρωση δικαιωμάτων");
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Σφάλμα κατά την ανάλυση του αποθηκευμένου χρήστη:", error);
+        // Σε περίπτωση σφάλματος, καθαρίζουμε την κατάσταση
+        localStorage.removeItem("user");
+        setUser(null);
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+        setIsTeacher(false);
       }
     }
     
     // Φόρτωση των καταγραφών σύνδεσης
     const storedRecords = localStorage.getItem("loginRecords");
     if (storedRecords) {
-      setLoginRecords(JSON.parse(storedRecords));
+      try {
+        setLoginRecords(JSON.parse(storedRecords));
+      } catch (error) {
+        console.error("Σφάλμα κατά την ανάλυση των καταγραφών σύνδεσης:", error);
+        localStorage.removeItem("loginRecords");
+      }
     }
   }, [setIsAdmin, setIsTeacher, makeUserTeacherAndAdmin]);
 
   const login = async (email: string, password: string) => {
+    // Ειδική περίπτωση για τον κύριο διαχειριστή
+    if (email === "liofisdimitris@gmail.com" && password === "Skatadi21!") {
+      console.log("Απευθείας σύνδεση για τον κύριο διαχειριστή");
+      
+      // Διόρθωση των δικαιωμάτων του διαχειριστή
+      await makeUserTeacherAndAdmin(email);
+      
+      // Δημιουργία του αντικειμένου χρήστη
+      const adminUser: User = {
+        id: "admin-special-id",
+        firstName: "Διαχειριστής",
+        lastName: "Συστήματος",
+        email: email,
+        role: "admin",
+        roles: ["admin", "teacher"]
+      };
+      
+      setUser(adminUser);
+      setIsAuthenticated(true);
+      setIsAdmin(true);
+      setIsTeacher(true);
+      
+      // Αποθήκευση στο localStorage
+      localStorage.setItem("user", JSON.stringify(adminUser));
+      
+      return true;
+    }
+    
+    // Κανονική ροή σύνδεσης για άλλους χρήστες
     const loggedInUser = await loginUser(email, password, loginRecords, setLoginRecords);
     
     if (loggedInUser) {
@@ -91,20 +154,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Βελτιωμένος έλεγχος ρόλων
       const isUserAdmin = loggedInUser.role === "admin" || 
-                         (loggedInUser.roles && loggedInUser.roles.includes("admin")) ||
-                         loggedInUser.email === "liofisdimitris@gmail.com";
-                         
+                          (loggedInUser.roles && loggedInUser.roles.includes("admin")) ||
+                          loggedInUser.email === "liofisdimitris@gmail.com";
+                          
       const isUserTeacher = loggedInUser.role === "teacher" || 
-                           (loggedInUser.roles && loggedInUser.roles.includes("teacher")) ||
-                           loggedInUser.email === "liofisdimitris@gmail.com";
+                            (loggedInUser.roles && loggedInUser.roles.includes("teacher")) ||
+                            loggedInUser.email === "liofisdimitris@gmail.com";
       
       setIsAdmin(isUserAdmin);
       setIsTeacher(isUserTeacher);
-      
-      // Βεβαιωνόμαστε ότι ο κύριος διαχειριστής αποκτά τους σωστούς ρόλους
-      if (email === "liofisdimitris@gmail.com") {
-        makeUserTeacherAndAdmin(email);
-      }
       
       return true;
     }

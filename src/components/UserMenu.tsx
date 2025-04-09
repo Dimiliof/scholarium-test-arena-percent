@@ -1,4 +1,5 @@
 
+import React, { useEffect } from "react";
 import { User, LogOut, Settings, UserCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,7 +43,7 @@ export default function UserMenu() {
   };
 
   // Κλείνουμε το dropdown όταν κάνουμε κλικ έξω από αυτό
-  React.useEffect(() => {
+  useEffect(() => {
     const closeDropdown = (e: MouseEvent) => {
       const dropdown = document.getElementById("userDropdown");
       const button = document.querySelector("[data-dropdown-toggle='userDropdown']");

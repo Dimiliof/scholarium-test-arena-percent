@@ -52,7 +52,7 @@ const LoginPage = () => {
     setLoginError(null);
     
     try {
-      // Έλεγχος για τον κύριο διαχειριστή
+      // Έλεγχος για τον κύριο διαχειριστή (απευθείας αναγνώριση)
       if (values.email === "liofisdimitris@gmail.com" && values.password === "Skatadi21!") {
         console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
         
@@ -84,7 +84,7 @@ const LoginPage = () => {
         return;
       }
       
-      // Κανονική ροή σύνδεσης
+      // Κανονική ροή σύνδεσης για άλλους χρήστες
       const success = await login(values.email, values.password);
       
       if (success) {

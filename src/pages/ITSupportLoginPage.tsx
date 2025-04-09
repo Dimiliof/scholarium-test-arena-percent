@@ -26,7 +26,7 @@ const ITSupportLoginPage = () => {
     try {
       // Ελέγχουμε ειδικά για τον διαχειριστή με hardcoded διαπιστευτήρια
       if (email === "liofisdimitris@gmail.com" && password === "Skatadi21!") {
-        console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
+        console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος από IT Support");
         
         // Διόρθωση των δικαιωμάτων του διαχειριστή
         await makeUserTeacherAndAdmin(email);

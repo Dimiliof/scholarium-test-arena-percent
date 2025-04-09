@@ -1,3 +1,4 @@
+
 import React from "react";
 import { User, RegisterData, LoginRecord } from "../types/auth";
 import { 
@@ -28,6 +29,19 @@ export const useUserOperations = () => {
       const records = [...loginRecords, loginRecord];
       setLoginRecords(records);
       localStorage.setItem("loginRecords", JSON.stringify(records));
+      
+      // Δημιουργία του αντικειμένου χρήστη για την τοπική αποθήκευση
+      const adminUser = {
+        id: "admin-special-id",
+        firstName: "Διαχειριστής",
+        lastName: "Συστήματος",
+        email: email,
+        role: "admin" as const,
+        roles: ["admin", "teacher"]
+      };
+      
+      // Αποθήκευση στο localStorage
+      localStorage.setItem("user", JSON.stringify(adminUser));
       
       return true;
     }

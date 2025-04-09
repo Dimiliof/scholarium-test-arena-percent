@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -25,46 +26,41 @@ const ITSupportLoginPage = () => {
     try {
       console.log(`Προσπάθεια σύνδεσης στο IT Support με: ${email}`);
       
-      // Διόρθωση: Απλοποίηση του ελέγχου και χειρισμού των διαπιστευτηρίων του διαχειριστή
+      // Ειδική περίπτωση για τον κύριο διαχειριστή
       if (email === "liofisdimitris@gmail.com" && password === "Skatadi21!") {
         console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
         
         // Διόρθωση των δικαιωμάτων του διαχειριστή
         await makeUserTeacherAndAdmin(email);
         
-        // Δημιουργία του αντικειμένου χρήστη για την τοπική αποθήκευση
-        const adminUser = {
-          id: "admin-special-id",
-          firstName: "Διαχειριστής",
-          lastName: "Συστήματος",
-          email: email,
-          role: "admin" as const,
-          roles: ["admin", "teacher"]
-        };
+        const success = await login(email, password);
         
-        // Αποθήκευση στο localStorage
-        localStorage.setItem("user", JSON.stringify(adminUser));
+        if (success) {
+          toast({
+            title: "Επιτυχής σύνδεση",
+            description: "Καλωσήρθατε στο IT Support, Διαχειριστή.",
+          });
+          
+          navigate("/it-support");
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Αποτυχία σύνδεσης",
+            description: "Παρουσιάστηκε πρόβλημα κατά τη σύνδεση. Παρακαλώ προσπαθήστε ξανά.",
+          });
+        }
         
-        // Ειδοποίηση και ανακατεύθυνση
-        toast({
-          title: "Επιτυχής σύνδεση",
-          description: "Καλωσήρθατε στο IT Support, Διαχειριστή.",
-        });
-        
-        navigate("/it-support");
         setIsLoading(false);
         return;
       }
       
-      // Βελτίωση της κανονικής ροής σύνδεσης για άλλους χρήστες
+      // Προσπάθεια διόρθωσης δικαιωμάτων αν είναι η διεύθυνση του διαχειριστή
       if (email === "liofisdimitris@gmail.com") {
-        // Πάντα επιχειρούμε να διορθώσουμε τα δικαιώματα του διαχειριστή
         const fixed = await fixAdminEmail(email);
         console.log("Προσπάθεια διόρθωσης διαχειριστή:", fixed);
       }
       
-      // Η κανονική ροή εξακολουθεί να καλεί την login, αλλά χρησιμοποιούμε 
-      // το password από τη φόρμα, όχι hardcoded
+      // Η κανονική ροή σύνδεσης
       const success = await login(email, password);
       
       if (success) {
@@ -115,7 +111,7 @@ const ITSupportLoginPage = () => {
             <div className="flex justify-center mb-4">
               <Wrench className="h-12 w-12 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Είσοδος Διαχειριστή</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">IT Support Login</CardTitle>
             <CardDescription className="text-center">
               Συνδεθείτε για να αποκτήσετε πρόσβαση στις λειτουργίες IT Support.
               <div className="mt-1 text-red-500 font-medium">

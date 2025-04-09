@@ -81,24 +81,7 @@ export const fixAdminEmailOnStartup = (): void => {
 export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> => {
   try {
     console.log(`Προσπάθεια ορισμού χρήστη ως διαχειριστή και εκπαιδευτικό: ${email}`);
-    const storedUsers = localStorage.getItem("users");
-    if (!storedUsers) {
-      // Αν δεν υπάρχουν χρήστες, δημιουργούμε νέο με διπλό ρόλο
-      const newUser = {
-        id: "admin-special-id",
-        firstName: "Διαχειριστής",
-        lastName: "Συστήματος",
-        email: email,
-        password: "Skatadi21!",
-        role: "admin" as const,
-        roles: ["admin", "teacher"],
-      };
-      localStorage.setItem("users", JSON.stringify([newUser]));
-      console.log("Δημιουργήθηκε χρήστης με διπλό ρόλο:", newUser);
-      return true;
-    }
-    
-    const users = JSON.parse(storedUsers);
+    const users = getAllUsersFromLocalStorage();
     let userFound = false;
     
     const updatedUsers = users.map((u: User & { password?: string }) => {
@@ -130,7 +113,7 @@ export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> =
       updatedUsers.push(newUser);
     }
     
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    saveUsersToLocalStorage(updatedUsers);
     console.log("Η λίστα χρηστών ενημερώθηκε επιτυχώς");
     
     // Αν ο συνδεδεμένος χρήστης είναι αυτός που ενημερώνουμε, ενημερώνουμε και το user state
@@ -146,6 +129,18 @@ export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> =
         saveUserToLocalStorage(updatedUser);
         console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης με διπλό ρόλο");
       }
+    } else {
+      // Αν δεν υπάρχει συνδεδεμένος χρήστης, δημιουργούμε έναν
+      const newAdminUser = {
+        id: "admin-special-id",
+        firstName: "Διαχειριστής",
+        lastName: "Συστήματος",
+        email: email,
+        role: "admin" as const,
+        roles: ["admin", "teacher"]
+      };
+      saveUserToLocalStorage(newAdminUser);
+      console.log("Δημιουργήθηκε νέος συνδεδεμένος χρήστης-διαχειριστής");
     }
     
     return true;

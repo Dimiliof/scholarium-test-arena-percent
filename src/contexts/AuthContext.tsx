@@ -51,50 +51,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    console.log("Προσπάθεια σύνδεσης από το AuthContext");
+    console.log("Προσπάθεια σύνδεσης από το AuthContext με email:", email);
     
-    // Ειδική περίπτωση για τον κύριο διαχειριστή
-    if (email === "liofisdimitris@gmail.com" && password === "Skatadi21!") {
-      console.log("Αναγνωρίστηκε ο κύριος διαχειριστής");
-      
-      // Δημιουργία του αντικειμένου χρήστη για την τοπική αποθήκευση
-      const adminUser = {
-        id: "admin-special-id",
-        firstName: "Διαχειριστής",
-        lastName: "Συστήματος",
-        email: email,
-        role: "admin" as const,
-        roles: ["admin", "teacher"]
-      };
-      
-      // Αποθήκευση στο localStorage
-      localStorage.setItem("user", JSON.stringify(adminUser));
-      
-      // Ενημέρωση του state
-      setUser(adminUser);
-      setIsAuthenticated(true);
-      setIsAdmin(true);
-      setIsTeacher(true);
-      
-      // Διόρθωση των δικαιωμάτων του διαχειριστή στη βάση δεδομένων
-      await makeUserTeacherAndAdmin(email);
-      
-      // Προσθήκη καταγραφής σύνδεσης
-      const loginRecord: LoginRecord = {
-        userId: adminUser.id,
-        userName: `${adminUser.firstName} ${adminUser.lastName}`,
-        email: adminUser.email,
-        role: adminUser.role,
-        timestamp: Date.now(),
-      };
-      
-      const updatedRecords = [...loginRecords, loginRecord];
-      setLoginRecords(updatedRecords);
-      localStorage.setItem("loginRecords", JSON.stringify(updatedRecords));
-      
-      return true;
-    }
-    
+    // Για τον κύριο διαχειριστή χρησιμοποιούμε απευθείας το useUserOperations
     const success = await userOperations.login(email, password, loginRecords, setLoginRecords);
     
     if (success) {
@@ -150,6 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const success = await makeUserTeacherAndAdmin(email);
     
     if (success && user && user.email === email) {
+      // Ενημέρωση του τοπικού χρήστη με τα νέα δικαιώματα
       const updatedUser = {
         ...user,
         role: "admin" as const,

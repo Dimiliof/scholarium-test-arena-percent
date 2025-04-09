@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,17 +17,7 @@ const ITSupportLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login, fixAdminEmail, makeUserTeacherAndAdmin, isAuthenticated, isAdmin } = useAuth();
-
-  // Έλεγχος αν ο χρήστης είναι ήδη συνδεδεμένος και είναι διαχειριστής
-  useEffect(() => {
-    console.log("ITSupportLoginPage - Auth State:", { isAuthenticated, isAdmin });
-    if (isAuthenticated && isAdmin) {
-      console.log("User is already authenticated and is admin. Redirecting to IT Support");
-      // Ανακατευθύνουμε απευθείας στο IT Support
-      navigate("/it-support");
-    }
-  }, [isAuthenticated, isAdmin, navigate]);
+  const { login, fixAdminEmail, makeUserTeacherAndAdmin } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +26,7 @@ const ITSupportLoginPage = () => {
     try {
       // Ελέγχουμε ειδικά για τον διαχειριστή με hardcoded διαπιστευτήρια
       if (email === "liofisdimitris@gmail.com" && password === "Skatadi21!") {
-        console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος από IT Support");
+        console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
         
         // Διόρθωση των δικαιωμάτων του διαχειριστή
         await makeUserTeacherAndAdmin(email);

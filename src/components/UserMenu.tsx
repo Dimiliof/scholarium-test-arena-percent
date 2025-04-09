@@ -1,193 +1,234 @@
 
-import React, { useEffect, useRef } from "react";
-import { User, LogOut, Settings, UserCircle, Server } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { useToast } from "@/hooks/use-toast";
-import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, LogOut, Settings, Book, BookPlus, School, PlusCircle, Users, Shield, Wrench, GraduationCap, BookOpen, Award } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-export default function UserMenu() {
-  const { user, logout, isAuthenticated, isTeacher, isAdmin } = useAuth();
-  const navigate = useNavigate();
-  const { toast: uiToast } = useToast();
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+const UserMenu = () => {
+  const { user, isAuthenticated, isAdmin, isTeacher, logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
+  if (!isAuthenticated) {
+    return (
+      <div className="flex gap-2">
+        <Link to="/login">
+          <Button variant="outline">Σύνδεση</Button>
+        </Link>
+        <Link to="/register-type" className="hidden sm:block">
+          <Button>Εγγραφή</Button>
+        </Link>
+        <Link to="/it-support-login" className="hidden sm:block">
+          <Button variant="outline" className="border-blue-400 text-blue-500 hover:bg-blue-50">
+            Login IT Support
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const getInitials = () => {
+    if (!user) return "??";
+    return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+  };
+  
+  const getRoleBadge = () => {
+    if (!user) return null;
     
-    // Διπλή ειδοποίηση για επιβεβαίωση αποσύνδεσης στον χρήστη
-    uiToast({
-      title: "Αποσύνδεση",
-      description: "Αποσυνδεθήκατε επιτυχώς από το σύστημα."
-    });
-    
-    toast.success("Αποσυνδεθήκατε επιτυχώς");
-    navigate("/");
-  };
-
-  const handleLogin = () => {
-    navigate("/login");
-  };
-
-  const handleRegister = () => {
-    navigate("/register-type");
-  };
-
-  const toggleDropdown = () => {
-    if (dropdownRef.current) {
-      dropdownRef.current.classList.toggle("hidden");
+    if (user.roles && user.roles.length > 1) {
+      return (
+        <Badge 
+          className="bg-purple-500 text-white text-xs absolute -bottom-1 -right-1 px-1 rounded-sm"
+        >
+          {user.roles.length} ρόλοι
+        </Badge>
+      );
     }
+    
+    let color = "";
+    let label = "";
+    
+    switch (user.role) {
+      case "admin":
+        color = "bg-red-500";
+        label = "Διαχειριστής";
+        break;
+      case "teacher":
+        color = "bg-blue-500";
+        label = "Εκπαιδευτικός";
+        break;
+      default:
+        color = "bg-green-500";
+        label = "Μαθητής";
+    }
+    
+    return (
+      <Badge 
+        className={`${color} text-white text-xs absolute -bottom-1 -right-1 px-1 rounded-sm`}
+      >
+        {label}
+      </Badge>
+    );
+  };
+  
+  const getRoles = () => {
+    if (!user) return "Άγνωστος ρόλος";
+    
+    if (user.roles && user.roles.length > 0) {
+      return user.roles.map(role => {
+        switch(role) {
+          case "admin": return "Διαχειριστής";
+          case "teacher": return "Εκπαιδευτικός";
+          case "student": return "Μαθητής";
+          default: return role;
+        }
+      }).join(", ");
+    }
+    
+    return user.role === "admin" ? "Διαχειριστής" : 
+           user.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής";
   };
 
-  // Κλείνουμε το dropdown όταν κάνουμε κλικ έξω από αυτό
-  useEffect(() => {
-    const closeDropdown = (e: MouseEvent) => {
-      if (dropdownRef.current && buttonRef.current && 
-          !dropdownRef.current.contains(e.target as Node) && 
-          !buttonRef.current.contains(e.target as Node)) {
-        dropdownRef.current.classList.add("hidden");
-      }
-    };
-    
-    document.addEventListener("click", closeDropdown);
-    
-    return () => {
-      document.removeEventListener("click", closeDropdown);
-    };
-  }, []);
+  // Προσδιορίζουμε εάν ο χρήστης είναι μαθητής (όχι admin, όχι teacher)
+  const isStudent = isAuthenticated && !isAdmin && !isTeacher;
 
   return (
-    <div className="flex items-center gap-2">
-      {isAuthenticated ? (
-        <>
-          {/* Κουμπί ειδοποιήσεων */}
-          <NotificationBell />
-          
-          <div className="dropdown relative">
-            <Button
-              variant="ghost"
-              className="flex items-center gap-2 text-gray-700 hover:text-primary"
-              onClick={toggleDropdown}
-              ref={buttonRef}
-            >
-              <UserCircle className="h-6 w-6" />
-              <span className="hidden md:inline">
-                {user?.firstName || "ΔΗΜΗΤΡΗΣ"}
-              </span>
-            </Button>
-            <div
-              ref={dropdownRef}
-              className="dropdown-menu hidden absolute right-0 mt-2 bg-white shadow-md rounded-md py-2 min-w-[200px] z-50"
-            >
-              <div className="px-4 py-2 border-b">
-                <p className="text-sm font-medium text-gray-900">
-                  {user?.firstName} {user?.lastName}
-                </p>
-                <p className="text-sm text-gray-500 truncate">
-                  {user?.email}
-                </p>
-                <div className="flex gap-1 mt-1">
-                  {isAdmin && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                      Διαχειριστής
-                    </span>
-                  )}
-                  {isTeacher && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                      Εκπαιδευτικός
-                    </span>
-                  )}
-                </div>
-              </div>
-              <ul>
-                <li>
-                  <a
-                    href="/profile"
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Το προφίλ μου
-                  </a>
-                </li>
-                {isTeacher && (
-                  <>
-                    <li>
-                      <a
-                        href="/teacher-dashboard"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <Settings className="mr-2 h-4 w-4" />
-                        Πίνακας Ελέγχου
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/teacher/notifications"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <Settings className="mr-2 h-4 w-4" />
-                        Αποστολή Ειδοποιήσεων
-                      </a>
-                    </li>
-                  </>
-                )}
-                {isAdmin && (
-                  <>
-                    <li>
-                      <a
-                        href="/admin/users"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <Settings className="mr-2 h-4 w-4" />
-                        Διαχείριση
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/admin/logins"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        Καταγραφές Συνδέσεων
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/it-support"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <Server className="mr-2 h-4 w-4" />
-                        IT Support
-                      </a>
-                    </li>
-                  </>
-                )}
-                <li>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Αποσύνδεση
-                  </button>
-                </li>
-              </ul>
-            </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+          <Avatar>
+            {user?.profileImage ? (
+              <AvatarImage src={user.profileImage} alt={user.firstName} />
+            ) : (
+              <AvatarFallback>{getInitials()}</AvatarFallback>
+            )}
+          </Avatar>
+          {getRoleBadge()}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuLabel>
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">
+              {user?.firstName} {user?.lastName}
+            </p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {user?.email}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {getRoles()}
+            </p>
           </div>
-        </>
-      ) : (
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleLogin}>
-            Σύνδεση
-          </Button>
-          <Button size="sm" onClick={handleRegister}>
-            Εγγραφή
-          </Button>
-        </div>
-      )}
-    </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        
+        {/* Προβολή προφίλ και αποσύνδεση είναι διαθέσιμα για όλους τους χρήστες */}
+        <DropdownMenuItem asChild>
+          <Link to="/profile" className="cursor-pointer flex w-full items-center">
+            <User className="mr-2 h-4 w-4" />
+            <span>Το προφίλ μου</span>
+          </Link>
+        </DropdownMenuItem>
+        
+        {/* Επεξεργασία προφίλ είναι επίσης διαθέσιμη για όλους */}
+        <DropdownMenuItem asChild>
+          <Link to="/edit-profile" className="cursor-pointer flex w-full items-center">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Επεξεργασία προφίλ</span>
+          </Link>
+        </DropdownMenuItem>
+
+        {/* Επιλογές μόνο για μαθητές */}
+        {isStudent && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs">Μαθήματα</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link to="/student/courses" className="cursor-pointer flex w-full items-center">
+                <BookOpen className="mr-2 h-4 w-4" />
+                <span>Τα Μαθήματά μου</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/student/enroll" className="cursor-pointer flex w-full items-center">
+                <GraduationCap className="mr-2 h-4 w-4" />
+                <span>Εγγραφή σε Μάθημα</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/student/results" className="cursor-pointer flex w-full items-center">
+                <Award className="mr-2 h-4 w-4" />
+                <span>Τα Αποτελέσματά μου</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {/* Επιλογές μόνο για εκπαιδευτικούς */}
+        {isTeacher && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs">Διδασκαλία</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link to="/teacher-dashboard" className="cursor-pointer flex w-full items-center">
+                <School className="mr-2 h-4 w-4" />
+                <span>Πίνακας Εκπαιδευτικού</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/add-content" className="cursor-pointer flex w-full items-center">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                <span>Προσθήκη Υλικού</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {/* Επιλογές μόνο για διαχειριστές */}
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs">Διαχείριση</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/users" className="cursor-pointer flex w-full items-center">
+                <Users className="mr-2 h-4 w-4" />
+                <span>Διαχείριση Χρηστών</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/logins" className="cursor-pointer flex w-full items-center">
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Καταγραφές Συνδέσεων</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/it-support" className="cursor-pointer flex w-full items-center">
+                <Wrench className="mr-2 h-4 w-4" />
+                <span>IT Support</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="cursor-pointer text-red-500 focus:text-red-500"
+          onClick={logout}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Αποσύνδεση</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
-}
+};
+
+export default UserMenu;

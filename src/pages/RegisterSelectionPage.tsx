@@ -1,18 +1,13 @@
+
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, GraduationCap, Wrench } from 'lucide-react';
+import { BookOpen, GraduationCap } from "lucide-react";
 
 const RegisterSelectionPage = () => {
-  const navigate = useNavigate();
-
-  const handleITSupportLogin = () => {
-    navigate("/it-support-login");
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -98,21 +93,13 @@ const RegisterSelectionPage = () => {
             </Link>
           </div>
           
-          <div className="text-center mt-8 flex justify-center items-center gap-4">
+          <div className="text-center mt-8">
             <p className="text-sm text-muted-foreground">
               Έχετε ήδη λογαριασμό;{" "}
               <Link to="/login" className="text-primary hover:underline">
                 Συνδεθείτε εδώ
               </Link>
             </p>
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={handleITSupportLogin}
-            >
-              <Wrench className="h-4 w-4" />
-              Σύνδεση IT Support
-            </Button>
           </div>
         </div>
       </div>

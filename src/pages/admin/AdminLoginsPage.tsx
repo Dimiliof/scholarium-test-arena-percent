@@ -1,190 +1,196 @@
 
-import React, { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
-import { useAuth } from "@/contexts/AuthContext";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
+import { el } from "date-fns/locale";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useAuth, LoginRecord } from "@/contexts/AuthContext";
 import { 
   Table, 
-  TableHeader, 
-  TableRow, 
-  TableHead, 
   TableBody, 
-  TableCell 
+  TableCaption, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { LoginRecord } from "@/types/auth";
-import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import { UserCheck, Clock, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Shield, Search, UserX } from "lucide-react";
+
+// Βοηθητική συνάρτηση για τη μορφοποίηση της ημερομηνίας
+const formatDate = (timestamp: number): string => {
+  const date = new Date(timestamp);
+  return date.toLocaleString('el-GR', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+// Βοηθητική συνάρτηση για το χρονικό διάστημα που πέρασε
+const timeAgo = (timestamp: number): string => {
+  return formatDistanceToNow(timestamp, { addSuffix: true, locale: el });
+};
 
 const AdminLoginsPage = () => {
-  const { loginRecords, isAdmin, isAuthenticated } = useAuth();
-  const [formattedLoginRecords, setFormattedLoginRecords] = useState<LoginRecord[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+  const { user, isAuthenticated, isAdmin, loginRecords } = useAuth();
   const [filteredRecords, setFilteredRecords] = useState<LoginRecord[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
 
+  // Έλεγχος αν ο χρήστης είναι διαχειριστής
   useEffect(() => {
-    // Έλεγχος δικαιωμάτων
     if (!isAuthenticated || !isAdmin) {
-      window.location.href = "/";
-      return;
+      navigate('/');
     }
+  }, [isAuthenticated, isAdmin, navigate]);
 
-    // Sort login records by timestamp in descending order (most recent first)
-    const sortedRecords = [...loginRecords].sort((a, b) => b.timestamp - a.timestamp);
-    setFormattedLoginRecords(sortedRecords);
-    setFilteredRecords(sortedRecords);
-  }, [loginRecords, isAuthenticated, isAdmin]);
-
-  // Filter records based on search term
+  // Φιλτράρισμα των εγγραφών βάσει των κριτηρίων αναζήτησης
   useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredRecords(formattedLoginRecords);
-      return;
+    let records = [...loginRecords];
+    
+    // Εφαρμογή φίλτρου ρόλου
+    if (roleFilter !== 'all') {
+      records = records.filter(record => record.role === roleFilter);
     }
     
-    const lowercaseSearch = searchTerm.toLowerCase();
-    const filtered = formattedLoginRecords.filter(record => 
-      record.userName.toLowerCase().includes(lowercaseSearch) ||
-      record.email.toLowerCase().includes(lowercaseSearch) ||
-      record.role.toLowerCase().includes(lowercaseSearch)
-    );
+    // Εφαρμογή φίλτρου αναζήτησης
+    if (searchTerm.trim() !== '') {
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      records = records.filter(record => 
+        record.userName.toLowerCase().includes(lowerSearchTerm) || 
+        record.email.toLowerCase().includes(lowerSearchTerm)
+      );
+    }
     
-    setFilteredRecords(filtered);
-  }, [searchTerm, formattedLoginRecords]);
+    setFilteredRecords(records);
+  }, [loginRecords, searchTerm, roleFilter]);
 
-  // Get role badge color
-  const getRoleBadgeColor = (role: string) => {
-    if (role === "admin") return "destructive";
-    if (role === "teacher") return "default";
-    return "secondary";
-  };
-
-  // Format time elapsed 
-  const getTimeElapsed = (timestamp: number) => {
-    const now = Date.now();
-    const diff = now - timestamp;
-    
-    if (diff < 60000) return "Μόλις τώρα";
-    if (diff < 3600000) return `${Math.floor(diff / 60000)} λεπτά πριν`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)} ώρες πριν`;
-    return `${Math.floor(diff / 86400000)} ημέρες πριν`;
-  };
-
+  // Αν ο χρήστης δεν είναι διαχειριστής, δεν εμφανίζουμε τίποτα
   if (!isAuthenticated || !isAdmin) {
-    return null; // Δεν εμφανίζουμε περιεχόμενο αν ο χρήστης δεν είναι διαχειριστής
+    return null;
   }
 
   return (
-    <>
-      <Helmet>
-        <title>Admin - Καταγραφές Συνδέσεων | Εκπαιδευτική Πλατφόρμα</title>
-      </Helmet>
-      
+    <div className="min-h-screen flex flex-col">
       <Header />
       
-      <div className="container mx-auto py-8">
-        <Card className="mb-8">
+      <main className="flex-grow container mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Shield className="h-8 w-8" />
+              Καταγραφές Συνδέσεων
+            </h1>
+            <p className="text-muted-foreground">
+              Προβολή του ιστορικού συνδέσεων των χρηστών στην πλατφόρμα
+            </p>
+          </div>
+        </div>
+        
+        {/* Φίλτρα αναζήτησης */}
+        <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center">
-              <UserCheck className="h-6 w-6 mr-2 text-primary" />
-              Λίστα Συνδέσεων Χρηστών
-            </CardTitle>
-            <CardDescription>
-              Παρακολούθηση όλων των συνδέσεων χρηστών στην πλατφόρμα
-            </CardDescription>
+            <CardTitle className="text-lg">Φίλτρα Αναζήτησης</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 flex items-center gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Αναζήτηση με όνομα, email ή ρόλο..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Αναζήτηση με όνομα ή email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
               </div>
-              <Button
-                variant="outline"
-                onClick={() => setSearchTerm("")}
-              >
-                Καθαρισμός
-              </Button>
-            </div>
-
-            <div className="overflow-x-auto rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[180px]">Χρήστης</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead className="w-[120px]">Ρόλος</TableHead>
-                    <TableHead className="w-[160px]">Ημερομηνία</TableHead>
-                    <TableHead className="w-[120px]">Ώρα</TableHead>
-                    <TableHead className="w-[100px] text-right">Πριν από</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredRecords.length > 0 ? (
-                    filteredRecords.map((record, index) => (
-                      <TableRow key={`${record.userId}-${record.timestamp}-${index}`}>
-                        <TableCell className="font-medium">{record.userName}</TableCell>
-                        <TableCell>{record.email}</TableCell>
-                        <TableCell>
-                          <Badge variant={getRoleBadgeColor(record.role)}>
-                            {record.role === "admin" ? "Διαχειριστής" : 
-                             record.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {format(new Date(record.timestamp), "dd/MM/yyyy")}
-                        </TableCell>
-                        <TableCell>
-                          {format(new Date(record.timestamp), "HH:mm:ss")}
-                        </TableCell>
-                        <TableCell className="text-right flex items-center justify-end">
-                          <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                          <span className="text-muted-foreground text-sm">
-                            {getTimeElapsed(record.timestamp)}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center">
-                        {searchTerm ? (
-                          <div className="text-muted-foreground">
-                            Δεν βρέθηκαν εγγραφές που να ταιριάζουν με την αναζήτηση
-                          </div>
-                        ) : (
-                          <div className="text-muted-foreground">
-                            Δεν υπάρχουν καταγραφές συνδέσεων
-                          </div>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            <div className="mt-4 text-sm text-muted-foreground flex items-center">
-              <UserCheck className="h-4 w-4 mr-1" />
-              Συνολικά {filteredRecords.length} καταγεγραμμένες συνδέσεις
-              {searchTerm && ` (φιλτραρισμένες από ${formattedLoginRecords.length})`}
+              <div className="w-full md:w-48">
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Όλοι οι ρόλοι" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Όλοι οι ρόλοι</SelectItem>
+                    <SelectItem value="admin">Διαχειριστές</SelectItem>
+                    <SelectItem value="teacher">Εκπαιδευτικοί</SelectItem>
+                    <SelectItem value="student">Μαθητές</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
-      </div>
+        
+        {/* Πίνακας καταγραφών */}
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableCaption>
+                {filteredRecords.length === 0 ? 
+                  "Δεν βρέθηκαν καταγραφές συνδέσεων" : 
+                  `Συνολικά ${filteredRecords.length} καταγραφές συνδέσεων`}
+              </TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Χρήστης</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Ρόλος</TableHead>
+                  <TableHead>Ημερομηνία</TableHead>
+                  <TableHead>Χρονικό διάστημα</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredRecords.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8">
+                      <div className="flex flex-col items-center gap-2">
+                        <UserX className="h-8 w-8 text-muted-foreground" />
+                        <p>Δεν βρέθηκαν καταγραφές συνδέσεων</p>
+                        <p className="text-sm text-muted-foreground">
+                          Δοκιμάστε να αλλάξετε τα φίλτρα αναζήτησης
+                        </p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredRecords.map((record, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">
+                        {record.userName}
+                      </TableCell>
+                      <TableCell>{record.email}</TableCell>
+                      <TableCell>
+                        {record.role === "admin" ? "Διαχειριστής" :
+                         record.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής"}
+                      </TableCell>
+                      <TableCell>{formatDate(record.timestamp)}</TableCell>
+                      <TableCell>{timeAgo(record.timestamp)}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </main>
       
       <Footer />
-    </>
+    </div>
   );
 };
 

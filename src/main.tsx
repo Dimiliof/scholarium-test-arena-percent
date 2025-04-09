@@ -1,8 +1,7 @@
 
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
+import { createRoot } from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
 
 // Preconnect to origin for faster loading
 const linkPreconnect = document.createElement('link');
@@ -32,14 +31,4 @@ const updateMetaTags = () => {
 updateMetaTags();
 
 // Mount app with optimized rendering
-const rootElement = document.getElementById("root");
-if (!rootElement) throw new Error("Root element not found");
-
-const root = createRoot(rootElement);
-
-// Render with proper StrictMode wrapping
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+createRoot(document.getElementById("root")!).render(<App />);

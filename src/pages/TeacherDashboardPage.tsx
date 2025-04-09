@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -21,13 +22,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNotification } from '@/contexts/NotificationContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { subjects, QuizQuestion } from '@/lib/subjectsData';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Bell, Search } from 'lucide-react';
 
+// Ορισμός τύπων για τα δεδομένα
 interface TeacherContent {
   id: number;
   question: string;
@@ -44,16 +43,6 @@ interface ClassData {
   createdAt: string;
 }
 
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-  grade: string;
-  performance: number;
-  lastActive: string;
-  classroom: string;
-}
-
 const TeacherDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('content');
   const [content, setContent] = useState<TeacherContent[]>([]);
@@ -63,30 +52,8 @@ const TeacherDashboardPage: React.FC = () => {
   const [classrooms, setClassrooms] = useState<ClassData[]>([]);
   const [newClassName, setNewClassName] = useState('');
   const [newClassGrade, setNewClassGrade] = useState('Α Γυμνασίου');
-  const [students, setStudents] = useState<Student[]>([]);
-  const [studentSearchQuery, setStudentSearchQuery] = useState('');
-  const [selectedClassroom, setSelectedClassroom] = useState<string>('all');
   const { isAuthenticated, isTeacher, user } = useAuth();
-  const { unreadCount } = useNotification();
   const navigate = useNavigate();
-
-  const subjectPerformanceData = [
-    { name: 'Μαθηματικά', score: 78 },
-    { name: 'Φυσική', score: 65 },
-    { name: 'Χημεία', score: 72 },
-    { name: 'Πληροφορική', score: 85 },
-    { name: 'Βιολογία', score: 70 },
-  ];
-
-  const classDistributionData = [
-    { name: 'Άριστα', value: 25 },
-    { name: 'Πολύ Καλά', value: 40 },
-    { name: 'Καλά', value: 20 },
-    { name: 'Μέτρια', value: 10 },
-    { name: 'Χρειάζεται Βελτίωση', value: 5 },
-  ];
-
-  const COLORS = ['#00C49F', '#4CAF50', '#FFBB28', '#FF8042', '#FF0000'];
 
   useEffect(() => {
     if (!isAuthenticated || !isTeacher) {
@@ -96,7 +63,6 @@ const TeacherDashboardPage: React.FC = () => {
 
     loadTeacherContent();
     loadClassrooms();
-    loadStudents();
   }, [isAuthenticated, isTeacher, navigate]);
 
   const loadTeacherContent = () => {
@@ -142,10 +108,12 @@ const TeacherDashboardPage: React.FC = () => {
   };
 
   const loadClassrooms = () => {
+    // Φόρτωση τάξεων από localStorage ή API
     const savedClassrooms = localStorage.getItem('teacher_classrooms');
     if (savedClassrooms) {
       setClassrooms(JSON.parse(savedClassrooms));
     } else {
+      // Δημιουργία προεπιλεγμένων τάξεων για όλες τις βαθμίδες
       const defaultClassrooms: ClassData[] = [
         { id: '1', name: 'Τμήμα Α1', gradeLevel: 'Α Γυμνασίου', studentsCount: 0, createdAt: new Date().toISOString() },
         { id: '2', name: 'Τμήμα Β1', gradeLevel: 'Β Γυμνασίου', studentsCount: 0, createdAt: new Date().toISOString() },
@@ -156,30 +124,6 @@ const TeacherDashboardPage: React.FC = () => {
       ];
       setClassrooms(defaultClassrooms);
       localStorage.setItem('teacher_classrooms', JSON.stringify(defaultClassrooms));
-    }
-  };
-
-  const loadStudents = () => {
-    const savedStudents = localStorage.getItem('teacher_students');
-    if (savedStudents) {
-      setStudents(JSON.parse(savedStudents));
-    } else {
-      const defaultStudents: Student[] = [
-        { id: '1', name: 'Γιάννης Παπαδόπουλος', email: 'giannis@example.com', grade: 'Α Γυμνασίου', performance: 85, lastActive: '2025-04-08', classroom: '1' },
-        { id: '2', name: 'Μαρία Κωνσταντίνου', email: 'maria@example.com', grade: 'Α Γυμνασίου', performance: 92, lastActive: '2025-04-07', classroom: '1' },
-        { id: '3', name: 'Νίκος Αντωνίου', email: 'nikos@example.com', grade: 'Β Γυμνασίου', performance: 78, lastActive: '2025-04-09', classroom: '2' },
-        { id: '4', name: 'Ελένη Δημητρίου', email: 'eleni@example.com', grade: 'Β Γυμνασίου', performance: 89, lastActive: '2025-04-06', classroom: '2' },
-        { id: '5', name: 'Κώστας Ιωάννου', email: 'kostas@example.com', grade: 'Γ Γυμνασίου', performance: 76, lastActive: '2025-04-08', classroom: '3' },
-        { id: '6', name: 'Σοφία Μακρή', email: 'sofia@example.com', grade: 'Γ Γυμνασίου', performance: 94, lastActive: '2025-04-07', classroom: '3' },
-        { id: '7', name: 'Δημήτρης Αλεξίου', email: 'dimitris@example.com', grade: 'Α Λυκείου', performance: 83, lastActive: '2025-04-09', classroom: '4' },
-        { id: '8', name: 'Αναστασία Νικολάου', email: 'anastasia@example.com', grade: 'Α Λυκείου', performance: 88, lastActive: '2025-04-05', classroom: '4' },
-        { id: '9', name: 'Βασίλης Γεωργίου', email: 'vasilis@example.com', grade: 'Β Λυκείου', performance: 81, lastActive: '2025-04-08', classroom: '5' },
-        { id: '10', name: 'Αγγελική Παππά', email: 'aggeliki@example.com', grade: 'Β Λυκείου', performance: 90, lastActive: '2025-04-06', classroom: '5' },
-        { id: '11', name: 'Χρήστος Μιχαηλίδης', email: 'christos@example.com', grade: 'Γ Λυκείου', performance: 95, lastActive: '2025-04-07', classroom: '6' },
-        { id: '12', name: 'Κατερίνα Βασιλείου', email: 'katerina@example.com', grade: 'Γ Λυκείου', performance: 87, lastActive: '2025-04-09', classroom: '6' },
-      ];
-      setStudents(defaultStudents);
-      localStorage.setItem('teacher_students', JSON.stringify(defaultStudents));
     }
   };
 
@@ -212,21 +156,6 @@ const TeacherDashboardPage: React.FC = () => {
     toast.success('Η τάξη διαγράφηκε με επιτυχία');
   };
 
-  const handleAddStudent = () => {
-    toast.info('Η λειτουργία προσθήκης νέου μαθητή θα είναι διαθέσιμη σύντομα');
-  };
-
-  const handleEditStudent = (studentId: string) => {
-    toast.info(`Επεξεργασία στοιχείων μαθητή με ID: ${studentId}`);
-  };
-
-  const handleDeleteStudent = (studentId: string) => {
-    const updatedStudents = students.filter(s => s.id !== studentId);
-    setStudents(updatedStudents);
-    localStorage.setItem('teacher_students', JSON.stringify(updatedStudents));
-    toast.success('Ο μαθητής διαγράφηκε με επιτυχία');
-  };
-
   const filteredContent = content.filter(item => {
     const matchesSearch = item.question.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSubject = selectedSubject === 'all' || item.subjectId === selectedSubject;
@@ -253,19 +182,6 @@ const TeacherDashboardPage: React.FC = () => {
   const classroomsByGrade = (grade: string) => {
     return classrooms.filter(c => c.gradeLevel === grade);
   };
-
-  const getClassroomName = (classroomId: string) => {
-    const classroom = classrooms.find(c => c.id === classroomId);
-    return classroom ? classroom.name : 'Άγνωστη τάξη';
-  };
-
-  const filteredStudents = students.filter(student => {
-    const matchesSearch = 
-      student.name.toLowerCase().includes(studentSearchQuery.toLowerCase()) || 
-      student.email.toLowerCase().includes(studentSearchQuery.toLowerCase());
-    const matchesClassroom = selectedClassroom === 'all' || student.classroom === selectedClassroom;
-    return matchesSearch && matchesClassroom;
-  });
 
   const renderClassroomsTable = (gradeLevel: string) => {
     const filteredClassrooms = classroomsByGrade(gradeLevel);
@@ -322,18 +238,6 @@ const TeacherDashboardPage: React.FC = () => {
     );
   };
 
-  const getPerformanceColor = (score: number) => {
-    if (score >= 90) return 'text-green-600';
-    if (score >= 80) return 'text-green-500';
-    if (score >= 70) return 'text-yellow-500';
-    if (score >= 60) return 'text-orange-500';
-    return 'text-red-500';
-  };
-
-  const handleNavigateToNotifications = () => {
-    navigate("/teacher/notifications");
-  };
-
   return (
     <div className="container mx-auto p-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -344,28 +248,12 @@ const TeacherDashboardPage: React.FC = () => {
           </p>
         </div>
         
-        <div className="flex items-center space-x-3">
-          <Button 
-            variant="outline" 
-            className="relative" 
-            onClick={handleNavigateToNotifications}
-          >
-            <Bell className="h-5 w-5 mr-2" />
-            Ειδοποιήσεις
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
-          </Button>
-          
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={user?.email ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}` : ''} alt={user?.email || 'Προφίλ'} />
-            <AvatarFallback>
-              {user?.email?.charAt(0) || 'U'}
-            </AvatarFallback>
-          </Avatar>
-        </div>
+        <Avatar className="h-12 w-12">
+          <AvatarImage src={user?.email ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}` : ''} alt={user?.email || 'Προφίλ'} />
+          <AvatarFallback>
+            {user?.email?.charAt(0) || 'U'}
+          </AvatarFallback>
+        </Avatar>
       </div>
       
       <Tabs defaultValue="content" value={activeTab} onValueChange={setActiveTab}>
@@ -474,8 +362,9 @@ const TeacherDashboardPage: React.FC = () => {
             
             <CardContent>
               <div className="space-y-6">
+                {/* Φόρμα δημιουργίας νέας τάξης */}
                 <div className="bg-muted p-4 rounded-lg">
-                  <h3 className="text-lg font-medium mb-2">Δημιου��γία Νέας Τάξης</h3>
+                  <h3 className="text-lg font-medium mb-2">Δημιουργία Νέας Τάξης</h3>
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
                       <label className="text-sm text-muted-foreground">Όνομα Τάξης</label>
@@ -510,6 +399,7 @@ const TeacherDashboardPage: React.FC = () => {
                   </div>
                 </div>
                 
+                {/* Γυμνάσιο */}
                 <div>
                   <h3 className="text-xl font-bold mb-4">Τάξεις Γυμνασίου</h3>
                   
@@ -531,6 +421,7 @@ const TeacherDashboardPage: React.FC = () => {
                   </div>
                 </div>
                 
+                {/* Λύκειο */}
                 <div>
                   <h3 className="text-xl font-bold mb-4">Τάξεις Λυκείου</h3>
                   
@@ -563,98 +454,13 @@ const TeacherDashboardPage: React.FC = () => {
               <CardDescription>
                 Διαχειριστείτε τους μαθητές και την πρόοδό τους.
               </CardDescription>
-
-              <div className="flex flex-col md:flex-row justify-between gap-4 mt-4">
-                <div className="flex flex-1 gap-2">
-                  <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <Search className="h-4 w-4 text-gray-500" />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Αναζήτηση μαθητών..."
-                      className="w-full pl-10 p-2 border rounded"
-                      value={studentSearchQuery}
-                      onChange={e => setStudentSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  
-                  <select 
-                    value={selectedClassroom} 
-                    onChange={e => setSelectedClassroom(e.target.value)}
-                    className="border rounded p-2"
-                  >
-                    <option value="all">Όλες οι τάξεις</option>
-                    {classrooms.map(classroom => (
-                      <option key={classroom.id} value={classroom.id}>
-                        {classroom.name} ({classroom.gradeLevel})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <Button onClick={handleAddStudent}>
-                  Προσθήκη Μαθητή
-                </Button>
-              </div>
             </CardHeader>
-            
             <CardContent>
-              {filteredStudents.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Ονοματεπώνυμο</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Τάξη</TableHead>
-                      <TableHead>Επίδοση</TableHead>
-                      <TableHead>Τελευταίο Είσοδος</TableHead>
-                      <TableHead>Ενέργειες</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredStudents.map(student => (
-                      <TableRow key={student.id}>
-                        <TableCell className="font-medium">{student.name}</TableCell>
-                        <TableCell>{student.email}</TableCell>
-                        <TableCell>
-                          {getClassroomName(student.classroom)} ({student.grade})
-                        </TableCell>
-                        <TableCell>
-                          <span className={getPerformanceColor(student.performance)}>
-                            {student.performance}%
-                          </span>
-                        </TableCell>
-                        <TableCell>{student.lastActive}</TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleEditStudent(student.id)}
-                            >
-                              Επεξεργασία
-                            </Button>
-                            <Button 
-                              variant="destructive" 
-                              size="sm"
-                              onClick={() => handleDeleteStudent(student.id)}
-                            >
-                              Διαγραφή
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <div className="text-center p-8">
-                  <p className="text-muted-foreground">
-                    Δεν βρέθηκαν μαθητές που να ταιριάζουν με τα κριτήρια αναζήτησης.
-                  </p>
-                </div>
-              )}
+              <div className="text-center p-8">
+                <p className="text-muted-foreground">
+                  Η ενότητα Μαθητές είναι υπό κατασκευή.
+                </p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -664,79 +470,14 @@ const TeacherDashboardPage: React.FC = () => {
             <CardHeader>
               <CardTitle>Στατιστικά</CardTitle>
               <CardDescription>
-                Δείτε στατιστικά επίδοσης των μαθητών σας ανά μάθημα και τάξη.
+                Δείτε στατιστικά χρήσης και προόδου των μαθητών σας.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-4 rounded-lg shadow">
-                  <h3 className="text-lg font-medium mb-4">Μέση Επίδοση ανά Μάθημα</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart
-                      data={subjectPerformanceData}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis domain={[0, 100]} />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="score" fill="#4f46e5" name="Μέση Βαθμολογία (%)" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                
-                <div className="bg-white p-4 rounded-lg shadow">
-                  <h3 className="text-lg font-medium mb-4">Κατανομή Επιδόσεων</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={classDistributionData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={true}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {classDistributionData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value) => [`${value} μαθητές`, 'Αριθμός']} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                
-                <div className="bg-white p-4 rounded-lg shadow md:col-span-2">
-                  <h3 className="text-lg font-medium mb-4">Συνολική Στατιστική Εικόνα</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-blue-50 p-4 rounded-lg text-center">
-                      <h4 className="text-sm font-medium text-blue-700">Σύνολο Μαθητών</h4>
-                      <p className="text-3xl font-bold mt-2">{students.length}</p>
-                    </div>
-                    <div className="bg-green-50 p-4 rounded-lg text-center">
-                      <h4 className="text-sm font-medium text-green-700">Μέση Επίδοση</h4>
-                      <p className="text-3xl font-bold mt-2">
-                        {students.length > 0 
-                          ? Math.round(students.reduce((sum, s) => sum + s.performance, 0) / students.length) 
-                          : 0}%
-                      </p>
-                    </div>
-                    <div className="bg-purple-50 p-4 rounded-lg text-center">
-                      <h4 className="text-sm font-medium text-purple-700">Ενεργοί Μαθητές (7 ημέρες)</h4>
-                      <p className="text-3xl font-bold mt-2">
-                        {students.filter(s => {
-                          const lastActive = new Date(s.lastActive);
-                          const weekAgo = new Date();
-                          weekAgo.setDate(weekAgo.getDate() - 7);
-                          return lastActive >= weekAgo;
-                        }).length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              <div className="text-center p-8">
+                <p className="text-muted-foreground">
+                  Η ενότητα Στατιστικά είναι υπό κατασκευή.
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -747,3 +488,4 @@ const TeacherDashboardPage: React.FC = () => {
 };
 
 export default TeacherDashboardPage;
+

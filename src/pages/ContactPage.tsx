@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { MessageCircle } from 'lucide-react';
+import LiveChatWidget from '@/components/chat/LiveChatWidget';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -200,6 +201,8 @@ const ContactPage = () => {
       </main>
       
       <Footer />
+      
+      <LiveChatWidget />
     </div>
   );
 };

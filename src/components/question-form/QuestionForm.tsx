@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -54,7 +55,7 @@ export function QuestionForm({
   const { addQuestion, editQuestion, isLoading } = useQuestionManagement();
   const isEditing = !!initialData;
   
-  const defaultValues = isEditing 
+  const defaultValues: QuestionFormValues = isEditing 
     ? {
         question: initialData.question,
         optionA: initialData.options[0],
@@ -70,7 +71,7 @@ export function QuestionForm({
         optionB: "",
         optionC: "",
         optionD: "",
-        correctAnswer: "0",
+        correctAnswer: "0" as "0" | "1" | "2" | "3",
         quizType: initialQuizType.toString() as "basic" | "intermediate" | "advanced" | "quick" | "medium" | "full",
       };
   

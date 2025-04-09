@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from '@/contexts/AuthContext';
 import { BookText, FileText, Video, Link2, Download, BookOpen, Search } from 'lucide-react';
+import { toast } from 'sonner';
 
 type ResourceType = 'book' | 'document' | 'video' | 'link';
 
@@ -23,90 +25,128 @@ interface Resource {
   authorEmail?: string;
   dateAdded: string;
   downloads: number;
+  isPublic?: boolean;
 }
 
 const ResourcesPage = () => {
-  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
+  const { isAuthenticated, isTeacher, isAdmin, user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedGradeLevel, setSelectedGradeLevel] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
-  const [resources] = useState<Resource[]>([
-    {
-      id: '1',
-      title: "Οδηγός Μαθηματικών Α' Γυμνασίου",
-      description: "Πλήρης οδηγός με όλη την ύλη των μαθηματικών για την Α' Γυμνασίου, με λυμένες ασκήσεις.",
-      type: 'book',
-      url: '/resources/math-guide-a.pdf',
-      subject: 'mathematics',
-      gradeLevel: 'Α Γυμνασίου',
-      authorName: 'Δημήτρης Παπαδόπουλος',
-      authorEmail: 'papadopoulos@school.edu.gr',
-      dateAdded: '2023-09-15',
-      downloads: 254
-    },
-    {
-      id: '2',
-      title: 'Σημειώσεις Φυσικής - Ηλεκτρισμός',
-      description: 'Αναλυτικές σημειώσεις για το κεφάλαιο του Ηλεκτρισμού με παραδείγματα και ασκήσεις.',
-      type: 'document',
-      url: '/resources/physics-electricity.pdf',
-      subject: 'physics',
-      gradeLevel: 'Β Γυμνασίου',
-      authorName: 'Μαρία Κωνσταντίνου',
-      dateAdded: '2023-10-20',
-      downloads: 187
-    },
-    {
-      id: '3',
-      title: 'Βιντεομάθημα: Χημικές αντιδράσεις',
-      description: 'Αναλυτική παρουσίαση των βασικών χημικών αντιδράσεων με παραδείγματα.',
-      type: 'video',
-      url: 'https://youtube.com/watch?v=example123',
-      subject: 'chemistry',
-      gradeLevel: 'Γ Γυμνασίου',
-      authorName: 'Γιώργος Αλεξίου',
-      dateAdded: '2023-11-05',
-      downloads: 312
-    },
-    {
-      id: '4',
-      title: 'Ιστορία Αρχαίας Ελλάδας - Διαφάνειες',
-      description: 'Πλήρες σετ διαφανειών για την ιστορία της Αρχαίας Ελλάδας από την Αρχαϊκή έως την Ελληνιστική περίοδο.',
-      type: 'document',
-      url: '/resources/ancient-greece-slides.pptx',
-      subject: 'history',
-      gradeLevel: 'Α Λυκείου',
-      authorName: 'Ελένη Παπαδημητρίου',
-      dateAdded: '2023-12-10',
-      downloads: 143
-    },
-    {
-      id: '5',
-      title: 'Εκπαιδευτικά παιχνίδια Γεωγραφίας',
-      description: 'Συλλογή από διαδραστικά παιχνίδια για την εκμάθηση γεωγραφίας.',
-      type: 'link',
-      url: 'https://geography-games.edu/interactive',
-      subject: 'geography',
-      gradeLevel: 'Β Γυμνασίου',
-      authorName: 'Ανδρέας Νικολάου',
-      dateAdded: '2024-01-15',
-      downloads: 98
-    },
-    {
-      id: '6',
-      title: 'Επαναληπτικές Ασκήσεις Άλγεβρας',
-      description: 'Φυλλάδιο με επαναληπτικές ασκήσεις άλγεβρας για προετοιμασία εξετάσεων.',
-      type: 'document',
-      url: '/resources/algebra-exercises.pdf',
-      subject: 'mathematics',
-      gradeLevel: 'Γ Λυκείου',
-      authorName: 'Κώστας Δημητρίου',
-      dateAdded: '2024-02-20',
-      downloads: 421
+  // Φορτώνουμε τους πόρους από το localStorage
+  useEffect(() => {
+    setIsLoading(true);
+    
+    try {
+      // Φορτώνουμε τους προκαθορισμένους πόρους
+      const defaultResources = [
+        {
+          id: '1',
+          title: "Οδηγός Μαθηματικών Α' Γυμνασίου",
+          description: "Πλήρης οδηγός με όλη την ύλη των μαθηματικών για την Α' Γυμνασίου, με λυμένες ασκήσεις.",
+          type: 'book' as ResourceType,
+          url: '/resources/math-guide-a.pdf',
+          subject: 'mathematics',
+          gradeLevel: 'Α Γυμνασίου',
+          authorName: 'Δημήτρης Παπαδόπουλος',
+          authorEmail: 'papadopoulos@school.edu.gr',
+          dateAdded: '2023-09-15',
+          downloads: 254,
+          isPublic: true
+        },
+        {
+          id: '2',
+          title: 'Σημειώσεις Φυσικής - Ηλεκτρισμός',
+          description: 'Αναλυτικές σημειώσεις για το κεφάλαιο του Ηλεκτρισμού με παραδείγματα και ασκήσεις.',
+          type: 'document' as ResourceType,
+          url: '/resources/physics-electricity.pdf',
+          subject: 'physics',
+          gradeLevel: 'Β Γυμνασίου',
+          authorName: 'Μαρία Κωνσταντίνου',
+          dateAdded: '2023-10-20',
+          downloads: 187,
+          isPublic: true
+        },
+        {
+          id: '3',
+          title: 'Βιντεομάθημα: Χημικές αντιδράσεις',
+          description: 'Αναλυτική παρουσίαση των βασικών χημικών αντιδράσεων με παραδείγματα.',
+          type: 'video' as ResourceType,
+          url: 'https://youtube.com/watch?v=example123',
+          subject: 'chemistry',
+          gradeLevel: 'Γ Γυμνασίου',
+          authorName: 'Γιώργος Αλεξίου',
+          dateAdded: '2023-11-05',
+          downloads: 312,
+          isPublic: true
+        },
+        {
+          id: '4',
+          title: 'Ιστορία Αρχαίας Ελλάδας - Διαφάνειες',
+          description: 'Πλήρες σετ διαφανειών για την ιστορία της Αρχαίας Ελλάδας από την Αρχαϊκή έως την Ελληνιστική περίοδο.',
+          type: 'document' as ResourceType,
+          url: '/resources/ancient-greece-slides.pptx',
+          subject: 'history',
+          gradeLevel: 'Α Λυκείου',
+          authorName: 'Ελένη Παπαδημητρίου',
+          dateAdded: '2023-12-10',
+          downloads: 143,
+          isPublic: true
+        },
+        {
+          id: '5',
+          title: 'Εκπαιδευτικά παιχνίδια Γεωγραφίας',
+          description: 'Συλλογή από διαδραστικά παιχνίδια για την εκμάθηση γεωγραφίας.',
+          type: 'link' as ResourceType,
+          url: 'https://geography-games.edu/interactive',
+          subject: 'geography',
+          gradeLevel: 'Β Γυμνασίου',
+          authorName: 'Ανδρέας Νικολάου',
+          dateAdded: '2024-01-15',
+          downloads: 98,
+          isPublic: true
+        },
+        {
+          id: '6',
+          title: 'Επαναληπτικές Ασκήσεις Άλγεβρας',
+          description: 'Φυλλάδιο με επαναληπτικές ασκήσεις άλγεβρας για προετοιμασία εξετάσεων.',
+          type: 'document' as ResourceType,
+          url: '/resources/algebra-exercises.pdf',
+          subject: 'mathematics',
+          gradeLevel: 'Γ Λυκείου',
+          authorName: 'Κώστας Δημητρίου',
+          dateAdded: '2024-02-20',
+          downloads: 421,
+          isPublic: true
+        }
+      ];
+      
+      // Φορτώνουμε τους πόρους από το localStorage
+      const storedResources = localStorage.getItem('educational_resources');
+      let userAddedResources: Resource[] = [];
+      
+      if (storedResources) {
+        userAddedResources = JSON.parse(storedResources);
+      }
+      
+      // Συνδυάζουμε τους προκαθορισμένους με τους αποθηκευμένους πόρους
+      const allResources = [...defaultResources, ...userAddedResources];
+      
+      // Ταξινομούμε με βάση την ημερομηνία προσθήκης (πιο πρόσφατοι πρώτα)
+      allResources.sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime());
+      
+      setResources(allResources);
+    } catch (error) {
+      console.error("Σφάλμα κατά τη φόρτωση των πόρων:", error);
+      toast.error("Υπήρξε ένα σφάλμα κατά τη φόρτωση των εκπαιδευτικών πόρων.");
+    } finally {
+      setIsLoading(false);
     }
-  ]);
+  }, []);
 
   const filteredResources = resources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -115,7 +155,13 @@ const ResourcesPage = () => {
     const matchesGradeLevel = selectedGradeLevel === 'all' || resource.gradeLevel === selectedGradeLevel;
     const matchesType = selectedType === 'all' || resource.type === selectedType;
     
-    return matchesSearch && matchesSubject && matchesGradeLevel && matchesType;
+    // Φιλτράρουμε με βάση την ορατότητα
+    // Εμφανίζουμε δημόσιους πόρους ή ιδιωτικούς πόρους που ανήκουν στον χρήστη
+    const isVisible = 
+      resource.isPublic === true || 
+      (isTeacher && resource.authorEmail === user?.email);
+    
+    return matchesSearch && matchesSubject && matchesGradeLevel && matchesType && isVisible;
   });
 
   const getResourceIcon = (type: ResourceType) => {
@@ -324,7 +370,7 @@ const ResourcesPage = () => {
                   <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="text-lg font-medium mb-2">Δεν βρέθηκαν πόροι</h3>
                   <p className="text-muted-foreground">
-                    Δοκιμάστε να αλλάξετε τα φίλτρα αναζήτησης
+                    Δοκιμάστε να αλλάξετε τα φίλτρα αναζήτησης ή {isTeacher && "προσθέστε νέο περιεχόμενο"}
                   </p>
                 </div>
               )}

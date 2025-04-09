@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,6 +39,11 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login, isTeacher, isAdmin } = useAuth();
 
+  // Προσθήκη useEffect για να καθαρίσουμε τυχόν περιττές εγγραφές στο localStorage
+  useEffect(() => {
+    console.log("LoginPage rendered, checking authentication state");
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,23 +59,26 @@ const LoginPage = () => {
     try {
       console.log("Attempting login with:", values.email);
       
-      // Special check for admin login
-      if (values.email === "liofisdimitris@gmail.com" && values.password === "Skatadi21!") {
+      // Ειδικός έλεγχος για τον admin
+      const isSpecialAdmin = values.email === "liofisdimitris@gmail.com" && values.password === "Skatadi21!";
+      
+      if (isSpecialAdmin) {
         console.log("Admin credential match detected");
       }
       
       const success = await login(values.email, values.password);
+      console.log("Login success:", success);
       
       if (success) {
         console.log("Login successful, checking user roles");
         
-        // Get user from localStorage to double-check roles
+        // Λαμβάνουμε τον χρήστη από το localStorage για να ελέγξουμε τους ρόλους
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const user = JSON.parse(storedUser);
           console.log("User from localStorage:", user);
           
-          // Improved role checking
+          // Βελτιωμένος έλεγχος ρόλων
           const isUserAdmin = user.role === "admin" || 
                             (user.roles && user.roles.includes("admin")) ||
                             user.email === "liofisdimitris@gmail.com";
@@ -91,14 +99,22 @@ const LoginPage = () => {
           
           toast.success(`Συνδεθήκατε ως ${roleText}`);
           
-          // Redirect based on role
+          // Ανακατεύθυνση με βάση τον ρόλο
           if (isUserAdmin) {
+            console.log("Redirecting to admin dashboard");
             navigate("/admin/users");
-          } else if (isUserTeacher) {
+            return; // Σημαντικό: τερματίζουμε τη συνάρτηση εδώ
+          } 
+          
+          if (isUserTeacher) {
+            console.log("Redirecting to teacher dashboard");
             navigate("/teacher-dashboard");
-          } else {
-            navigate("/student/courses");
-          }
+            return; // Σημαντικό: τερματίζουμε τη συνάρτηση εδώ
+          } 
+          
+          console.log("Redirecting to student courses");
+          navigate("/student/courses");
+          return; // Σημαντικό: τερματίζουμε τη συνάρτηση εδώ
         } else {
           console.log("No user found in localStorage after successful login");
           uiToast({

@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { useAuth } from "./contexts/AuthContext";
 import LiveChatWidget from '@/components/chat/LiveChatWidget';
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 import Index from "./pages/Index";
 import SubjectPage from "./pages/SubjectPage";
@@ -170,14 +171,16 @@ const App = () => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <NotificationProvider>
-            <Toaster />
-            <Sonner />
-            <AppRoutes />
-            <LiveChatWidget />
-          </NotificationProvider>
-        </AuthProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <Toaster />
+              <Sonner />
+              <AppRoutes />
+              <LiveChatWidget />
+            </NotificationProvider>
+          </AuthProvider>
+        </TooltipProvider>
       </QueryClientProvider>
     </BrowserRouter>
   );

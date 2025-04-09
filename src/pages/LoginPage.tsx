@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -36,7 +37,7 @@ const LoginPage = () => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const { toast: uiToast } = useToast();
   const navigate = useNavigate();
-  const { login, makeUserTeacherAndAdmin, isTeacher, isAdmin } = useAuth();
+  const { login, isTeacher, isAdmin } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,57 +52,37 @@ const LoginPage = () => {
     setLoginError(null);
     
     try {
-      // Έλεγχος για τον κύριο διαχειριστή (απευθείας αναγνώριση)
+      console.log("Attempting login with:", values.email);
+      
+      // Special check for admin login
       if (values.email === "liofisdimitris@gmail.com" && values.password === "Skatadi21!") {
-        console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
-        
-        // Διόρθωση των δικαιωμάτων του διαχειριστή
-        await makeUserTeacherAndAdmin(values.email);
-        
-        // Δημιουργία του αντικειμένου χρήστη για την τοπική αποθήκευση
-        const adminUser = {
-          id: "admin-special-id",
-          firstName: "Διαχειριστής",
-          lastName: "Συστήματος",
-          email: values.email,
-          role: "admin",
-          roles: ["admin", "teacher"]
-        };
-        
-        // Αποθήκευση στο localStorage
-        localStorage.setItem("user", JSON.stringify(adminUser));
-        
-        // Ειδοποίηση και ανακατεύθυνση
-        uiToast({
-          title: "Επιτυχής σύνδεση",
-          description: "Καλωσήρθατε, Διαχειριστή.",
-        });
-        
-        toast.success("Συνδεθήκατε ως Διαχειριστής");
-        
-        // Κατευθύνουμε τον διαχειριστή στον πίνακα ελέγχου
-        navigate("/admin/users");
-        setIsLoading(false);
-        return;
+        console.log("Admin credential match detected");
       }
       
-      // Κανονική ροή σύνδεσης για άλλους χρήστες
       const success = await login(values.email, values.password);
       
       if (success) {
-        // Παίρνουμε το χρήστη από το localStorage
+        console.log("Login successful, checking user roles");
+        
+        // Get user from localStorage to double-check roles
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const user = JSON.parse(storedUser);
+          console.log("User from localStorage:", user);
           
-          // Διπλός έλεγχος για τα δικαιώματα
-          const isUserAdmin = user.role === "admin" || (user.roles && user.roles.includes("admin"));
-          const isUserTeacher = user.role === "teacher" || (user.roles && user.roles.includes("teacher"));
+          // Improved role checking
+          const isUserAdmin = user.role === "admin" || 
+                            (user.roles && user.roles.includes("admin")) ||
+                            user.email === "liofisdimitris@gmail.com";
+                            
+          const isUserTeacher = user.role === "teacher" || 
+                              (user.roles && user.roles.includes("teacher")) ||
+                              user.email === "liofisdimitris@gmail.com";
           
           const roleText = isUserAdmin ? "Διαχειριστής" : 
-                           isUserTeacher ? "Εκπαιδευτικός" : "Μαθητής";
+                          isUserTeacher ? "Εκπαιδευτικός" : "Μαθητής";
           
-          console.log(`Επιτυχής σύνδεση ως ${roleText} (${user.role})`);
+          console.log(`Login successful as ${roleText} (admin: ${isUserAdmin}, teacher: ${isUserTeacher})`);
           
           uiToast({
             title: "Επιτυχής σύνδεση",
@@ -110,7 +91,7 @@ const LoginPage = () => {
           
           toast.success(`Συνδεθήκατε ως ${roleText}`);
           
-          // Κατεύθυνση χρήστη ανάλογα με τον ρόλο
+          // Redirect based on role
           if (isUserAdmin) {
             navigate("/admin/users");
           } else if (isUserTeacher) {
@@ -119,6 +100,7 @@ const LoginPage = () => {
             navigate("/student/courses");
           }
         } else {
+          console.log("No user found in localStorage after successful login");
           uiToast({
             title: "Επιτυχής σύνδεση",
             description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
@@ -126,6 +108,7 @@ const LoginPage = () => {
           navigate("/");
         }
       } else {
+        console.log("Login failed - incorrect credentials");
         setLoginError("Λάθος email ή κωδικός πρόσβασης. Παρακαλώ προσπαθήστε ξανά.");
       }
     } catch (error) {

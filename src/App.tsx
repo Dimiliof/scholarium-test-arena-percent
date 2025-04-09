@@ -9,7 +9,7 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import LiveChatWidget from '@/components/chat/LiveChatWidget';
 
-// Import useAuth here, not below
+// Import useAuth
 import { useAuth } from "./contexts/AuthContext";
 
 // Σελίδες
@@ -67,6 +67,26 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Κύριο component της εφαρμογής
+function App() {
+  return (
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            <NotificationProvider>
+              <Toaster />
+              <Sonner />
+              <AppRoutes />
+              <LiveChatWidget />
+            </NotificationProvider>
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  );
+}
 
 // Protected Route components
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -172,32 +192,5 @@ const AppRoutes = () => {
     </Routes>
   );
 };
-
-// Create a wrapping component for TooltipProvider
-const AppContent = () => {
-  return (
-    <TooltipProvider>
-      <AuthProvider>
-        <NotificationProvider>
-          <Toaster />
-          <Sonner />
-          <AppRoutes />
-          <LiveChatWidget />
-        </NotificationProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  );
-};
-
-// Κύριο component της εφαρμογής
-function App() {
-  return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AppContent />
-      </QueryClientProvider>
-    </BrowserRouter>
-  );
-}
 
 export default App;

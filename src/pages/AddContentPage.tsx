@@ -1,20 +1,16 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, AlertCircle, Mail, Smartphone, BookText } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { subjects } from '@/lib/subjectsData';
-import { useQuestionManagement } from '@/hooks/useQuestionManagement';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { AddQuestionForm, QuizType } from '@/components/AddQuestionForm';
-import AddResourceForm from '@/components/resources/AddResourceForm';
 import { useToast } from '@/hooks/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import VerificationStep from '@/components/add-content/VerificationStep';
+import VerifyCodeStep from '@/components/add-content/VerifyCodeStep';
+import VerifiedBanner from '@/components/add-content/VerifiedBanner';
+import ContentTypeSelector from '@/components/add-content/ContentTypeSelector';
+import SubjectSelector from '@/components/add-content/SubjectSelector';
+import ContentForm from '@/components/add-content/ContentForm';
 
 const AddContentPage = () => {
   const navigate = useNavigate();
@@ -27,8 +23,6 @@ const AddContentPage = () => {
   const [otpCode, setOtpCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [contentType, setContentType] = useState<'question' | 'resource'>('question');
-  const { addQuestion, isLoading: isAdding } = useQuestionManagement();
-  const initialQuizType: QuizType = QuizType.BASIC;
   
   useEffect(() => {
     const isVerified = localStorage.getItem('educatorVerified') === 'true';
@@ -184,216 +178,55 @@ const AddContentPage = () => {
         <h1 className="text-3xl font-bold mb-8">Προσθήκη Υλικού</h1>
         
         {verificationStep === 'initial' && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Επαλήθευση Εκπαιδευτικού</CardTitle>
-              <CardDescription>
-                Για να προσθέσετε εκπαιδευτικό υλικό, χρειάζεται πρώτα να επαληθεύσετε την ιδιότητά σας ως εκπαιδευτικός.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="email" onValueChange={(value) => setVerificationMethod(value as 'email' | 'sms')}>
-                <TabsList className="mb-4">
-                  <TabsTrigger value="email">Επαλήθευση μέσω Email</TabsTrigger>
-                  <TabsTrigger value="sms">Επαλήθευση μέσω SMS</TabsTrigger>
-                </TabsList>
-                <TabsContent value="email">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Εκπαιδευτικού</Label>
-                      <Input 
-                        id="email" 
-                        type="email" 
-                        placeholder="me@school.edu.gr" 
-                        value={emailInput} 
-                        onChange={(e) => setEmailInput(e.target.value)}
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Παρακαλώ εισάγετε το επίσημο email σας ως εκπαιδευτικός.
-                      </p>
-                    </div>
-                    <Button onClick={handleSendVerification} disabled={isVerifying} className="w-full">
-                      {isVerifying ? "Αποστολή..." : "Αποστολή Κωδικού Επαλήθευσης"}
-                    </Button>
-                    
-                    <p className="text-xs text-center text-muted-foreground mt-2">
-                      <Button variant="link" className="p-0 h-auto text-xs" onClick={showTestCode}>
-                        Εμφάνιση δοκιμαστικού κωδικού (για ανάπτυξη)
-                      </Button>
-                    </p>
-                  </div>
-                </TabsContent>
-                <TabsContent value="sms">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Αριθμός Κινητού</Label>
-                      <Input 
-                        id="phone" 
-                        type="tel" 
-                        placeholder="69XXXXXXXX" 
-                        value={phoneInput} 
-                        onChange={(e) => setPhoneInput(e.target.value)}
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Παρακαλώ εισάγετε τον αριθμό του κινητού σας τηλεφώνου.
-                      </p>
-                    </div>
-                    <Button onClick={handleSendVerification} disabled={isVerifying} className="w-full">
-                      {isVerifying ? "Αποστολή..." : "Αποστολή Κωδικού Επαλήθευσης"}
-                    </Button>
-                    
-                    <p className="text-xs text-center text-muted-foreground mt-2">
-                      <Button variant="link" className="p-0 h-auto text-xs" onClick={showTestCode}>
-                        Εμφάνιση δοκιμαστικού κωδικού (για ανάπτυξη)
-                      </Button>
-                    </p>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+          <VerificationStep
+            verificationMethod={verificationMethod}
+            emailInput={emailInput}
+            phoneInput={phoneInput}
+            isVerifying={isVerifying}
+            setVerificationMethod={setVerificationMethod}
+            setEmailInput={setEmailInput}
+            setPhoneInput={setPhoneInput}
+            handleSendVerification={handleSendVerification}
+            showTestCode={showTestCode}
+          />
         )}
 
         {verificationStep === 'verify' && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Εισαγωγή Κωδικού Επαλήθευσης</CardTitle>
-              <CardDescription>
-                Παρακαλώ εισάγετε τον 6-ψήφιο κωδικό που σας στείλαμε
-                {verificationMethod === 'email' ? ` στο ${emailInput}` : ` στο ${phoneInput}`}.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-center py-4">
-                  <InputOTP maxLength={6} value={otpCode} onChange={setOtpCode}>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Button onClick={handleVerifyCode} disabled={isVerifying} className="w-full">
-                    {isVerifying ? "Επαλήθευση..." : "Επαλήθευση Κωδικού"}
-                  </Button>
-                  <Button variant="outline" onClick={handleBack} className="w-full">
-                    Πίσω
-                  </Button>
-                </div>
-                <p className="text-sm text-center text-muted-foreground">
-                  Δεν λάβατε τον κωδικό; <Button variant="link" className="p-0 h-auto" onClick={handleSendVerification}>Αποστολή ξανά</Button>
-                </p>
-                
-                <p className="text-xs text-center text-muted-foreground mt-2">
-                  <Button variant="link" className="p-0 h-auto text-xs" onClick={showTestCode}>
-                    Εμφάνιση δοκιμαστικού κωδικού (για ανάπτυξη)
-                  </Button>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <VerifyCodeStep
+            verificationMethod={verificationMethod}
+            emailInput={emailInput}
+            phoneInput={phoneInput}
+            otpCode={otpCode}
+            setOtpCode={setOtpCode}
+            isVerifying={isVerifying}
+            handleVerifyCode={handleVerifyCode}
+            handleBack={handleBack}
+            handleSendVerification={handleSendVerification}
+            showTestCode={showTestCode}
+          />
         )}
 
         {verificationStep === 'verified' && !selectedSubject && (
           <>
-            <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6 flex items-center gap-3">
-              <Check className="h-5 w-5 text-green-500" />
-              <p className="text-green-700">
-                Έχετε επαληθευτεί ως εκπαιδευτικός και μπορείτε να προσθέσετε υλικό.
-              </p>
-            </div>
+            <VerifiedBanner />
             
-            <div className="mb-6">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/teacher-dashboard')}
-                className="flex items-center gap-2"
-              >
-                <span>Μετάβαση στον Πίνακα Εκπαιδευτικού</span>
-              </Button>
-            </div>
+            <ContentTypeSelector 
+              contentType={contentType}
+              setContentType={setContentType}
+            />
             
-            <div className="mb-6">
-              <Tabs defaultValue="question" onValueChange={(value) => setContentType(value as 'question' | 'resource')}>
-                <TabsList className="mb-4">
-                  <TabsTrigger value="question">Ερωτήσεις / Κουίζ</TabsTrigger>
-                  <TabsTrigger value="resource">Εκπαιδευτικοί Πόροι</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            
-            <p className="text-lg mb-6">Επιλέξτε το μάθημα στο οποίο θέλετε να προσθέσετε υλικό:</p>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {subjects.map((subject) => {
-                const IconComponent = subject.icon;
-                
-                return (
-                  <Card 
-                    key={subject.id} 
-                    className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => handleSubjectSelect(subject.id)}
-                  >
-                    <CardContent className="p-6 flex items-center gap-4">
-                      <div className={`${subject.color} w-12 h-12 rounded-full flex items-center justify-center text-white text-2xl`}>
-                        {IconComponent && <IconComponent className="h-6 w-6" />}
-                      </div>
-                      <div>
-                        <h3 className="font-bold">{subject.name}</h3>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+            <SubjectSelector onSelectSubject={handleSubjectSelect} />
           </>
         )}
         
         {verificationStep === 'verified' && selectedSubject && (
-          <div>
-            <Button 
-              variant="outline" 
-              onClick={handleBack}
-              className="mb-6"
-            >
-              &larr; Πίσω στα μαθήματα
-            </Button>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {contentType === 'question' ? (
-                    <>
-                      {subjects.find(s => s.id === selectedSubject)?.name} - Προσθήκη Νέας Ερώτησης
-                    </>
-                  ) : (
-                    <>
-                      {subjects.find(s => s.id === selectedSubject)?.name} - Προσθήκη Εκπαιδευτικού Πόρου
-                    </>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {contentType === 'question' ? (
-                  <AddQuestionForm 
-                    subjectId={selectedSubject}
-                    onSuccess={handleQuestionAdded}
-                    initialQuizType={initialQuizType}
-                  />
-                ) : (
-                  <AddResourceForm 
-                    onSuccess={handleResourceAdded}
-                    selectedSubject={selectedSubject}
-                  />
-                )}
-              </CardContent>
-            </Card>
-          </div>
+          <ContentForm
+            contentType={contentType}
+            selectedSubject={selectedSubject}
+            handleBack={handleBack}
+            handleQuestionAdded={handleQuestionAdded}
+            handleResourceAdded={handleResourceAdded}
+          />
         )}
       </div>
       

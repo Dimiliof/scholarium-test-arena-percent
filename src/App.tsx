@@ -61,6 +61,7 @@ const queryClient = new QueryClient({
   },
 });
 
+// Protected route components
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
@@ -120,8 +121,8 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <TooltipProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <TooltipProvider>
             <NotificationProvider>
               <Toaster />
               <Sonner />
@@ -174,8 +175,8 @@ const App = () => {
               
               <LiveChatWidget />
             </NotificationProvider>
-          </AuthProvider>
-        </TooltipProvider>
+          </TooltipProvider>
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

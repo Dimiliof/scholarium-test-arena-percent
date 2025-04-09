@@ -35,7 +35,10 @@ updateMetaTags();
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Root element not found");
 
-createRoot(rootElement).render(
+const root = createRoot(rootElement);
+
+// Render with proper StrictMode wrapping
+root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>

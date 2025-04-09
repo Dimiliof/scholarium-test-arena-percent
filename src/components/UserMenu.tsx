@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { User, LogOut, Settings, UserCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +12,8 @@ export default function UserMenu() {
   const { user, logout, isAuthenticated, isTeacher, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast: uiToast } = useToast();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleLogout = () => {
     logout();
@@ -34,24 +36,19 @@ export default function UserMenu() {
     navigate("/register-type");
   };
 
-  // Εδώ προσθέτουμε κώδικα για σωστή εμφάνιση του dropdown μενού
   const toggleDropdown = () => {
-    const dropdown = document.getElementById("userDropdown");
-    if (dropdown) {
-      dropdown.classList.toggle("hidden");
+    if (dropdownRef.current) {
+      dropdownRef.current.classList.toggle("hidden");
     }
   };
 
   // Κλείνουμε το dropdown όταν κάνουμε κλικ έξω από αυτό
   useEffect(() => {
     const closeDropdown = (e: MouseEvent) => {
-      const dropdown = document.getElementById("userDropdown");
-      const button = document.querySelector("[data-dropdown-toggle='userDropdown']");
-      
-      if (dropdown && button && 
-          !dropdown.contains(e.target as Node) && 
-          !button.contains(e.target as Node)) {
-        dropdown.classList.add("hidden");
+      if (dropdownRef.current && buttonRef.current && 
+          !dropdownRef.current.contains(e.target as Node) && 
+          !buttonRef.current.contains(e.target as Node)) {
+        dropdownRef.current.classList.add("hidden");
       }
     };
     
@@ -73,8 +70,8 @@ export default function UserMenu() {
             <Button
               variant="ghost"
               className="flex items-center gap-2 text-gray-700 hover:text-primary"
-              data-dropdown-toggle="userDropdown"
               onClick={toggleDropdown}
+              ref={buttonRef}
             >
               <UserCircle className="h-6 w-6" />
               <span className="hidden md:inline">
@@ -82,7 +79,7 @@ export default function UserMenu() {
               </span>
             </Button>
             <div
-              id="userDropdown"
+              ref={dropdownRef}
               className="dropdown-menu hidden absolute right-0 mt-2 bg-white shadow-md rounded-md py-2 min-w-[200px] z-50"
             >
               <div className="px-4 py-2 border-b">

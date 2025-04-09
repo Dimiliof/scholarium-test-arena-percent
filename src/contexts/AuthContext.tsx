@@ -16,6 +16,7 @@ import {
 import { useAdminFunctions } from "@/hooks/useAdminFunctions";
 import { useUserManagement } from "@/hooks/useUserManagement";
 
+// Create context with default values
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
@@ -32,8 +33,10 @@ const AuthContext = createContext<AuthContextType>({
   makeUserTeacherAndAdmin: async () => false,
 });
 
+// Custom hook to use the auth context
 export const useAuth = () => useContext(AuthContext);
 
+// Auth provider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);

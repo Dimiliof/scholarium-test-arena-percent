@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { User } from "@/types/auth";
-import { fixAdminEmailOnStartup, makeUserTeacherAndAdmin } from "@/services/authService";
+import { fixAdminEmailOnStartup, makeUserTeacherAndAdmin } from "@/services/adminService";
 
 export const useAuthInitialization = () => {
   const [user, setUser] = useState<User | null>(null);

@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext } from "react";
 import { User, AuthContextType } from "@/types/auth";
-import { getAllUsersFromStorage } from "@/services/authService";
+import { getAllUsersFromStorage } from "@/services/userService";
 import { useAuthInitialization } from "@/hooks/useAuthInitialization";
 import { useAuthOperations } from "@/hooks/useAuthOperations";
 import { useRoleManagement } from "@/hooks/useRoleManagement";

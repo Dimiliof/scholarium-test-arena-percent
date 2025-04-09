@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from "react";
 import { User } from "@/types/auth";
-import { makeUserTeacherAndAdmin as makeUserTeacherAndAdminService } from "@/services/authService";
+import { makeUserTeacherAndAdmin as makeUserTeacherAndAdminService } from "@/services/adminService";
 
 export const useAdminFunctions = (setUser: (user: User | null) => void) => {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);

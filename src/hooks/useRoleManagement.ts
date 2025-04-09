@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { User } from "@/types/auth";
-import { makeUserTeacherAndAdmin as makeUserTeacherAndAdminService } from "@/services/authService";
+import { makeUserTeacherAndAdmin as makeUserTeacherAndAdminService } from "@/services/adminService";
 
 export const useRoleManagement = (user: User | null) => {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);

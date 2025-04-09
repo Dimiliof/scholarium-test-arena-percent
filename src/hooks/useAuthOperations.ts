@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { User, LoginRecord } from "@/types/auth";
-import { loginUser, registerUser } from "@/services/authService";
+import { loginUser, registerUser } from "@/services/authenticationService";
 import { toast } from "sonner";
 
 export const useAuthOperations = () => {

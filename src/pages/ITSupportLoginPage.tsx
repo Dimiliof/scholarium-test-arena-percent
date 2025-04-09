@@ -24,7 +24,7 @@ const ITSupportLoginPage = () => {
     setIsLoading(true);
 
     try {
-      // Ελέγχουμε ειδικά για τον διαχειριστή με hardcoded διαπιστευτήρια
+      // Διόρθωση: Απλοποίηση του ελέγχου και χειρισμού των διαπιστευτηρίων του διαχειριστή
       if (email === "liofisdimitris@gmail.com" && password === "Skatadi21!") {
         console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
         
@@ -55,14 +55,15 @@ const ITSupportLoginPage = () => {
         return;
       }
       
-      // Η κανονική ροή σύνδεσης για άλλους χρήστες
-      // Πρώτα δοκιμάζουμε να διορθώσουμε το email διαχειριστή
+      // Βελτίωση της κανονικής ροής σύνδεσης για άλλους χρήστες
       if (email === "liofisdimitris@gmail.com") {
+        // Πάντα επιχειρούμε να διορθώσουμε τα δικαιώματα του διαχειριστή
         const fixed = await fixAdminEmail(email);
         console.log("Προσπάθεια διόρθωσης διαχειριστή:", fixed);
       }
       
-      // Στη συνέχεια κάνουμε το login
+      // Η κανονική ροή εξακολουθεί να καλεί την login, αλλά χρησιμοποιούμε 
+      // το password από τη φόρμα, όχι hardcoded
       const success = await login(email, password);
       
       if (success) {

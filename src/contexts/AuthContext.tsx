@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { AuthContextType, User, RegisterData, LoginRecord } from "../types/auth";
 import { checkIsAdmin, checkIsTeacher, getUserFromLocalStorage } from "../utils/authUtils";
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextType>({
   loginRecords: [],
   fixAdminEmail: async () => false,
   makeUserTeacherAndAdmin: async () => false,
+  canViewAllContent: false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -28,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
   const [loginRecords, setLoginRecords] = useState<LoginRecord[]>([]);
+  const [canViewAllContent, setCanViewAllContent] = useState(true); // Όλοι οι χρήστες μπορούν να δουν το περιεχόμενο
   
   const userOperations = useUserOperations();
 
@@ -144,7 +147,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         getAllUsers: userOperations.getAllUsers,
         loginRecords,
         fixAdminEmail: handleFixAdminEmail,
-        makeUserTeacherAndAdmin: handleMakeUserTeacherAndAdmin
+        makeUserTeacherAndAdmin: handleMakeUserTeacherAndAdmin,
+        canViewAllContent: true, // Προσθέτουμε αυτή την ιδιότητα
       }}
     >
       {children}

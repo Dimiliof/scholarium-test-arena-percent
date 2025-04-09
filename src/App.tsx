@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -61,7 +60,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Protected route components
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
@@ -79,7 +77,6 @@ const TeacherRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
   
-  // Επιτρέπουμε πρόσβαση και στους διαχειριστές
   if (!isTeacher && !isAdmin) {
     return <Navigate to="/" replace />;
   }
@@ -94,7 +91,6 @@ const StudentRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
   
-  // Επιτρέπουμε πρόσβαση μόνο στους μαθητές
   if (isTeacher || isAdmin) {
     return <Navigate to="/" replace />;
   }
@@ -116,7 +112,6 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// The App component with proper provider nesting
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,6 +1,6 @@
 // Service worker για την εφαρμογή EduPercentage PWA
 
-const CACHE_NAME = 'eduPercentage-v6';
+const CACHE_NAME = 'eduPercentage-v7';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -12,20 +12,30 @@ const urlsToCache = [
   'https://edupercentage.s3.eu-central-1.amazonaws.com/releases/eduPercentage-latest.apk'
 ];
 
-// Skip waiting to ensure the new service worker activates immediately
+// Install event handler with improved error handling
 self.addEventListener('install', event => {
   console.log('Εγκατάσταση του Service Worker');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Άνοιγμα cache');
-        return cache.addAll(urlsToCache);
+        // Cache assets one by one to prevent total failure if one asset fails
+        return Promise.all(
+          urlsToCache.map(url => 
+            cache.add(url).catch(error => {
+              console.error(`Failed to cache ${url}:`, error);
+            })
+          )
+        );
       })
-      .then(() => self.skipWaiting()) // Διασφαλίζει ότι ο νέος worker παίρνει τον έλεγχο αμέσως
+      .then(() => self.skipWaiting())
+      .catch(error => {
+        console.error('Service worker installation failed:', error);
+      })
   );
 });
 
-// Claim clients immediately when service worker activates
+// Activate event with better cleanup logic
 self.addEventListener('activate', event => {
   console.log('Ενεργοποίηση του νέου service worker');
   
@@ -44,12 +54,14 @@ self.addEventListener('activate', event => {
           })
         );
       }),
-      self.clients.claim() // Παίρνει τον έλεγχο αμέσως σε όλα τα ανοιχτά παράθυρα
-    ])
+      self.clients.claim()
+    ]).catch(error => {
+      console.error('Service worker activation failed:', error);
+    })
   );
 });
 
-// Network-first strategy for all navigation requests
+// Improved fetch event handler with better fallback strategy
 self.addEventListener('fetch', event => {
   // For navigation requests, try network first, then fall back to cache
   if (event.request.mode === 'navigate') {
@@ -63,13 +75,21 @@ self.addEventListener('fetch', event => {
               }
               // If there's no cache match, return the offline page
               return caches.match('/');
+            })
+            .catch(error => {
+              console.error('Error serving navigation request:', error);
+              // Final fallback
+              return new Response('Network and cache both failed. Please try again later.', {
+                status: 503,
+                headers: {'Content-Type': 'text/plain'}
+              });
             });
         })
     );
     return;
   }
   
-  // For non-navigation requests (assets, API calls), use a more standard strategy
+  // For non-navigation requests (assets, API calls), use cache-first strategy
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -81,9 +101,9 @@ self.addEventListener('fetch', event => {
         // Clone the request because it's a one-time use stream
         const fetchRequest = event.request.clone();
         
-        return fetch(fetchRequest).then(
-          response => {
-            // Check we received a valid response
+        return fetch(fetchRequest)
+          .then(response => {
+            // Check if we received a valid response
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
@@ -94,14 +114,17 @@ self.addEventListener('fetch', event => {
             caches.open(CACHE_NAME)
               .then(cache => {
                 cache.put(event.request, responseToCache);
+              })
+              .catch(error => {
+                console.error('Failed to cache response:', error);
               });
             
             return response;
-          }
-        ).catch(() => {
-          // If fetch fails, we just continue without doing anything special
-          // We'll return undefined which is effectively a network error
-        });
+          })
+          .catch(error => {
+            console.error('Network fetch failed:', error);
+            // We don't have a fallback for non-navigation requests
+          });
       })
   );
 });

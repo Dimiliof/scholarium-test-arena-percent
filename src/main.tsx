@@ -1,5 +1,6 @@
 
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
 
@@ -30,26 +31,45 @@ const updateMetaTags = () => {
 // Update meta tags on app initialization
 updateMetaTags();
 
-// Disable service worker registration in development mode
-const disableServiceWorkerInDev = () => {
-  if (window.location.hostname === 'localhost' || 
-      window.location.hostname.includes('lovableproject.com')) {
-    // Unregister any existing service workers in development
-    if ('serviceWorker' in navigator) {
+// Determine if we're in development mode
+const isDevMode = () => {
+  const hostname = window.location.hostname;
+  return hostname === 'localhost' || 
+         hostname.includes('lovableproject.com');
+};
+
+// Handle service worker registration or unregistration
+const handleServiceWorker = () => {
+  if ('serviceWorker' in navigator) {
+    if (isDevMode()) {
+      // Unregister any existing service workers in development
       navigator.serviceWorker.getRegistrations().then(registrations => {
         for (let registration of registrations) {
           registration.unregister();
           console.log('ServiceWorker unregistered for development');
         }
       });
+    } else {
+      // Register service worker in production
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registered successfully:', registration.scope);
+          })
+          .catch(error => {
+            console.error('ServiceWorker registration failed:', error);
+          });
+      });
     }
-    return true;
   }
-  return false;
 };
 
-// Only run service worker in production
-const isDevMode = disableServiceWorkerInDev();
+// Handle service worker based on environment
+handleServiceWorker();
 
-// Mount app with optimized rendering
-createRoot(document.getElementById("root")!).render(<App />);
+// Mount app with routing
+createRoot(document.getElementById("root")!).render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+);

@@ -9,6 +9,9 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import LiveChatWidget from '@/components/chat/LiveChatWidget';
 
+// Import useAuth here, not below
+import { useAuth } from "./contexts/AuthContext";
+
 // Σελίδες
 import Index from "./pages/Index";
 import SubjectPage from "./pages/SubjectPage";
@@ -65,26 +68,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Κύριο component της εφαρμογής
-function App() {
-  return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <Toaster />
-              <Sonner />
-              <AppRoutes />
-              <LiveChatWidget />
-            </NotificationProvider>
-          </AuthProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
-  );
-}
-
 // Protected Route components
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
@@ -138,9 +121,6 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Import useAuth here, not above
-import { useAuth } from "./contexts/AuthContext";
-
 // Separate component for Routes
 const AppRoutes = () => {
   return (
@@ -192,5 +172,32 @@ const AppRoutes = () => {
     </Routes>
   );
 };
+
+// Create a wrapping component for TooltipProvider
+const AppContent = () => {
+  return (
+    <TooltipProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <Toaster />
+          <Sonner />
+          <AppRoutes />
+          <LiveChatWidget />
+        </NotificationProvider>
+      </AuthProvider>
+    </TooltipProvider>
+  );
+};
+
+// Κύριο component της εφαρμογής
+function App() {
+  return (
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <AppContent />
+      </QueryClientProvider>
+    </BrowserRouter>
+  );
+}
 
 export default App;

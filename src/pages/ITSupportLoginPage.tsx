@@ -113,7 +113,7 @@ const ITSupportLoginPage = () => {
             <div className="flex justify-center mb-4">
               <Wrench className="h-12 w-12 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold text-center">IT Support Login</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">Είσοδος Διαχειριστή</CardTitle>
             <CardDescription className="text-center">
               Συνδεθείτε για να αποκτήσετε πρόσβαση στις λειτουργίες IT Support.
               <div className="mt-1 text-red-500 font-medium">

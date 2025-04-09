@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ const UserMenu = () => {
         </Link>
         <Link to="/it-support-login" className="hidden sm:block">
           <Button variant="outline" className="border-blue-400 text-blue-500 hover:bg-blue-50">
-            Login IT Support
+            IT Support
           </Button>
         </Link>
       </div>
@@ -97,7 +96,6 @@ const UserMenu = () => {
            user.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής";
   };
 
-  // Προσδιορίζουμε εάν ο χρήστης είναι μαθητής (όχι admin, όχι teacher)
   const isStudent = isAuthenticated && !isAdmin && !isTeacher;
 
   return (
@@ -130,7 +128,6 @@ const UserMenu = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        {/* Προβολή προφίλ και αποσύνδεση είναι διαθέσιμα για όλους τους χρήστες */}
         <DropdownMenuItem asChild>
           <Link to="/profile" className="cursor-pointer flex w-full items-center">
             <User className="mr-2 h-4 w-4" />
@@ -138,7 +135,6 @@ const UserMenu = () => {
           </Link>
         </DropdownMenuItem>
         
-        {/* Επεξεργασία προφίλ είναι επίσης διαθέσιμη για όλους */}
         <DropdownMenuItem asChild>
           <Link to="/edit-profile" className="cursor-pointer flex w-full items-center">
             <Settings className="mr-2 h-4 w-4" />
@@ -146,7 +142,6 @@ const UserMenu = () => {
           </Link>
         </DropdownMenuItem>
 
-        {/* Επιλογές μόνο για μαθητές */}
         {isStudent && (
           <>
             <DropdownMenuSeparator />
@@ -172,7 +167,6 @@ const UserMenu = () => {
           </>
         )}
 
-        {/* Επιλογές μόνο για εκπαιδευτικούς */}
         {isTeacher && (
           <>
             <DropdownMenuSeparator />
@@ -192,7 +186,6 @@ const UserMenu = () => {
           </>
         )}
 
-        {/* Επιλογές μόνο για διαχειριστές */}
         {isAdmin && (
           <>
             <DropdownMenuSeparator />

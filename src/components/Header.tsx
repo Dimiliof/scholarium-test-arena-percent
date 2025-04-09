@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import UserMenu from "@/components/UserMenu";
-import { School, BookOpen, BookText, Video, Link2 } from 'lucide-react';
+import { School, BookOpen, BookText, Video, Link2, Wrench } from 'lucide-react';
 import MobileMenu from "@/components/MobileMenu";
 
 const Header = () => {
@@ -105,6 +105,17 @@ const Header = () => {
                 </NavigationMenuLink>
               </NavigationMenuItem>
             )}
+            
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link to="/it-support-login" className={navigationMenuTriggerStyle()}>
+                  <div className="flex items-center">
+                    <Wrench className="h-4 w-4 mr-1" />
+                    IT Support
+                  </div>
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
         

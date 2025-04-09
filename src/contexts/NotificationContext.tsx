@@ -6,7 +6,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 const NotificationContext = createContext<NotificationContextType>({
   notifications: [],
   unreadCount: 0,
-  addNotification: () => ({} as Notification),
+  addNotification: () => {} as any,
   markAsRead: () => {},
   markAllAsRead: () => {},
   removeNotification: () => {},

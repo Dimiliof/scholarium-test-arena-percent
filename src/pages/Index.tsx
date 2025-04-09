@@ -16,7 +16,7 @@ import AddContentButton from '@/components/home/AddContentButton';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
 import SchoolIntegrationSection from '@/components/home/SchoolIntegrationSection';
 import DownloadAppButton from '@/components/home/DownloadAppButton';
-import LiveChatWidget from '@/components/chat/LiveChatWidget';
+// Removed duplicate LiveChatWidget import since it's already included globally in App.tsx
 
 const Index = () => {
   const navigate = useNavigate();
@@ -90,7 +90,7 @@ const Index = () => {
       
       <Footer />
       
-      <LiveChatWidget />
+      {/* Removed LiveChatWidget from here as it's included globally in App.tsx */}
     </div>
   );
 };

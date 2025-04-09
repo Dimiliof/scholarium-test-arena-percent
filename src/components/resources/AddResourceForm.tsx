@@ -8,6 +8,7 @@ import GradeLevelSelect from './form/GradeLevelSelect';
 import ResourceUrlInput from './form/ResourceUrlInput';
 import FileUploadInput from './form/FileUploadInput';
 import FormActions from './form/FormActions';
+import VisibilitySelect from './form/VisibilitySelect';
 
 interface AddResourceFormProps {
   onSuccess: () => void;
@@ -20,6 +21,7 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
     isSubmitting,
     handleChange,
     handleSelectChange,
+    handleCheckboxChange,
     handleFileChange,
     handleSubmit
   } = useResourceForm({ onSuccess, selectedSubject });
@@ -61,6 +63,11 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
         ) : (
           <FileUploadInput onChange={handleFileChange} />
         )}
+        
+        <VisibilitySelect
+          isPublic={resource.isPublic}
+          onChange={(checked) => handleCheckboxChange('isPublic', checked)}
+        />
       </div>
       
       <FormActions 

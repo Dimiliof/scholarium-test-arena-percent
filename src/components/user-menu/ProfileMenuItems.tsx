@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { User, Settings } from "lucide-react";
+import { DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { User, Settings, BookOpen } from "lucide-react";
 
 const ProfileMenuItems = () => {
   return (
@@ -17,6 +17,15 @@ const ProfileMenuItems = () => {
         <Link to="/edit-profile" className="cursor-pointer flex w-full items-center">
           <Settings className="mr-2 h-4 w-4" />
           <span>Επεξεργασία προφίλ</span>
+        </Link>
+      </DropdownMenuItem>
+      
+      <DropdownMenuSeparator />
+      
+      <DropdownMenuItem asChild>
+        <Link to="/resources" className="cursor-pointer flex w-full items-center">
+          <BookOpen className="mr-2 h-4 w-4" />
+          <span>Εκπαιδευτικό Υλικό</span>
         </Link>
       </DropdownMenuItem>
     </>

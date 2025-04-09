@@ -10,6 +10,7 @@ interface ResourceFormInput {
   url: string;
   subject: string;
   gradeLevel: string;
+  isPublic: boolean;
   file: File | null;
 }
 
@@ -29,6 +30,7 @@ export const useResourceForm = ({ onSuccess, selectedSubject = '' }: UseResource
     url: '',
     subject: selectedSubject,
     gradeLevel: 'Α Γυμνασίου',
+    isPublic: true,
     file: null,
   });
 
@@ -39,6 +41,10 @@ export const useResourceForm = ({ onSuccess, selectedSubject = '' }: UseResource
 
   const handleSelectChange = (name: string, value: string) => {
     setResource(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (name: string, checked: boolean) => {
+    setResource(prev => ({ ...prev, [name]: checked }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +106,7 @@ export const useResourceForm = ({ onSuccess, selectedSubject = '' }: UseResource
           url: resource.url || (resource.file ? URL.createObjectURL(resource.file) : ''),
           subject: resource.subject,
           gradeLevel: resource.gradeLevel,
+          isPublic: resource.isPublic,
           authorName: user ? `${user.firstName} ${user.lastName}` : 'Ανώνυμος Εκπαιδευτικός',
           authorEmail: user?.email || '',
           dateAdded: new Date().toISOString().split('T')[0],
@@ -119,6 +126,7 @@ export const useResourceForm = ({ onSuccess, selectedSubject = '' }: UseResource
           url: '',
           subject: selectedSubject,
           gradeLevel: 'Α Γυμνασίου',
+          isPublic: true,
           file: null,
         });
         
@@ -138,6 +146,7 @@ export const useResourceForm = ({ onSuccess, selectedSubject = '' }: UseResource
     isSubmitting,
     handleChange,
     handleSelectChange,
+    handleCheckboxChange,
     handleFileChange,
     handleSubmit
   };

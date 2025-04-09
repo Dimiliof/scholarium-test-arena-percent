@@ -13,7 +13,11 @@ const VisibilitySelect: React.FC<VisibilitySelectProps> = ({ isPublic, onChange 
     <div className="flex items-center justify-between space-x-2">
       <Label htmlFor="visibility" className="flex-grow">
         Ορατό σε όλους τους μαθητές
-        <p className="text-sm text-muted-foreground mt-1">Αν απενεργοποιηθεί, μόνο εσείς θα μπορείτε να δείτε αυτό το υλικό</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          {isPublic 
+            ? "Το υλικό θα είναι προσβάσιμο από όλους τους μαθητές." 
+            : "Το υλικό θα είναι ορατό μόνο σε εσάς ως εκπαιδευτικό."}
+        </p>
       </Label>
       <Switch 
         id="visibility" 

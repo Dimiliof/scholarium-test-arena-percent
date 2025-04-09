@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { BookOpen, GraduationCap, Award } from "lucide-react";
+import { BookOpen, GraduationCap, Award, FileText } from "lucide-react";
 
 const StudentMenuItems = () => {
   return (
@@ -18,6 +18,12 @@ const StudentMenuItems = () => {
         <Link to="/student/enroll" className="cursor-pointer flex w-full items-center">
           <GraduationCap className="mr-2 h-4 w-4" />
           <span>Εγγραφή σε Μάθημα</span>
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild>
+        <Link to="/resources" className="cursor-pointer flex w-full items-center">
+          <FileText className="mr-2 h-4 w-4" />
+          <span>Εκπαιδευτικό Υλικό</span>
         </Link>
       </DropdownMenuItem>
       <DropdownMenuItem asChild>

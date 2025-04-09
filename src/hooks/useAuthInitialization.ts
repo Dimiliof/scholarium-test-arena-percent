@@ -10,7 +10,11 @@ export const useAuthInitialization = () => {
   // Initialize user state from localStorage on mount
   useEffect(() => {
     // Fix admin email on startup
-    fixAdminEmailOnStartup();
+    try {
+      fixAdminEmailOnStartup();
+    } catch (error) {
+      console.error("Σφάλμα κατά την επιδιόρθωση email διαχειριστή:", error);
+    }
     
     // Load user from localStorage
     const storedUser = localStorage.getItem("user");
@@ -39,7 +43,11 @@ export const useAuthInitialization = () => {
           localStorage.setItem("user", JSON.stringify(updatedUser));
           
           // Update user in the database
-          makeUserTeacherAndAdmin(parsedUser.email);
+          try {
+            makeUserTeacherAndAdmin(parsedUser.email);
+          } catch (error) {
+            console.error("Σφάλμα κατά την ενημέρωση ρόλων:", error);
+          }
         }
       } catch (error) {
         console.error("Σφάλμα κατά την ανάλυση του αποθηκευμένου χρήστη:", error);

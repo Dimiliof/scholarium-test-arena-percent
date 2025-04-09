@@ -15,9 +15,12 @@ const ITSupportPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("ITSupportPage - Auth State:", { isAuthenticated, isAdmin });
+    
     // Έλεγχος αν ο χρήστης είναι διαχειριστής
     const checkAccess = () => {
       if (!isAuthenticated) {
+        console.log("ITSupportPage - User not authenticated");
         toast({
           variant: "destructive",
           title: "Πρόσβαση απορρίφθηκε",
@@ -28,6 +31,7 @@ const ITSupportPage = () => {
       }
       
       if (!isAdmin) {
+        console.log("ITSupportPage - User not admin");
         toast({
           variant: "destructive",
           title: "Πρόσβαση απορρίφθηκε",
@@ -38,16 +42,21 @@ const ITSupportPage = () => {
       }
       
       // Αν φτάσουμε εδώ, ο χρήστης έχει πρόσβαση
+      console.log("ITSupportPage - User has access");
       setLoading(false);
-      console.log("IT Support page accessed by admin user");
     };
     
-    // Περιμένουμε λίγο για να φορτώσουν τα δεδομένα αυθεντικοποίησης
-    const timer = setTimeout(() => {
+    // Αν έχουμε ήδη πρόσβαση στην κατάσταση αυθεντικοποίησης, ελέγχουμε αμέσως
+    if (typeof isAuthenticated !== 'undefined' && typeof isAdmin !== 'undefined') {
       checkAccess();
-    }, 500);
-    
-    return () => clearTimeout(timer);
+    } else {
+      // Περιμένουμε λίγο για να φορτώσουν τα δεδομένα αυθεντικοποίησης
+      const timer = setTimeout(() => {
+        checkAccess();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
   }, [isAuthenticated, isAdmin, navigate, toast]);
 
   // Προσομοίωση ενεργειών διαχείρισης

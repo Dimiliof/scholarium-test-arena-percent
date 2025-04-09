@@ -14,7 +14,11 @@ export const loginUser = async (
     console.log("Απευθείας σύνδεση για τον κύριο διαχειριστή");
     
     // Βεβαιωνόμαστε ότι υπάρχει ο χρήστης με τα σωστά δικαιώματα
-    await makeUserTeacherAndAdmin(email);
+    try {
+      await makeUserTeacherAndAdmin(email);
+    } catch (error) {
+      console.error("Σφάλμα κατά την ενημέρωση δικαιωμάτων διαχειριστή:", error);
+    }
     
     const adminUser: User = {
       id: "admin-special-id",
@@ -49,57 +53,69 @@ export const loginUser = async (
       updatedRecords[existingLoginIndex] = loginRecord;
     }
     
-    setLoginRecords(updatedRecords);
-    localStorage.setItem("loginRecords", JSON.stringify(updatedRecords));
+    try {
+      setLoginRecords(updatedRecords);
+      localStorage.setItem("loginRecords", JSON.stringify(updatedRecords));
+    } catch (error) {
+      console.error("Σφάλμα κατά την αποθήκευση των καταγραφών σύνδεσης:", error);
+    }
     
     return adminUser;
   }
   
   // Κανονική διαδικασία σύνδεσης
-  const storedUsers = localStorage.getItem("users");
-  if (!storedUsers) return null;
-
-  const users = JSON.parse(storedUsers);
-  const user = users.find((u: User & { password?: string }) => u.email === email && u.password === password);
-
-  if (user) {
-    // Αφαιρούμε τον κωδικό πριν αποθηκεύσουμε τον χρήστη
-    const userWithoutPassword = { ...user };
-    delete userWithoutPassword.password;
-    
-    // Βεβαιωνόμαστε ότι έχει την ιδιότητα roles αν δεν την έχει
-    if (!userWithoutPassword.roles) {
-      userWithoutPassword.roles = [userWithoutPassword.role];
+  try {
+    const storedUsers = localStorage.getItem("users");
+    if (!storedUsers) return null;
+  
+    const users = JSON.parse(storedUsers);
+    const user = users.find((u: User & { password?: string }) => u.email === email && u.password === password);
+  
+    if (user) {
+      // Αφαιρούμε τον κωδικό πριν αποθηκεύσουμε τον χρήστη
+      const userWithoutPassword = { ...user };
+      delete userWithoutPassword.password;
+      
+      // Βεβαιωνόμαστε ότι έχει την ιδιότητα roles αν δεν την έχει
+      if (!userWithoutPassword.roles) {
+        userWithoutPassword.roles = [userWithoutPassword.role];
+      }
+      
+      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+      
+      // Καταγραφή της σύνδεσης με περισσότερες λεπτομέρειες
+      const loginRecord: LoginRecord = {
+        userId: user.id,
+        userName: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        role: user.role,
+        timestamp: Date.now(),
+      };
+      
+      // Αποφυγή διπλότυπων εγγραφών
+      const existingLoginIndex = loginRecords.findIndex(record => 
+        record.userId === user.id && record.timestamp > Date.now() - 60000);
+      
+      let records;
+      if (existingLoginIndex === -1) {
+        records = [...loginRecords, loginRecord];
+      } else {
+        // Αντικατάσταση του υπάρχοντος
+        records = [...loginRecords];
+        records[existingLoginIndex] = loginRecord;
+      }
+      
+      try {
+        setLoginRecords(records);
+        localStorage.setItem("loginRecords", JSON.stringify(records));
+      } catch (error) {
+        console.error("Σφάλμα κατά την αποθήκευση των καταγραφών σύνδεσης:", error);
+      }
+      
+      return userWithoutPassword;
     }
-    
-    localStorage.setItem("user", JSON.stringify(userWithoutPassword));
-    
-    // Καταγραφή της σύνδεσης με περισσότερες λεπτομέρειες
-    const loginRecord: LoginRecord = {
-      userId: user.id,
-      userName: `${user.firstName} ${user.lastName}`,
-      email: user.email,
-      role: user.role,
-      timestamp: Date.now(),
-    };
-    
-    // Αποφυγή διπλότυπων εγγραφών
-    const existingLoginIndex = loginRecords.findIndex(record => 
-      record.userId === user.id && record.timestamp > Date.now() - 60000);
-    
-    let records;
-    if (existingLoginIndex === -1) {
-      records = [...loginRecords, loginRecord];
-    } else {
-      // Αντικατάσταση του υπάρχοντος
-      records = [...loginRecords];
-      records[existingLoginIndex] = loginRecord;
-    }
-    
-    setLoginRecords(records);
-    localStorage.setItem("loginRecords", JSON.stringify(records));
-    
-    return userWithoutPassword;
+  } catch (error) {
+    console.error("Σφάλμα κατά τη διαδικασία σύνδεσης:", error);
   }
 
   return null;

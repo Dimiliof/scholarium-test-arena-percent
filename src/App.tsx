@@ -6,10 +6,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
-import { useAuth } from "./contexts/AuthContext";
-import LiveChatWidget from '@/components/chat/LiveChatWidget';
 import { TooltipProvider } from "@/components/ui/tooltip";
+import LiveChatWidget from '@/components/chat/LiveChatWidget';
 
+// Σελίδες
 import Index from "./pages/Index";
 import SubjectPage from "./pages/SubjectPage";
 import QuizPage from "./pages/QuizPage";
@@ -31,12 +31,14 @@ import ChangePasswordPage from "./pages/ChangePasswordPage";
 import ForumPage from "./pages/ForumPage";
 import ForumPostPage from "./pages/ForumPostPage";
 
+// Admin σελίδες
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminLoginsPage from "./pages/admin/AdminLoginsPage";
 import ITSupportLoginPage from "./pages/ITSupportLoginPage";
 import ITSupportPage from "./pages/ITSupportPage";
 import NotificationSendPage from "./pages/teacher/NotificationSendPage";
 
+// Εργαλεία
 import CalculatorPage from "./pages/tools/CalculatorPage";
 import ConverterPage from "./pages/tools/ConverterPage";
 import PeriodicTablePage from "./pages/tools/PeriodicTablePage";
@@ -44,24 +46,46 @@ import FormulasPage from "./pages/tools/FormulasPage";
 
 import ResourcesPage from "./pages/ResourcesPage";
 
+// Σελίδες μαθητών
 import StudentCoursesPage from "./pages/student/StudentCoursesPage";
 import StudentEnrollPage from "./pages/student/StudentEnrollPage";
 import StudentResultsPage from "./pages/student/StudentResultsPage";
 
 import EcdlEmbedPage from './pages/EcdlEmbedPage';
 
+// Αρχικοποίηση του React Query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 300000, // 5 minutes
-      gcTime: 900000, // 15 minutes (αντί για cacheTime)
+      gcTime: 900000, // 15 minutes
       retry: 1,
       refetchOnWindowFocus: false,
     },
   },
 });
 
-// Route components need to be defined outside of the main App component
+// Κύριο component της εφαρμογής
+function App() {
+  return (
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <Toaster />
+              <Sonner />
+              <AppRoutes />
+              <LiveChatWidget />
+            </NotificationProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  );
+}
+
+// Protected Route components
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
@@ -114,7 +138,10 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Separate component for Routes to ensure hooks are used properly
+// Import useAuth here, not above
+import { useAuth } from "./contexts/AuthContext";
+
+// Separate component for Routes
 const AppRoutes = () => {
   return (
     <Routes>
@@ -163,26 +190,6 @@ const AppRoutes = () => {
       
       <Route path="*" element={<NotFound />} />
     </Routes>
-  );
-};
-
-// Main App component with correct provider order
-const App = () => {
-  return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <Toaster />
-              <Sonner />
-              <AppRoutes />
-              <LiveChatWidget />
-            </NotificationProvider>
-          </AuthProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
   );
 };
 

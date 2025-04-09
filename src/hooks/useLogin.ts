@@ -10,7 +10,7 @@ export const useLogin = () => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const { toast: uiToast } = useToast();
   const navigate = useNavigate();
-  const { login, isTeacher, isAdmin } = useAuth();
+  const { login } = useAuth();
 
   const handleLogin = async (email: string, password: string) => {
     setIsLoading(true);

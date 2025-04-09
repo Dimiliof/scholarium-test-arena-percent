@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, LogOut, Settings, Book, BookPlus, School, PlusCircle, Users, Shield, Wrench, GraduationCap, BookOpen, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { User, LogOut } from "lucide-react";
+import StudentMenuItems from "./user-menu/StudentMenuItems";
+import TeacherMenuItems from "./user-menu/TeacherMenuItems";
+import AdminMenuItems from "./user-menu/AdminMenuItems";
+import ProfileMenuItems from "./user-menu/ProfileMenuItems";
 
 const UserMenu = () => {
   const { user, isAuthenticated, isAdmin, isTeacher, logout } = useAuth();
@@ -128,88 +133,11 @@ const UserMenu = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem asChild>
-          <Link to="/profile" className="cursor-pointer flex w-full items-center">
-            <User className="mr-2 h-4 w-4" />
-            <span>Το προφίλ μου</span>
-          </Link>
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem asChild>
-          <Link to="/edit-profile" className="cursor-pointer flex w-full items-center">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Επεξεργασία προφίλ</span>
-          </Link>
-        </DropdownMenuItem>
+        <ProfileMenuItems />
 
-        {isStudent && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs">Μαθήματα</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link to="/student/courses" className="cursor-pointer flex w-full items-center">
-                <BookOpen className="mr-2 h-4 w-4" />
-                <span>Τα Μαθήματά μου</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/student/enroll" className="cursor-pointer flex w-full items-center">
-                <GraduationCap className="mr-2 h-4 w-4" />
-                <span>Εγγραφή σε Μάθημα</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/student/results" className="cursor-pointer flex w-full items-center">
-                <Award className="mr-2 h-4 w-4" />
-                <span>Τα Αποτελέσματά μου</span>
-              </Link>
-            </DropdownMenuItem>
-          </>
-        )}
-
-        {isTeacher && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs">Διδασκαλία</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link to="/teacher-dashboard" className="cursor-pointer flex w-full items-center">
-                <School className="mr-2 h-4 w-4" />
-                <span>Πίνακας Εκπαιδευτικού</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/add-content" className="cursor-pointer flex w-full items-center">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                <span>Προσθήκη Υλικού</span>
-              </Link>
-            </DropdownMenuItem>
-          </>
-        )}
-
-        {isAdmin && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs">Διαχείριση</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link to="/admin/users" className="cursor-pointer flex w-full items-center">
-                <Users className="mr-2 h-4 w-4" />
-                <span>Διαχείριση Χρηστών</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/admin/logins" className="cursor-pointer flex w-full items-center">
-                <Shield className="mr-2 h-4 w-4" />
-                <span>Καταγραφές Συνδέσεων</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/it-support" className="cursor-pointer flex w-full items-center">
-                <Wrench className="mr-2 h-4 w-4" />
-                <span>IT Support</span>
-              </Link>
-            </DropdownMenuItem>
-          </>
-        )}
+        {isStudent && <StudentMenuItems />}
+        {isTeacher && <TeacherMenuItems />}
+        {isAdmin && <AdminMenuItems />}
 
         <DropdownMenuSeparator />
         <DropdownMenuItem

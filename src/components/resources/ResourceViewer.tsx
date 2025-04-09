@@ -24,8 +24,14 @@ const responseSchema = z.object({
 
 type ResponseFormValues = z.infer<typeof responseSchema>;
 
-const ResourceViewer: React.FC = () => {
-  const { resourceId } = useParams<{ resourceId: string }>();
+interface ResourceViewerProps {
+  resourceId?: string;
+}
+
+const ResourceViewer: React.FC<ResourceViewerProps> = ({ resourceId: propResourceId }) => {
+  const { resourceId: paramResourceId } = useParams<{ resourceId: string }>();
+  const actualResourceId = propResourceId || paramResourceId;
+  
   const { getResourceById, addResourceResponse } = useQuestionManagement();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -34,14 +40,14 @@ const ResourceViewer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Φορτώνουμε τον πόρο
-  const resource = resourceId ? getResourceById(resourceId) : undefined;
+  const resource = actualResourceId ? getResourceById(actualResourceId) : undefined;
   
   useEffect(() => {
     // Απλό timeout για να δείξουμε το loading
     const timer = setTimeout(() => {
       setLoading(false);
       
-      if (resourceId && !resource) {
+      if (actualResourceId && !resource) {
         setError("Ο πόρος που ζητήθηκε δεν βρέθηκε ή δεν είναι διαθέσιμος.");
       } else if (resource && !resource.isPublic && (!isAuthenticated || (user?.email !== resource.authorEmail))) {
         setError("Αυτός ο πόρος είναι ιδιωτικός και δεν έχετε πρόσβαση σε αυτόν.");
@@ -49,9 +55,9 @@ const ResourceViewer: React.FC = () => {
     }, 500);
     
     return () => clearTimeout(timer);
-  }, [resourceId, resource, isAuthenticated, user]);
+  }, [actualResourceId, resource, isAuthenticated, user]);
   
-  if (!resourceId) {
+  if (!actualResourceId) {
     return (
       <div className="container mx-auto py-8">
         <Card>
@@ -123,7 +129,7 @@ const ResourceViewer: React.FC = () => {
     }
   });
   
-  const subject = subjects.find(s => s.id === resource.subject);
+  const subject = subjects.find(s => s.id === resource?.subject);
   
   const handleCopyLink = () => {
     const shareableLink = window.location.href;
@@ -134,8 +140,10 @@ const ResourceViewer: React.FC = () => {
   };
   
   const onSubmit = (data: ResponseFormValues) => {
-    addResourceResponse(resourceId, data);
-    form.reset();
+    if (actualResourceId) {
+      addResourceResponse(actualResourceId, data);
+      form.reset();
+    }
   };
   
   const increaseDownloadCount = () => {
@@ -144,6 +152,8 @@ const ResourceViewer: React.FC = () => {
   };
   
   const renderResourceContent = () => {
+    if (!resource) return null;
+    
     switch (resource.type) {
       case 'pdf':
         return (

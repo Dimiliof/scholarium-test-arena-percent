@@ -1,7 +1,6 @@
-
 // Service worker για την εφαρμογή EduPercentage PWA
 
-const CACHE_NAME = 'eduPercentage-v5';
+const CACHE_NAME = 'eduPercentage-v6';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -13,7 +12,7 @@ const urlsToCache = [
   'https://edupercentage.s3.eu-central-1.amazonaws.com/releases/eduPercentage-latest.apk'
 ];
 
-// Εγκατάσταση Service Worker
+// Skip waiting to ensure the new service worker activates immediately
 self.addEventListener('install', event => {
   console.log('Εγκατάσταση του Service Worker');
   event.waitUntil(
@@ -26,64 +25,84 @@ self.addEventListener('install', event => {
   );
 });
 
-// Φόρτωση από την cache ή το δίκτυο
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - επιστροφή απάντησης
-        if (response) {
-          return response;
-        }
-        
-        // Αντιγραφή του αιτήματος επειδή είναι μιας χρήσης
-        return fetch(event.request).then(
-          response => {
-            // Έλεγχος αν λάβαμε έγκυρη απάντηση
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Αντιγραφή της απάντησης για να την αποθηκεύσουμε στην cache
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          }
-        ).catch(() => {
-          // Αν υπάρχει σφάλμα στο fetch, επιστρέφουμε μια σελίδα offline
-          // ή συνεχίζουμε κανονικά αν δεν μπορούμε να ανακτήσουμε την σελίδα
-          if (event.request.mode === 'navigate') {
-            return caches.match('/');
-          }
-          // Για άλλα αιτήματα, επιστρέφουμε κενή απάντηση
-          return new Response();
-        });
-      })
-  );
-});
-
-// Ενεργοποίηση και εκκαθάριση παλαιών caches
+// Claim clients immediately when service worker activates
 self.addEventListener('activate', event => {
   console.log('Ενεργοποίηση του νέου service worker');
   
   const cacheWhitelist = [CACHE_NAME];
   
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            console.log('Διαγραφή παλιού cache:', cacheName);
-            return caches.delete(cacheName);
-          }
+    Promise.all([
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheWhitelist.indexOf(cacheName) === -1) {
+              console.log('Διαγραφή παλιού cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+            return null;
+          })
+        );
+      }),
+      self.clients.claim() // Παίρνει τον έλεγχο αμέσως σε όλα τα ανοιχτά παράθυρα
+    ])
+  );
+});
+
+// Network-first strategy for all navigation requests
+self.addEventListener('fetch', event => {
+  // For navigation requests, try network first, then fall back to cache
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => {
+          return caches.match(event.request)
+            .then(response => {
+              if (response) {
+                return response;
+              }
+              // If there's no cache match, return the offline page
+              return caches.match('/');
+            });
         })
-      );
-    }).then(() => self.clients.claim()) // Παίρνει τον έλεγχο αμέσως σε όλα τα ανοιχτά παράθυρα
+    );
+    return;
+  }
+  
+  // For non-navigation requests (assets, API calls), use a more standard strategy
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Cache hit - return the response
+        if (response) {
+          return response;
+        }
+        
+        // Clone the request because it's a one-time use stream
+        const fetchRequest = event.request.clone();
+        
+        return fetch(fetchRequest).then(
+          response => {
+            // Check we received a valid response
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+            
+            // Clone the response to store it in cache
+            const responseToCache = response.clone();
+            
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+            
+            return response;
+          }
+        ).catch(() => {
+          // If fetch fails, we just continue without doing anything special
+          // We'll return undefined which is effectively a network error
+        });
+      })
   );
 });
 

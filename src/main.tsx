@@ -30,5 +30,26 @@ const updateMetaTags = () => {
 // Update meta tags on app initialization
 updateMetaTags();
 
+// Disable service worker registration in development mode
+const disableServiceWorkerInDev = () => {
+  if (window.location.hostname === 'localhost' || 
+      window.location.hostname.includes('lovableproject.com')) {
+    // Unregister any existing service workers in development
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          registration.unregister();
+          console.log('ServiceWorker unregistered for development');
+        }
+      });
+    }
+    return true;
+  }
+  return false;
+};
+
+// Only run service worker in production
+const isDevMode = disableServiceWorkerInDev();
+
 // Mount app with optimized rendering
 createRoot(document.getElementById("root")!).render(<App />);

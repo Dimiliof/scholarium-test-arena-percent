@@ -7,7 +7,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { useAuth } from "./contexts/AuthContext";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import LiveChatWidget from '@/components/chat/LiveChatWidget';
 
 import Index from "./pages/Index";
@@ -172,14 +171,12 @@ const App = () => {
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <TooltipProvider>
-            <NotificationProvider>
-              <Toaster />
-              <Sonner />
-              <AppRoutes />
-              <LiveChatWidget />
-            </NotificationProvider>
-          </TooltipProvider>
+          <NotificationProvider>
+            <Toaster />
+            <Sonner />
+            <AppRoutes />
+            <LiveChatWidget />
+          </NotificationProvider>
         </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>

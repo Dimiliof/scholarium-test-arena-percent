@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Loader2, Mail, User } from "lucide-react";
+import { AlertCircle, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -37,7 +37,7 @@ const LoginPage = () => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const { toast: uiToast } = useToast();
   const navigate = useNavigate();
-  const { login, makeUserTeacherAndAdmin } = useAuth();
+  const { login, makeUserTeacherAndAdmin, isTeacher, isAdmin } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,7 +79,9 @@ const LoginPage = () => {
         });
         
         toast.success("Συνδεθήκατε ως Διαχειριστής");
-        navigate("/");
+        
+        // Κατευθύνουμε τον διαχειριστή στον πίνακα ελέγχου
+        navigate("/admin/users");
         setIsLoading(false);
         return;
       }
@@ -94,11 +96,11 @@ const LoginPage = () => {
           const user = JSON.parse(storedUser);
           
           // Διπλός έλεγχος για τα δικαιώματα
-          const isAdmin = user.role === "admin" || (user.roles && user.roles.includes("admin"));
-          const isTeacher = user.role === "teacher" || (user.roles && user.roles.includes("teacher"));
+          const isUserAdmin = user.role === "admin" || (user.roles && user.roles.includes("admin"));
+          const isUserTeacher = user.role === "teacher" || (user.roles && user.roles.includes("teacher"));
           
-          const roleText = isAdmin ? "Διαχειριστής" : 
-                           isTeacher ? "Εκπαιδευτικός" : "Μαθητής";
+          const roleText = isUserAdmin ? "Διαχειριστής" : 
+                           isUserTeacher ? "Εκπαιδευτικός" : "Μαθητής";
           
           console.log(`Επιτυχής σύνδεση ως ${roleText} (${user.role})`);
           
@@ -108,14 +110,22 @@ const LoginPage = () => {
           });
           
           toast.success(`Συνδεθήκατε ως ${roleText}`);
+          
+          // Κατεύθυνση χρήστη ανάλογα με τον ρόλο
+          if (isUserAdmin) {
+            navigate("/admin/users");
+          } else if (isUserTeacher) {
+            navigate("/teacher-dashboard");
+          } else {
+            navigate("/student/courses");
+          }
         } else {
           uiToast({
             title: "Επιτυχής σύνδεση",
             description: "Καλωσήρθατε στην πλατφόρμα ΕκπαιδευτικήΓωνιά.",
           });
+          navigate("/");
         }
-        
-        navigate("/");
       } else {
         setLoginError("Λάθος email ή κωδικός πρόσβασης. Παρακαλώ προσπαθήστε ξανά.");
       }
@@ -197,7 +207,7 @@ const LoginPage = () => {
               <div className="mt-4 text-center text-sm">
                 <p>
                   Δεν έχετε λογαριασμό;{" "}
-                  <Link to="/register" className="text-primary hover:underline">
+                  <Link to="/register-type" className="text-primary hover:underline">
                     Εγγραφείτε εδώ
                   </Link>
                 </p>

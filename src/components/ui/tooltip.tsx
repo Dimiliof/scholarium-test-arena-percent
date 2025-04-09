@@ -6,13 +6,9 @@ import { cn } from "@/lib/utils"
 
 const TooltipProvider = TooltipPrimitive.Provider
 
-TooltipProvider.displayName = "TooltipProvider"
-
 const Tooltip = TooltipPrimitive.Root
-Tooltip.displayName = "Tooltip"
 
 const TooltipTrigger = TooltipPrimitive.Trigger
-TooltipTrigger.displayName = "TooltipTrigger"
 
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,

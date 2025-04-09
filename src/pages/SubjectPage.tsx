@@ -109,6 +109,8 @@ const SubjectPage = () => {
   
   const subject = subjects.find(s => s.id === subjectId);
   
+  console.log('Subject page loaded:', { subjectId, subject, allSubjects: subjects.map(s => s.id) });
+  
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -133,6 +135,7 @@ const SubjectPage = () => {
         <div className="flex-grow flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Το μάθημα δεν βρέθηκε</h1>
+            <p className="text-gray-600 mb-6">Το μάθημα με ID: "{subjectId}" δεν υπάρχει στη λίστα μαθημάτων</p>
             <Link to="/">
               <Button>Επιστροφή στην αρχική</Button>
             </Link>
@@ -143,7 +146,7 @@ const SubjectPage = () => {
     );
   }
 
-  const IconComponent = subject.icon;
+  const IconComponent = subject.icon || BookOpen;
 
   const getRankIcon = (position: number) => {
     if (position === 0) return <Trophy className="h-5 w-5 text-amber-500" />;
@@ -176,7 +179,7 @@ const SubjectPage = () => {
             </div>
             <div className="text-center md:text-left">
               <h1 className="text-3xl md:text-4xl font-bold mb-3">{subject?.name}</h1>
-              <p className="text-xl text-white/90 max-w-2xl">{subject?.description}</p>
+              <p className="text-xl text-white/90 max-w-2xl">{subject?.description || 'Διαθέσιμο εκπαιδευτικό υλικό και ασκήσεις'}</p>
             </div>
           </div>
         </div>
@@ -207,7 +210,7 @@ const SubjectPage = () => {
                 
                 <h3 className="text-xl font-bold mb-3">Τι θα μάθετε:</h3>
                 <ul className="list-disc pl-5 space-y-2 mb-6">
-                  <li>Βασικές έννοιες και ορισμοί</li>
+                  <li>Βα��ικές έννοιες και ορισμοί</li>
                   <li>Μεθοδολογίες και τεχνικές επίλυσης προβλημάτων</li>
                   <li>Πρακτικές εφαρμογές</li>
                   <li>Προετοιμασία για σχολικές εξετάσεις</li>

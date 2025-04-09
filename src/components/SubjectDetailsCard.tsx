@@ -3,14 +3,15 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Subject } from '@/lib/subjectsData';
 import { Link } from 'react-router-dom';
+import { BookOpen } from 'lucide-react';
 
 interface SubjectDetailsCardProps {
   subject: Subject;
 }
 
 const SubjectDetailsCard: React.FC<SubjectDetailsCardProps> = ({ subject }) => {
-  // Δημιουργία του εικονιδίου ως έγκυρο στοιχείο React
-  const IconComponent = subject.icon;
+  // Default icon if none is provided
+  const IconComponent = subject.icon || BookOpen;
   
   return (
     <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
@@ -19,7 +20,7 @@ const SubjectDetailsCard: React.FC<SubjectDetailsCardProps> = ({ subject }) => {
         <h2 className="text-2xl font-bold">{subject.name}</h2>
       </div>
       
-      <p className="text-gray-600 mb-4">{subject.description}</p>
+      <p className="text-gray-600 mb-4">{subject.description || 'Διαθέσιμο εκπαιδευτικό υλικό και ασκήσεις'}</p>
       
       <div className="grid grid-cols-2 gap-4">
         <div>

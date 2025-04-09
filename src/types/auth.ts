@@ -8,6 +8,8 @@ export type User = {
   profileImage?: string;
   role: "admin" | "teacher" | "student";
   roles?: string[];
+  school?: string;     // Added for teachers
+  classYear?: string;  // Added for students
 };
 
 export type RegisterData = {
@@ -16,6 +18,9 @@ export type RegisterData = {
   email: string;
   password: string;
   role?: "admin" | "teacher" | "student";
+  school?: string;     // Added for teachers
+  classYear?: string;  // Added for students
+  termsAccepted?: boolean; // Added for registration form
 };
 
 export type LoginRecord = {
@@ -40,5 +45,5 @@ export type AuthContextType = {
   loginRecords: LoginRecord[];
   fixAdminEmail: (email: string) => Promise<boolean>;
   makeUserTeacherAndAdmin: (email: string) => Promise<boolean>;
-  canViewAllContent: boolean; // Νέα ιδιότητα
+  canViewAllContent: boolean;
 };

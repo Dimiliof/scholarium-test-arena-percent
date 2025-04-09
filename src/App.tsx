@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./contexts/AuthContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import LiveChatWidget from '@/components/chat/LiveChatWidget';
 
 import Index from "./pages/Index";
 import SubjectPage from "./pages/SubjectPage";
@@ -163,6 +165,9 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        
+        {/* Προσθήκη του LiveChatWidget σε καθολικό επίπεδο */}
+        <LiveChatWidget />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

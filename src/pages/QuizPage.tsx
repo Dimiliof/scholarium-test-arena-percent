@@ -16,7 +16,6 @@ import { usePrintQuiz } from '@/hooks/usePrintQuiz';
 import { 
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger 
 } from "@/components/ui/tooltip";
 
@@ -371,23 +370,21 @@ const QuizPage = () => {
               </div>
               
               <div className="flex items-center gap-4 mt-4 md:mt-0">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handlePrint}
-                        className="no-print"
-                      >
-                        <Printer className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      Εκτύπωση διαγωνίσματος
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handlePrint}
+                      className="no-print"
+                    >
+                      <Printer className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Εκτύπωση διαγωνίσματος
+                  </TooltipContent>
+                </Tooltip>
                 
                 <div className="flex items-center">
                   <Clock className="h-5 w-5 mr-2 text-gray-600" />
@@ -486,7 +483,7 @@ const QuizPage = () => {
           {timeLeft < 60 && !quizCompleted && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center no-print">
               <AlertTriangle className="h-5 w-5 text-red-500 mr-2" />
-              <span className="text-red-600">Ο χρόνος τελειώνει! Λιγότερο από ��να λεπτό απομένει.</span>
+              <span className="text-red-600">Ο χρόνος τελειώνει! Λιγότερο από ένα λεπτό απομένει.</span>
             </div>
           )}
         </div>

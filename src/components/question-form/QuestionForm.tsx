@@ -71,6 +71,7 @@ export function QuestionForm({
         optionB: "",
         optionC: "",
         optionD: "",
+        correctAnswer: "" as "0" | "1" | "2" | "3",
         quizType: initialQuizType.toString() as "basic" | "intermediate" | "advanced" | "quick" | "medium" | "full",
       };
   

@@ -4,13 +4,19 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { useToast } from "@/hooks/use-toast";
 
 export default function UserMenu() {
   const { user, logout, isAuthenticated, isTeacher, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleLogout = () => {
     logout();
+    toast({
+      title: "Αποσύνδεση",
+      description: "Αποσυνδεθήκατε επιτυχώς από το σύστημα."
+    });
     navigate("/");
   };
 
@@ -29,7 +35,7 @@ export default function UserMenu() {
           {/* Κουμπί ειδοποιήσεων */}
           <NotificationBell />
           
-          <div className="dropdown">
+          <div className="dropdown relative">
             <Button
               variant="ghost"
               className="flex items-center gap-2 text-gray-700 hover:text-primary"
@@ -42,7 +48,7 @@ export default function UserMenu() {
             </Button>
             <div
               id="userDropdown"
-              className="dropdown-menu hidden bg-white shadow-md rounded-md py-2 min-w-[200px] z-50"
+              className="dropdown-menu hidden absolute right-0 mt-2 bg-white shadow-md rounded-md py-2 min-w-[200px] z-50"
             >
               <div className="px-4 py-2 border-b">
                 <p className="text-sm font-medium text-gray-900">

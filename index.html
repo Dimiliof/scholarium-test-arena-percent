@@ -38,19 +38,7 @@
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-              console.log('ServiceWorker καταχωρήθηκε επιτυχώς:', registration.scope);
-            })
-            .catch(error => {
-              console.log('Η καταχώρηση του ServiceWorker απέτυχε:', error);
-            });
-        });
-      }
-    </script>
+    <!-- Αφαιρούμε την εγγραφή service worker από το HTML - θα γίνει από το main.tsx με καθυστέρηση -->
     <noscript>
       <div style="padding: 20px; text-align: center; background-color: #f8d7da; color: #721c24; margin: 20px;">
         Για να λειτουργήσει σωστά αυτή η εφαρμογή, παρακαλούμε ενεργοποιήστε την JavaScript στον περιηγητή σας.

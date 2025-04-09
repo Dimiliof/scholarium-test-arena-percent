@@ -1,15 +1,17 @@
+
 // Service worker για την εφαρμογή EduPercentage PWA
 
-const CACHE_NAME = 'eduPercentage-v7';
+const CACHE_NAME = 'eduPercentage-v8';
+const OFFLINE_URL = '/index.html';
+
+// Βελτιωμένη λίστα αρχείων προς αποθήκευση στην cache
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
   '/logo.png',
-  '/src/index.css',
-  '/src/main.tsx',
-  '/lovable-uploads/c9f693b7-586d-4d3d-b6c2-c494a723965d.png',
-  'https://edupercentage.s3.eu-central-1.amazonaws.com/releases/eduPercentage-latest.apk'
+  '/favicon.ico',
+  '/src/index.css'
 ];
 
 // Install event handler with improved error handling
@@ -19,112 +21,88 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Άνοιγμα cache');
-        // Cache assets one by one to prevent total failure if one asset fails
-        return Promise.all(
-          urlsToCache.map(url => 
-            cache.add(url).catch(error => {
-              console.error(`Failed to cache ${url}:`, error);
-            })
-          )
-        );
+        // Αποθήκευση μόνο των βασικών αρχείων για offline λειτουργία
+        return cache.addAll(urlsToCache);
       })
-      .then(() => self.skipWaiting())
+      .then(() => {
+        console.log('Βασικά αρχεία αποθηκεύτηκαν στην cache');
+        return self.skipWaiting();
+      })
       .catch(error => {
         console.error('Service worker installation failed:', error);
       })
   );
 });
 
-// Activate event with better cleanup logic
+// Άμεση ενεργοποίηση του service worker
 self.addEventListener('activate', event => {
   console.log('Ενεργοποίηση του νέου service worker');
   
-  const cacheWhitelist = [CACHE_NAME];
-  
+  // Διαγραφή παλαιών caches για να αποφύγουμε προβλήματα χώρου
   event.waitUntil(
-    Promise.all([
-      caches.keys().then(cacheNames => {
+    caches.keys()
+      .then(cacheNames => {
         return Promise.all(
           cacheNames.map(cacheName => {
-            if (cacheWhitelist.indexOf(cacheName) === -1) {
+            if (cacheName !== CACHE_NAME) {
               console.log('Διαγραφή παλιού cache:', cacheName);
               return caches.delete(cacheName);
             }
-            return null;
+            return Promise.resolve();
           })
         );
-      }),
-      self.clients.claim()
-    ]).catch(error => {
-      console.error('Service worker activation failed:', error);
-    })
+      })
+      .then(() => {
+        console.log('Ο service worker ανέλαβε τον έλεγχο');
+        return self.clients.claim();
+      })
+      .catch(error => {
+        console.error('Service worker activation failed:', error);
+      })
   );
 });
 
-// Improved fetch event handler with better fallback strategy
+// Απλουστευμένος χειρισμός αιτημάτων - "network-first" στρατηγική
 self.addEventListener('fetch', event => {
-  // For navigation requests, try network first, then fall back to cache
+  // Παράκαμψη αιτημάτων που δεν πρέπει να διαχειριστεί ο service worker
+  if (
+    event.request.method !== 'GET' || 
+    event.request.url.includes('/api/') || 
+    event.request.url.includes('/admin/') ||
+    event.request.url.startsWith('chrome-extension://') ||
+    !event.request.url.startsWith(self.location.origin)
+  ) {
+    return;
+  }
+
+  // Διαχείριση περιηγητικών αιτημάτων
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .catch(() => {
-          return caches.match(event.request)
-            .then(response => {
-              if (response) {
-                return response;
-              }
-              // If there's no cache match, return the offline page
-              return caches.match('/');
-            })
-            .catch(error => {
-              console.error('Error serving navigation request:', error);
-              // Final fallback
-              return new Response('Network and cache both failed. Please try again later.', {
-                status: 503,
-                headers: {'Content-Type': 'text/plain'}
-              });
-            });
+          // Σε περίπτωση αποτυχίας επιστροφή του offline σελίδας
+          return caches.match(OFFLINE_URL);
         })
     );
     return;
   }
-  
-  // For non-navigation requests (assets, API calls), use cache-first strategy
+
+  // Για τα στατικά περιουσιακά στοιχεία, χρησιμοποιούμε στρατηγική "network first"
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        // Cache hit - return the response
-        if (response) {
-          return response;
-        }
-        
-        // Clone the request because it's a one-time use stream
-        const fetchRequest = event.request.clone();
-        
-        return fetch(fetchRequest)
-          .then(response => {
-            // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            
-            // Clone the response to store it in cache
-            const responseToCache = response.clone();
-            
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              })
-              .catch(error => {
-                console.error('Failed to cache response:', error);
-              });
-            
-            return response;
-          })
-          .catch(error => {
-            console.error('Network fetch failed:', error);
-            // We don't have a fallback for non-navigation requests
+        // Αποθήκευση στην cache για μελλοντική χρήση
+        if (response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
           });
+        }
+        return response;
+      })
+      .catch(() => {
+        // Σε περίπτωση αποτυχίας, προσπάθησε να επιστρέψεις από την cache
+        return caches.match(event.request);
       })
   );
 });
@@ -132,19 +110,23 @@ self.addEventListener('fetch', event => {
 // Διαχείριση push notifications
 self.addEventListener('push', event => {
   if (event.data) {
-    const data = event.data.json();
-    const options = {
-      body: data.body,
-      icon: '/logo.png',
-      badge: '/logo.png',
-      data: {
-        url: data.url || '/'
-      }
-    };
-    
-    event.waitUntil(
-      self.registration.showNotification(data.title, options)
-    );
+    try {
+      const data = event.data.json();
+      const options = {
+        body: data.body || 'Νέα ειδοποίηση',
+        icon: '/logo.png',
+        badge: '/logo.png',
+        data: {
+          url: data.url || '/'
+        }
+      };
+      
+      event.waitUntil(
+        self.registration.showNotification(data.title || 'EduPercentage', options)
+      );
+    } catch (error) {
+      console.error('Σφάλμα στη διαχείριση push notification:', error);
+    }
   }
 });
 
@@ -163,12 +145,13 @@ self.addEventListener('notificationclick', event => {
   }
 });
 
-// Προσθήκη λειτουργικότητας για περιοδική συγχρονισμό δεδομένων
-self.addEventListener('periodicsync', event => {
-  if (event.tag === 'update-content') {
-    event.waitUntil(
-      // Εδώ θα προσθέταμε κώδικα για συγχρονισμό περιεχομένου
-      console.log('Εκτέλεση περιοδικού συγχρονισμού')
-    );
+// Απλός έλεγχος ζωτικότητας του service worker
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'PING') {
+    event.ports[0].postMessage({
+      type: 'PONG',
+      status: 'Service worker is running',
+      version: CACHE_NAME
+    });
   }
 });

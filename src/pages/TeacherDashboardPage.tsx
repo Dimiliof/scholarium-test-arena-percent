@@ -8,6 +8,7 @@ import { useTeacherContent } from '@/hooks/useTeacherContent';
 import { useTeacherClassrooms } from '@/hooks/useTeacherClassrooms';
 import ContentTab from '@/components/teacher-dashboard/ContentTab';
 import ClassesTab from '@/components/teacher-dashboard/ClassesTab';
+import ResourceResponsesTab from '@/components/teacher-dashboard/ResourceResponsesTab';
 import PlaceholderTab from '@/components/teacher-dashboard/PlaceholderTab';
 
 const TeacherDashboardPage: React.FC = () => {
@@ -58,6 +59,7 @@ const TeacherDashboardPage: React.FC = () => {
       <Tabs defaultValue="content" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-4">
           <TabsTrigger value="content">Περιεχόμενο</TabsTrigger>
+          <TabsTrigger value="responses">Απαντήσεις</TabsTrigger>
           <TabsTrigger value="classes">Τάξεις</TabsTrigger>
           <TabsTrigger value="students">Μαθητές</TabsTrigger>
           <TabsTrigger value="stats">Στατιστικά</TabsTrigger>
@@ -72,6 +74,10 @@ const TeacherDashboardPage: React.FC = () => {
             setSearchQuery={setSearchQuery}
             setSelectedSubject={setSelectedSubject}
           />
+        </TabsContent>
+        
+        <TabsContent value="responses">
+          <ResourceResponsesTab />
         </TabsContent>
         
         <TabsContent value="classes">

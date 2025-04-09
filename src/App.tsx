@@ -1,172 +1,105 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "./contexts/AuthContext";
-import { useAuth } from "./contexts/AuthContext";
-import { TooltipProvider } from "@/components/ui/tooltip";
-
-import Index from "./pages/Index";
-import SubjectPage from "./pages/SubjectPage";
-import QuizPage from "./pages/QuizPage";
-import AddContentPage from "./pages/AddContentPage";
-import TeacherDashboardPage from "./pages/TeacherDashboardPage";
-import SchoolRegistration from "./pages/SchoolRegistration";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import TeacherRegisterPage from "./pages/TeacherRegisterPage";
-import RegisterSelectionPage from "./pages/RegisterSelectionPage";
-import NotFound from "./pages/NotFound";
-import AboutPage from "./pages/AboutPage";
-import TermsPage from "./pages/TermsPage";
-import PrivacyPage from "./pages/PrivacyPage";
-import ContactPage from "./pages/ContactPage";
-import ProfilePage from "./pages/ProfilePage";
-import EditProfilePage from "./pages/EditProfilePage";
-import ChangePasswordPage from "./pages/ChangePasswordPage";
-import ForumPage from "./pages/ForumPage";
-import ForumPostPage from "./pages/ForumPostPage";
-
-import AdminUsersPage from "./pages/admin/AdminUsersPage";
-import AdminLoginsPage from "./pages/admin/AdminLoginsPage";
-import ITSupportLoginPage from "./pages/ITSupportLoginPage";
-import ITSupportPage from "./pages/ITSupportPage";
-
-import CalculatorPage from "./pages/tools/CalculatorPage";
-import ConverterPage from "./pages/tools/ConverterPage";
-import PeriodicTablePage from "./pages/tools/PeriodicTablePage";
-import FormulasPage from "./pages/tools/FormulasPage";
-
-import ResourcesPage from "./pages/ResourcesPage";
-
-import StudentCoursesPage from "./pages/student/StudentCoursesPage";
-import StudentEnrollPage from "./pages/student/StudentEnrollPage";
-import StudentResultsPage from "./pages/student/StudentResultsPage";
-
+import { Routes, Route } from 'react-router-dom';
+import Index from './pages/Index';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import NotFound from './pages/NotFound';
+import SubjectPage from './pages/SubjectPage';
+import QuizPage from './pages/QuizPage';
+import ProfilePage from './pages/ProfilePage';
+import { AuthProvider } from './contexts/AuthContext';
+import ChangePasswordPage from './pages/ChangePasswordPage';
+import EditProfilePage from './pages/EditProfilePage';
+import ForumPage from './pages/ForumPage';
+import ForumPostPage from './pages/ForumPostPage';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
 import EcdlEmbedPage from './pages/EcdlEmbedPage';
+import RegisterSelectionPage from './pages/RegisterSelectionPage';
+import TeacherRegisterPage from './pages/TeacherRegisterPage';
+import SchoolRegistration from './pages/SchoolRegistration';
+import ITSupportPage from './pages/ITSupportPage';
+import ITSupportLoginPage from './pages/ITSupportLoginPage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminLoginsPage from './pages/admin/AdminLoginsPage';
+import TeacherDashboardPage from './pages/TeacherDashboardPage';
+import AddContentPage from './pages/AddContentPage';
+import ResourcesPage from './pages/ResourcesPage';
+import ResourceViewPage from './pages/ResourceViewPage';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 300000, // 5 minutes
-      gcTime: 900000, // 15 minutes (αντί για cacheTime)
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+// Student pages
+import StudentCoursesPage from './pages/student/StudentCoursesPage';
+import StudentEnrollPage from './pages/student/StudentEnrollPage';
+import StudentResultsPage from './pages/student/StudentResultsPage';
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  return <>{children}</>;
-};
+// Tool pages
+import CalculatorPage from './pages/tools/CalculatorPage';
+import ConverterPage from './pages/tools/ConverterPage';
+import FormulasPage from './pages/tools/FormulasPage';
+import PeriodicTablePage from './pages/tools/PeriodicTablePage';
+import LiteratureAuthorsPage from './pages/tools/literature/LiteratureAuthorsPage';
+import LiteraturePeriodsPage from './pages/tools/literature/LiteraturePeriodsPage';
+import LiteratureResearchPage from './pages/tools/literature/LiteratureResearchPage';
+import LiteratureSourceFinderPage from './pages/tools/literature/LiteratureSourceFinderPage';
 
-const TeacherRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  // Επιτρέπουμε πρόσβαση και στους διαχειριστές
-  if (!isTeacher && !isAdmin) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return <>{children}</>;
-};
+import './App.css';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "sonner";
 
-const StudentRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  // Επιτρέπουμε πρόσβαση μόνο στους μαθητές
-  if (isTeacher || isAdmin) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return <>{children}</>;
-};
+function App() {
+  return (
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterSelectionPage />} />
+        <Route path="/register/teacher" element={<TeacherRegisterPage />} />
+        <Route path="/register/student" element={<RegisterPage />} />
+        <Route path="/register/school" element={<SchoolRegistration />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
+        <Route path="/edit-profile" element={<EditProfilePage />} />
+        <Route path="/subject/:subjectId" element={<SubjectPage />} />
+        <Route path="/quiz/:subjectId/:quizType" element={<QuizPage />} />
+        <Route path="/forum" element={<ForumPage />} />
+        <Route path="/forum/post/:postId" element={<ForumPostPage />} />
+        <Route path="/ecdl" element={<EcdlEmbedPage />} />
+        <Route path="/it-support" element={<ITSupportPage />} />
+        <Route path="/it-support/login" element={<ITSupportLoginPage />} />
+        <Route path="/admin/users" element={<AdminUsersPage />} />
+        <Route path="/admin/logins" element={<AdminLoginsPage />} />
+        <Route path="/teacher-dashboard" element={<TeacherDashboardPage />} />
+        <Route path="/add-content" element={<AddContentPage />} />
+        <Route path="/resources" element={<ResourcesPage />} />
+        <Route path="/resources/:resourceId" element={<ResourceViewPage />} />
 
-const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isAdmin } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  if (!isAdmin) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return <>{children}</>;
-};
+        {/* Σελίδες μαθητή */}
+        <Route path="/student/courses" element={<StudentCoursesPage />} />
+        <Route path="/student/enroll" element={<StudentEnrollPage />} />
+        <Route path="/student/results" element={<StudentResultsPage />} />
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/subject/:subjectId" element={<SubjectPage />} />
-            <Route path="/quiz/:subjectId/:quizType" element={<QuizPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register-type" element={<RegisterSelectionPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/teacher-register" element={<TeacherRegisterPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/school-registration" element={<SchoolRegistration />} />
-            <Route path="/it-support-login" element={<ITSupportLoginPage />} />
-            
-            <Route path="/forum/:subjectId" element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
-            <Route path="/forum/post/:postId" element={<ProtectedRoute><ForumPostPage /></ProtectedRoute>} />
-            
-            <Route path="/resources" element={<ResourcesPage />} />
-            
-            <Route path="/tools/calculator" element={<CalculatorPage />} />
-            <Route path="/tools/converter" element={<ConverterPage />} />
-            <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
-            <Route path="/tools/formulas" element={<FormulasPage />} />
-            
-            <Route path="/student/courses" element={<StudentRoute><StudentCoursesPage /></StudentRoute>} />
-            <Route path="/student/enroll" element={<StudentRoute><StudentEnrollPage /></StudentRoute>} />
-            <Route path="/student/results" element={<StudentRoute><StudentResultsPage /></StudentRoute>} />
-            
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/edit-profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
-            <Route path="/change-password" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
-            
-            <Route path="/add-content" element={<TeacherRoute><AddContentPage /></TeacherRoute>} />
-            <Route path="/teacher-dashboard" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
-            <Route path="/classroom/:classroomId" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
-            
-            <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
-            <Route path="/admin/logins" element={<AdminRoute><AdminLoginsPage /></AdminRoute>} />
-            <Route path="/it-support" element={<AdminRoute><ITSupportPage /></AdminRoute>} />
-            
-            <Route path="/ecdl-demo-embed" element={<EcdlEmbedPage />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </TooltipProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+        {/* Σελίδες εργαλείων */}
+        <Route path="/tools/calculator" element={<CalculatorPage />} />
+        <Route path="/tools/converter" element={<ConverterPage />} />
+        <Route path="/tools/formulas" element={<FormulasPage />} />
+        <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
+        <Route path="/tools/literature/authors" element={<LiteratureAuthorsPage />} />
+        <Route path="/tools/literature/periods" element={<LiteraturePeriodsPage />} />
+        <Route path="/tools/literature/research" element={<LiteratureResearchPage />} />
+        <Route path="/tools/literature/sources" element={<LiteratureSourceFinderPage />} />
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Toaster />
+      <SonnerToaster position="top-right" />
+    </AuthProvider>
+  );
+}
 
 export default App;

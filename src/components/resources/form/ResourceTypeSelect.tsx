@@ -21,6 +21,7 @@ const ResourceTypeSelect: React.FC<ResourceTypeSelectProps> = ({ value, onChange
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="document">Έγγραφο</SelectItem>
+          <SelectItem value="pdf">PDF</SelectItem>
           <SelectItem value="book">Βιβλίο</SelectItem>
           <SelectItem value="video">Βίντεο</SelectItem>
           <SelectItem value="link">Σύνδεσμος</SelectItem>

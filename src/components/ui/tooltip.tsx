@@ -5,10 +5,14 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 import { cn } from "@/lib/utils"
 
 const TooltipProvider = TooltipPrimitive.Provider
-TooltipProvider.displayName = TooltipPrimitive.Provider.displayName
+
+TooltipProvider.displayName = "TooltipProvider"
 
 const Tooltip = TooltipPrimitive.Root
+Tooltip.displayName = "Tooltip"
+
 const TooltipTrigger = TooltipPrimitive.Trigger
+TooltipTrigger.displayName = "TooltipTrigger"
 
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,

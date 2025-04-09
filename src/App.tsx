@@ -61,6 +61,7 @@ const queryClient = new QueryClient({
   },
 });
 
+// Route components need to be defined outside of the main App component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
@@ -113,6 +114,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Separate component for Routes to ensure hooks are used properly
 const AppRoutes = () => {
   return (
     <Routes>
@@ -164,20 +166,21 @@ const AppRoutes = () => {
   );
 };
 
+// Main App component with correct provider order
 const App = () => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <TooltipProvider>
             <NotificationProvider>
               <Toaster />
               <Sonner />
               <AppRoutes />
               <LiveChatWidget />
             </NotificationProvider>
-          </AuthProvider>
-        </TooltipProvider>
+          </TooltipProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>
   );

@@ -21,6 +21,7 @@ export type User = {
   role: "admin" | "teacher" | "student";
   roles?: string[]; // Προσθήκη πεδίου για πολλαπλούς ρόλους
   profileImage?: string | null;
+  password?: string; // Add password property for internal use
 };
 
 // Τύπος καταγραφής σύνδεσης

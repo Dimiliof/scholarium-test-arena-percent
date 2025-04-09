@@ -14,7 +14,7 @@ export const useUserOperations = () => {
     if (!storedUsers) return false;
 
     const users = JSON.parse(storedUsers);
-    const user = users.find((u: User & { password?: string }) => u.email === email && u.password === password);
+    const user = users.find((u: User) => u.email === email && u.password === password);
 
     if (user) {
       // Αφαιρούμε τον κωδικό πριν αποθηκεύσουμε τον χρήστη στο state
@@ -79,13 +79,22 @@ export const useUserOperations = () => {
     try {
       // Διατηρούμε τους άλλους χρήστες και επικαιροποιούμε μόνο τον τρέχοντα
       const users = getAllUsersFromLocalStorage();
-      const updatedUsers = users.map((u: User) => 
-        u.id === updatedUser.id ? updatedUser : u
-      );
+      const updatedUsers = users.map((u: User) => {
+        if (u.id === updatedUser.id) {
+          // Preserve the password if it exists in the original user
+          const password = u.password;
+          return { ...updatedUser, password };
+        }
+        return u;
+      });
+      
       saveUsersToLocalStorage(updatedUsers);
       
       // Ενημερώνουμε τον τρέχοντα χρήστη στο localStorage
-      saveUserToLocalStorage(updatedUser);
+      // We don't want to save the password in the current user state
+      const userWithoutPassword = { ...updatedUser };
+      delete userWithoutPassword.password;
+      saveUserToLocalStorage(userWithoutPassword);
       
       console.log("Το προφίλ ενημερώθηκε με επιτυχία:", updatedUser);
       
@@ -102,7 +111,7 @@ export const useUserOperations = () => {
     
     try {
       const users = getAllUsersFromLocalStorage();
-      const userIndex = users.findIndex((u: User & { password: string }) => 
+      const userIndex = users.findIndex((u: User) => 
         u.id === user.id && u.password === currentPassword
       );
       

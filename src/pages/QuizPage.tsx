@@ -16,6 +16,7 @@ import { usePrintQuiz } from '@/hooks/usePrintQuiz';
 import { 
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger 
 } from "@/components/ui/tooltip";
 
@@ -27,7 +28,7 @@ const QuizPage = () => {
   const { getQuestions } = useQuestionManagement();
   const { componentRef, handlePrint } = usePrintQuiz();
   
-  const hasAccess = !isAuthenticated || isTeacher || isAdmin;
+  const hasAccess = isAuthenticated && (isTeacher || isAdmin);
   
   if (!hasAccess) {
     return (
@@ -136,6 +137,7 @@ const QuizPage = () => {
     if (!subjectId || !quizType) return;
     
     setIsLoading(true);
+    console.log("Loading questions for subject:", subjectId, "quiz type:", quizType);
     
     let quizTypeEnum: QuizType;
     
@@ -162,9 +164,12 @@ const QuizPage = () => {
         quizTypeEnum = QuizType.BASIC;
     }
     
+    console.log("Quiz type enum:", quizTypeEnum);
     const availableQuestions = getQuestions(subjectId, quizTypeEnum);
+    console.log("Available questions:", availableQuestions);
     
     if (availableQuestions.length === 0) {
+      console.log("No questions found");
       setIsLoading(false);
       return;
     }
@@ -178,6 +183,7 @@ const QuizPage = () => {
     const shuffledQuestions = [...availableQuestions].sort(() => 0.5 - Math.random());
     const selectedQuestions = shuffledQuestions.slice(0, numQuestions);
     
+    console.log("Selected questions:", selectedQuestions);
     setQuestions(selectedQuestions);
     
     setUserAnswers(new Array(numQuestions).fill(-1));
@@ -199,7 +205,7 @@ const QuizPage = () => {
     );
   }
   
-  const getQuizTitle = () => {
+  function getQuizTitle() {
     switch (quizType) {
       case 'basic': return 'Βασικές Ασκήσεις';
       case 'intermediate': return 'Ενδιάμεσες Ασκήσεις';
@@ -209,13 +215,13 @@ const QuizPage = () => {
       case 'full': return 'Διαγώνισμα Εφ\' Όλης της Ύλης';
       default: return 'Εξάσκηση';
     }
-  };
+  }
   
-  const handleOptionSelect = (optionIndex: number) => {
+  function handleOptionSelect(optionIndex: number) {
     setSelectedOption(optionIndex);
-  };
+  }
   
-  const handleNextQuestion = () => {
+  function handleNextQuestion() {
     if (selectedOption === null) return;
     
     const newAnswers = [...userAnswers];
@@ -228,30 +234,14 @@ const QuizPage = () => {
     } else {
       setQuizCompleted(true);
     }
-  };
+  }
   
-  const handlePreviousQuestion = () => {
+  function handlePreviousQuestion() {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
       setSelectedOption(userAnswers[currentQuestion - 1] !== -1 ? userAnswers[currentQuestion - 1] : null);
     }
-  };
-  
-  const handleRetry = () => {
-    setCurrentQuestion(0);
-    setUserAnswers(new Array(questions.length).fill(-1));
-    setSelectedOption(null);
-    setQuizCompleted(false);
-    
-    let seconds = 0;
-    switch (quizType) {
-      case 'quick': seconds = 15 * 60; break;
-      case 'medium': seconds = 30 * 60; break;
-      case 'full': seconds = 45 * 60; break;
-      default: seconds = 10 * 60; break;
-    }
-    setTimeLeft(seconds);
-  };
+  }
   
   if (quizCompleted) {
     return (
@@ -351,25 +341,27 @@ const QuizPage = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
               <div>
                 <h1 className="text-2xl font-bold">{getQuizTitle()}</h1>
-                <p className="text-gray-600">{subject.name}</p>
+                <p className="text-gray-600">{subject?.name || 'Μάθημα'}</p>
               </div>
               
               <div className="flex items-center gap-4 mt-4 md:mt-0">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handlePrint}
-                      className="no-print"
-                    >
-                      <Printer className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    Εκτύπωση διαγωνίσματος
-                  </TooltipContent>
-                </Tooltip>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handlePrint}
+                        className="no-print"
+                      >
+                        <Printer className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Εκτύπωση διαγωνίσματος
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 
                 <div className="flex items-center">
                   <Clock className="h-5 w-5 mr-2 text-gray-600" />
@@ -395,68 +387,70 @@ const QuizPage = () => {
               <p className="text-sm text-gray-500">Συνολικός αριθμός ερωτήσεων: {questions.length}</p>
             </div>
             
-            <Card className="shadow mb-8">
-              <CardContent className="p-6">
-                <h2 className="text-xl font-medium mb-6">
-                  {currentQuestion + 1}. {questions[currentQuestion]?.question}
-                </h2>
-                
-                <div className="space-y-3">
-                  <p className="options-label">Επιλογές:</p>
-                  {questions[currentQuestion]?.options.map((option, index) => (
-                    <div
-                      key={index}
-                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        selectedOption === index 
-                          ? 'border-primary bg-primary/5' 
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => handleOptionSelect(index)}
-                    >
-                      <div className="flex items-center">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
+            {questions.length > 0 && (
+              <Card className="shadow mb-8">
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-medium mb-6">
+                    {currentQuestion + 1}. {questions[currentQuestion]?.question}
+                  </h2>
+                  
+                  <div className="space-y-3">
+                    <p className="options-label">Επιλογές:</p>
+                    {questions[currentQuestion]?.options.map((option, index) => (
+                      <div
+                        key={index}
+                        className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                           selectedOption === index 
-                            ? 'bg-primary text-white' 
-                            : 'border border-gray-300'
-                        }`}>
-                          <span className="text-sm">
-                            {selectedOption === index ? '✓' : String.fromCharCode(65 + index)}
-                          </span>
+                            ? 'border-primary bg-primary/5' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => handleOptionSelect(index)}
+                      >
+                        <div className="flex items-center">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
+                            selectedOption === index 
+                              ? 'bg-primary text-white' 
+                              : 'border border-gray-300'
+                          }`}>
+                            <span className="text-sm">
+                              {selectedOption === index ? '✓' : String.fromCharCode(65 + index)}
+                            </span>
+                          </div>
+                          <span>{option}</span>
                         </div>
-                        <span>{option}</span>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-              
-              <CardFooter className="flex justify-between p-6 border-t quiz-controls">
-                <Button 
-                  variant="outline" 
-                  onClick={handlePreviousQuestion}
-                  disabled={currentQuestion === 0}
-                  className="flex items-center"
-                >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Προηγούμενο
-                </Button>
+                    ))}
+                  </div>
+                </CardContent>
                 
-                <Button 
-                  onClick={handleNextQuestion}
-                  disabled={selectedOption === null}
-                  className="flex items-center"
-                >
-                  {currentQuestion < questions.length - 1 ? (
-                    <>
-                      Επόμενο
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </>
-                  ) : (
-                    'Ολοκλήρωση'
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
+                <CardFooter className="flex justify-between p-6 border-t quiz-controls">
+                  <Button 
+                    variant="outline" 
+                    onClick={handlePreviousQuestion}
+                    disabled={currentQuestion === 0}
+                    className="flex items-center"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Προηγούμενο
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleNextQuestion}
+                    disabled={selectedOption === null}
+                    className="flex items-center"
+                  >
+                    {currentQuestion < questions.length - 1 ? (
+                      <>
+                        Επόμενο
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </>
+                    ) : (
+                      'Ολοκλήρωση'
+                    )}
+                  </Button>
+                </CardFooter>
+              </Card>
+            )}
             
             <div className="print-footer">
               <p>© {new Date().getFullYear()} - Εκπαιδευτική Πλατφόρμα</p>

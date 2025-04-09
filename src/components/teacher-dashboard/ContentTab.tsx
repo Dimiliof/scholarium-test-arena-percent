@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { subjects, QuizQuestion } from '@/lib/subjectsData';
+import { RefreshCw, PlusCircle } from 'lucide-react';
 
 // Ορισμός τύπων για τα δεδομένα
 interface TeacherContent {
@@ -36,6 +37,7 @@ interface ContentTabProps {
   selectedSubject: string;
   setSearchQuery: (query: string) => void;
   setSelectedSubject: (subject: string) => void;
+  refreshContent?: () => void;
 }
 
 const ContentTab: React.FC<ContentTabProps> = ({ 
@@ -44,7 +46,8 @@ const ContentTab: React.FC<ContentTabProps> = ({
   searchQuery, 
   selectedSubject, 
   setSearchQuery, 
-  setSelectedSubject 
+  setSelectedSubject,
+  refreshContent
 }) => {
   const navigate = useNavigate();
 
@@ -105,9 +108,18 @@ const ContentTab: React.FC<ContentTabProps> = ({
             </select>
           </div>
           
-          <Button onClick={() => navigate('/add-content')}>
-            Προσθήκη Περιεχομένου
-          </Button>
+          <div className="flex gap-2">
+            {refreshContent && (
+              <Button variant="outline" onClick={refreshContent}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Ανανέωση
+              </Button>
+            )}
+            <Button onClick={() => navigate('/add-content')}>
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Προσθήκη Περιεχομένου
+            </Button>
+          </div>
         </div>
       </CardHeader>
       
@@ -129,7 +141,7 @@ const ContentTab: React.FC<ContentTabProps> = ({
             <TableBody>
               {filteredContent.map(item => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.question}</TableCell>
+                  <TableCell className="max-w-md truncate">{item.question}</TableCell>
                   <TableCell>
                     <Badge variant="outline">
                       {getSubjectName(item.subjectId)}

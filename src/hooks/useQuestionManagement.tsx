@@ -44,9 +44,10 @@ export function useQuestionManagement(): QuestionManagementResult {
       
       console.log(`Ερώτηση προστέθηκε στο μάθημα ${subjectId} και τύπο ${quizType}:`, question);
       console.log(`Συνολικές ερωτήσεις για ${subjectId}:`, sampleQuestions[subjectId]);
+      console.log(`Αποθηκεύτηκε στο localStorage με κλειδί: ${storageKey}`);
       
       toast.success("Η ερώτηση προστέθηκε επιτυχώς!", {
-        description: `Η ερώτηση προστέθηκε επιτυχώς στο ${quizType} του μαθήματος.`,
+        description: `Η ερώτηση προστέθηκε επιτυχώς στο ${quizType} του μαθήματος και θα εμφανίζεται στον πίνακα του εκπαιδευτικού.`,
         duration: 4000,
       });
       

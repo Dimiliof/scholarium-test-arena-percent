@@ -51,6 +51,7 @@ export const useTeacherContent = () => {
       allContent.sort((a, b) => b.id - a.id);
       
       setContent(allContent);
+      console.log("Περιεχόμενο που φορτώθηκε:", allContent);
     } catch (error) {
       console.error("Σφάλμα κατά τη φόρτωση του περιεχομένου:", error);
       toast.error("Σφάλμα κατά τη φόρτωση του περιεχομένου");
@@ -59,12 +60,23 @@ export const useTeacherContent = () => {
     }
   };
 
+  // Αυτόματη φόρτωση περιεχομένου κατά την αρχικοποίηση
+  useEffect(() => {
+    loadTeacherContent();
+  }, []);
+
+  const refreshContent = () => {
+    loadTeacherContent();
+    toast.success("Το περιεχόμενο ανανεώθηκε");
+  };
+
   return {
     content,
     isLoading,
     searchQuery,
     selectedSubject,
     loadTeacherContent,
+    refreshContent,
     setSearchQuery,
     setSelectedSubject
   };

@@ -243,6 +243,32 @@ const QuizPage = () => {
     }
   }
   
+  function handleRetry() {
+    setQuizCompleted(false);
+    setCurrentQuestion(0);
+    setSelectedOption(null);
+    setUserAnswers(new Array(questions.length).fill(-1));
+    
+    let seconds = 0;
+    if (quizType) {
+      switch (quizType) {
+        case 'quick':
+          seconds = 15 * 60; // 15 minutes
+          break;
+        case 'medium':
+          seconds = 30 * 60; // 30 minutes
+          break;
+        case 'full':
+          seconds = 45 * 60; // 45 minutes
+          break;
+        default:
+          seconds = 10 * 60; // 10 minutes for practice
+          break;
+      }
+      setTimeLeft(seconds);
+    }
+  }
+  
   if (quizCompleted) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -460,7 +486,7 @@ const QuizPage = () => {
           {timeLeft < 60 && !quizCompleted && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center no-print">
               <AlertTriangle className="h-5 w-5 text-red-500 mr-2" />
-              <span className="text-red-600">Ο χρόνος τελειώνει! Λιγότερο από ένα λεπτό απομένει.</span>
+              <span className="text-red-600">Ο χρόνος τελειώνει! Λιγότερο από ��να λεπτό απομένει.</span>
             </div>
           )}
         </div>

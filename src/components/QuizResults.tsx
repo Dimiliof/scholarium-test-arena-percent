@@ -7,7 +7,7 @@ import { usePrintResults } from "@/hooks/usePrintResults";
 
 interface QuizResultsProps {
   questions: QuizQuestion[];
-  userAnswers: number[];
+  userAnswers: number[];  // Changed to number[] to match type
   subject: Subject;
   quizType: string;
   onRetry: () => void;

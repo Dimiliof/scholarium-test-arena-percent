@@ -78,7 +78,7 @@ export function AddQuestionForm({
         optionB: initialData.options[1],
         optionC: initialData.options[2],
         optionD: initialData.options[3],
-        correctAnswer: initialData.correctAnswer.toString() as "0" | "1" | "2" | "3",
+        correctAnswer: String(initialData.correctAnswer) as "0" | "1" | "2" | "3", // Convert number to string
         quizType: initialQuizType.toString() as "basic" | "intermediate" | "advanced" | "quick" | "medium" | "full",
       }
     : {
@@ -100,7 +100,7 @@ export function AddQuestionForm({
       id: isEditing ? initialData.id : Date.now(),
       question: data.question,
       options: [data.optionA, data.optionB, data.optionC, data.optionD],
-      correctAnswer: parseInt(data.correctAnswer),
+      correctAnswer: parseInt(data.correctAnswer), // Convert string to number
     };
     
     if (isEditing) {

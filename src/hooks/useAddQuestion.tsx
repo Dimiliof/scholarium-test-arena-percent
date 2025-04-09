@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { QuizQuestion, sampleQuestions } from '@/lib/subjectsData';
+import { QuizQuestion } from '@/lib/subjectsData';
 import { toast } from 'sonner';
 import { QuizType } from '@/components/AddQuestionForm';
 
@@ -37,16 +37,8 @@ export function useAddQuestion(): AddQuestionResult {
       // Αποθήκευση στο localStorage
       localStorage.setItem(storageKey, JSON.stringify(existingQuestions));
       
-      // Ενημέρωση των sampleQuestions για άμεση εμφάνιση στην εφαρμογή
-      if (!sampleQuestions[subjectId]) {
-        sampleQuestions[subjectId] = [];
-      }
-      
-      // Προσθήκη της ερώτησης στο sampleQuestions
-      sampleQuestions[subjectId].push(question);
-      
       console.log(`Ερώτηση προστέθηκε στο μάθημα ${subjectId} και τύπο ${quizType}:`, question);
-      console.log(`Συνολικές ερωτήσεις για ${subjectId}:`, sampleQuestions[subjectId]);
+      console.log(`Συνολικές ερωτήσεις για ${subjectId}:`, existingQuestions.length);
       
       // Εμφάνιση μηνύματος επιτυχίας χρησιμοποιώντας και το sonner toast
       toast.success("Η ερώτηση προστέθηκε επιτυχώς!", {

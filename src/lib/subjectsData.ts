@@ -1,3 +1,4 @@
+
 import { ReactNode } from 'react';
 import {
   BookOpen,
@@ -40,10 +41,90 @@ export interface QuizQuestion {
   id: number;
   question: string;
   options: string[];
-  correctAnswer: string;
+  correctAnswer: number; // Changed to number to fix type errors
   image?: string;
   explanation?: string;
 }
+
+// Sample questions data by subject ID
+export const sampleQuestions: Record<string, QuizQuestion[]> = {
+  'mathematics': [
+    {
+      id: 1,
+      question: 'Πόσο κάνει 2 + 2;',
+      options: ['3', '4', '5', '6'],
+      correctAnswer: 1
+    },
+    {
+      id: 2,
+      question: 'Ποια είναι η τετραγωνική ρίζα του 9;',
+      options: ['2', '3', '4', '9'],
+      correctAnswer: 1
+    },
+    {
+      id: 3,
+      question: 'Πόσες μοίρες έχει ένα τρίγωνο;',
+      options: ['90 μοίρες', '180 μοίρες', '270 μοίρες', '360 μοίρες'],
+      correctAnswer: 1
+    }
+  ],
+  'physics': [
+    {
+      id: 1,
+      question: 'Ποια είναι η βασική μονάδα μέτρησης του χρόνου;',
+      options: ['Λεπτό', 'Ώρα', 'Δευτερόλεπτο', 'Ημέρα'],
+      correctAnswer: 2
+    },
+    {
+      id: 2,
+      question: 'Ποιος νόμος του Νεύτωνα αναφέρεται στη δράση και αντίδραση;',
+      options: ['Πρώτος', 'Δεύτερος', 'Τρίτος', 'Τέταρτος'],
+      correctAnswer: 2
+    }
+  ],
+  'word': [
+    {
+      id: 1,
+      question: 'Πώς εισάγουμε έναν πίνακα στο Word;',
+      options: ['Insert > Table', 'Format > Table', 'View > Table', 'Home > Table'],
+      correctAnswer: 0
+    },
+    {
+      id: 2,
+      question: 'Ποιο είναι το συντομευτικό πλήκτρο για την αποθήκευση ενός εγγράφου;',
+      options: ['Ctrl+P', 'Ctrl+S', 'Ctrl+O', 'Ctrl+N'],
+      correctAnswer: 1
+    }
+  ],
+  'excel': [
+    {
+      id: 1,
+      question: 'Πώς αναφερόμαστε σε ένα κελί με σταθερή διεύθυνση;',
+      options: ['Με το $', 'Με το #', 'Με το @', 'Με το &'],
+      correctAnswer: 0
+    },
+    {
+      id: 2,
+      question: 'Ποια συνάρτηση χρησιμοποιούμε για να βρούμε τη μέγιστη τιμή;',
+      options: ['MAX()', 'SUM()', 'COUNT()', 'AVERAGE()'],
+      correctAnswer: 0
+    }
+  ],
+  'powerpoint': [
+    {
+      id: 1,
+      question: 'Πώς προσθέτουμε μια νέα διαφάνεια;',
+      options: ['Insert > New Slide', 'Home > New Slide', 'File > New Slide', 'View > New Slide'],
+      correctAnswer: 1
+    },
+    {
+      id: 2,
+      question: 'Πώς ξεκινάμε την παρουσίαση από την αρχή;',
+      options: ['F1', 'F5', 'F9', 'F12'],
+      correctAnswer: 1
+    }
+  ]
+};
 
 // Mock subjects data
 export const subjects: Subject[] = [
@@ -193,3 +274,4 @@ export const subjects: Subject[] = [
 export const getSubject = (subjectId: string): Subject | undefined => {
   return subjects.find(subject => subject.id === subjectId);
 };
+

@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { QuizQuestion, sampleQuestions } from '@/lib/subjectsData';
+import { QuizQuestion } from '@/lib/subjectsData';
 import { toast } from 'sonner';
 import { QuizType } from '@/components/AddQuestionForm';
 
@@ -36,14 +36,8 @@ export function useQuestionManagement(): QuestionManagementResult {
       
       localStorage.setItem(storageKey, JSON.stringify(existingQuestions));
       
-      if (!sampleQuestions[subjectId]) {
-        sampleQuestions[subjectId] = [];
-      }
-      
-      sampleQuestions[subjectId].push(question);
-      
       console.log(`Ερώτηση προστέθηκε στο μάθημα ${subjectId} και τύπο ${quizType}:`, question);
-      console.log(`Συνολικές ερωτήσεις για ${subjectId}:`, sampleQuestions[subjectId]);
+      console.log(`Συνολικές ερωτήσεις για ${subjectId}:`, existingQuestions.length);
       console.log(`Αποθηκεύτηκε στο localStorage με κλειδί: ${storageKey}`);
       
       toast.success("Η ερώτηση προστέθηκε επιτυχώς!", {
@@ -74,10 +68,6 @@ export function useQuestionManagement(): QuestionManagementResult {
         questions = questions.filter(q => q.id !== questionId);
         
         localStorage.setItem(storageKey, JSON.stringify(questions));
-        
-        if (sampleQuestions[subjectId]) {
-          sampleQuestions[subjectId] = sampleQuestions[subjectId].filter(q => q.id !== questionId);
-        }
         
         toast.success("Η ερώτηση διαγράφηκε επιτυχώς!");
       }
@@ -119,17 +109,6 @@ export function useQuestionManagement(): QuestionManagementResult {
       }
       
       localStorage.setItem(storageKey, JSON.stringify(questions));
-      
-      if (!sampleQuestions[subjectId]) {
-        sampleQuestions[subjectId] = [];
-      }
-      
-      const sampleIndex = sampleQuestions[subjectId].findIndex(q => q.id === question.id);
-      if (sampleIndex !== -1) {
-        sampleQuestions[subjectId][sampleIndex] = question;
-      } else {
-        sampleQuestions[subjectId].push(question);
-      }
       
       toast.success("Η ερώτηση ενημερώθηκε επιτυχώς!");
     } catch (error) {

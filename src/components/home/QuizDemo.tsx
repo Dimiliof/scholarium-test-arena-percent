@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,11 +5,32 @@ import { Badge } from "@/components/ui/badge";
 import { Check, X, ChevronRight, RotateCcw, Award, Clock, PlayCircle, Video } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
-import { sampleQuestions } from '@/lib/subjectsData';
 import { useNavigate } from 'react-router-dom';
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 const DEMO_SUBJECT = 'mathematics'; // Σταθερό μάθημα για το demo
+
+// Δημιουργία δοκιμαστικών ερωτήσεων αντί να τις πάρουμε από το sampleQuestions που δεν υπάρχει ακόμα
+const demoQuestions = [
+  {
+    id: 1,
+    question: 'Πόσο κάνει 2 + 2;',
+    options: ['3', '4', '5', '6'],
+    correctAnswer: 1
+  },
+  {
+    id: 2,
+    question: 'Ποια είναι η τετραγωνική ρίζα του 9;',
+    options: ['2', '3', '4', '9'],
+    correctAnswer: 1
+  },
+  {
+    id: 3,
+    question: 'Πόσες μοίρες έχει ένα τρίγωνο;',
+    options: ['90 μοίρες', '180 μοίρες', '270 μοίρες', '360 μοίρες'],
+    correctAnswer: 1
+  }
+];
 
 const QuizDemo = () => {
   const navigate = useNavigate();
@@ -23,12 +43,8 @@ const QuizDemo = () => {
   const [carouselApi, setCarouselApi] = useState<any>(null);
   const [showVideo, setShowVideo] = useState(false);
 
-  // Επιλογή 3 τυχαίων ερωτήσεων από τα μαθηματικά
-  const [questions, setQuestions] = useState(() => {
-    const allQuestions = sampleQuestions[DEMO_SUBJECT];
-    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 3); // Επιστρέφει τις πρώτες 3 ερωτήσεις
-  });
+  // Χρησιμοποιούμε τις δοκιμαστικές ερωτήσεις
+  const [questions, setQuestions] = useState(demoQuestions);
 
   // Timer για κάθε ερώτηση
   useEffect(() => {
@@ -80,9 +96,8 @@ const QuizDemo = () => {
 
   const resetQuiz = () => {
     // Ανακατεύουμε τις ερωτήσεις για ένα νέο σετ
-    const allQuestions = sampleQuestions[DEMO_SUBJECT];
-    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-    setQuestions(shuffled.slice(0, 3));
+    const shuffled = [...demoQuestions].sort(() => 0.5 - Math.random());
+    setQuestions(shuffled);
     
     setCurrentQuestion(0);
     setSelectedAnswer(null);

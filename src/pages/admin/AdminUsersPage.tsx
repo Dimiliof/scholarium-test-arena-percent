@@ -1,270 +1,118 @@
-
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { useAuth, User } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { Helmet } from "react-helmet";
 import { 
   Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
   TableHeader, 
-  TableRow 
+  TableRow, 
+  TableHead, 
+  TableBody, 
+  TableCell 
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Users, Search, UserX, ShieldCheck, BookOpen } from "lucide-react";
+import { User } from "@/types/auth";
 
 const AdminUsersPage = () => {
-  const navigate = useNavigate();
-  const { user, isAuthenticated, isAdmin, getAllUsers, makeUserTeacherAndAdmin } = useAuth();
+  const { user, getAllUsers, fixAdminEmail, makeUserTeacherAndAdmin } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const { toast: uiToast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Έλεγχος αν ο χρήστης είναι διαχειριστής
   useEffect(() => {
-    if (!isAuthenticated || !isAdmin) {
-      navigate('/');
-    } else {
-      // Φόρτωση των χρηστών
-      loadUsers();
-    }
-  }, [isAuthenticated, isAdmin, navigate]);
+    const fetchUsers = async () => {
+      try {
+        const allUsers = getAllUsers();
+        setUsers(allUsers);
+        setLoading(false);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch users");
+        setLoading(false);
+      }
+    };
 
-  const loadUsers = () => {
-    setUsers(getAllUsers());
+    fetchUsers();
+  }, [getAllUsers]);
+
+  const handleFixAdminEmail = async (email: string) => {
+    try {
+      await fixAdminEmail(email);
+      // After fixing the admin email, refresh the user list
+      const updatedUsers = getAllUsers();
+      setUsers(updatedUsers);
+      alert(`Ο ρόλος του χρήστη ${email} ενημερώθηκε σε διαχειριστή.`);
+    } catch (err: any) {
+      setError(err.message || "Failed to fix admin email");
+      alert(`Σφάλμα κατά την ενημέρωση του ρόλου: ${err.message}`);
+    }
   };
-
-  // Φιλτράρισμα των χρηστών βάσει των κριτηρίων αναζήτησης
-  useEffect(() => {
-    let filteredList = [...users];
-    
-    // Εφαρμογή φίλτρου ρόλου
-    if (roleFilter !== 'all') {
-      filteredList = filteredList.filter(user => 
-        user.role === roleFilter || 
-        (user.roles && user.roles.includes(roleFilter))
-      );
-    }
-    
-    // Εφαρμογή φίλτρου αναζήτησης
-    if (searchTerm.trim() !== '') {
-      const lowerSearchTerm = searchTerm.toLowerCase();
-      filteredList = filteredList.filter(user => 
-        user.firstName.toLowerCase().includes(lowerSearchTerm) || 
-        user.lastName.toLowerCase().includes(lowerSearchTerm) ||
-        user.email.toLowerCase().includes(lowerSearchTerm)
-      );
-    }
-    
-    setFilteredUsers(filteredList);
-  }, [users, searchTerm, roleFilter]);
-
-  // Διόρθωση του ρόλου του διαχειριστή και εκπαιδευτικού
-  const handleFixAdminRole = async () => {
-    setIsLoading(true);
-    const adminEmail = "liofisdimitris@gmail.com";
-    const success = await makeUserTeacherAndAdmin(adminEmail);
-    
-    if (success) {
-      uiToast({
-        title: "Επιτυχής ενημέρωση",
-        description: `Ο χρήστης ${adminEmail} ορίστηκε ως διαχειριστής και εκπαιδευτικός επιτυχώς.`,
-      });
-      
-      toast.success("Ο διπλός ρόλος ορίστηκε επιτυχώς!", {
-        position: "top-center",
-      });
-      
-      loadUsers(); // Επαναφόρτωση χρηστών για να εμφανιστούν οι αλλαγές
-    } else {
-      uiToast({
-        variant: "destructive",
-        title: "Σφάλμα",
-        description: "Προέκυψε πρόβλημα κατά την ενημέρωση του ρόλου.",
-      });
-    }
-    setIsLoading(false);
-  };
-
-  // Συνάρτηση για εμφάνιση των ρόλων του χρήστη
-  const getUserRoleBadges = (user: User) => {
-    const badges = [];
-    
-    // Αν έχει πολλαπλούς ρόλους, τους εμφανίζουμε όλους
-    if (user.roles && user.roles.length > 0) {
-      return (
-        <div className="flex flex-wrap gap-1">
-          {user.roles.includes('admin') && (
-            <Badge variant="destructive">
-              Διαχειριστής
-            </Badge>
-          )}
-          {user.roles.includes('teacher') && (
-            <Badge variant="default">
-              Εκπαιδευτικός
-            </Badge>
-          )}
-          {user.roles.includes('student') && (
-            <Badge variant="outline">
-              Μαθητής
-            </Badge>
-          )}
-        </div>
-      );
-    } else {
-      // Διαφορετικά, εμφανίζουμε τον κύριο ρόλο
-      return (
-        <Badge 
-          variant={
-            user.role === "admin" ? "destructive" : 
-            user.role === "teacher" ? "default" : "outline"
-          }
-        >
-          {user.role === "admin" ? "Διαχειριστής" :
-           user.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής"}
-        </Badge>
-      );
+  
+  const handleMakeUserTeacherAndAdmin = async (email: string) => {
+    try {
+      await makeUserTeacherAndAdmin(email);
+      // After making the user teacher and admin, refresh the user list
+      const updatedUsers = getAllUsers();
+      setUsers(updatedUsers);
+      alert(`Ο χρήστης ${email} έγινε εκπαιδευτικός και διαχειριστής.`);
+    } catch (err: any) {
+      setError(err.message || "Failed to make user teacher and admin");
+      alert(`Σφάλμα κατά την ενημέρωση του ρόλου: ${err.message}`);
     }
   };
 
-  // Αν ο χρήστης δεν είναι διαχειριστής, δεν εμφανίζουμε τίποτα
-  if (!isAuthenticated || !isAdmin) {
-    return null;
+  if (loading) {
+    return <div>Loading users...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Users className="h-8 w-8" />
-              Διαχείριση Χρηστών
-            </h1>
-            <p className="text-muted-foreground">
-              Προβολή και διαχείριση των χρηστών της πλατφόρμας
-            </p>
-          </div>
-          <div className="mt-4 md:mt-0">
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-              onClick={handleFixAdminRole}
-              disabled={isLoading}
-            >
-              <ShieldCheck className="h-4 w-4" />
-              <BookOpen className="h-4 w-4" />
-              {isLoading ? "Ορισμός..." : "Όρισε Διαχειριστή & Εκπαιδευτικό"}
-            </Button>
-          </div>
-        </div>
-        
-        {/* Φίλτρα αναζήτησης */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">Φίλτρα Αναζήτησης</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Αναζήτηση με όνομα ή email..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8"
-                  />
-                </div>
-              </div>
-              <div className="w-full md:w-48">
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Όλοι οι ρόλοι" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Όλοι οι ρόλοι</SelectItem>
-                    <SelectItem value="admin">Διαχειριστές</SelectItem>
-                    <SelectItem value="teacher">Εκπαιδευτικοί</SelectItem>
-                    <SelectItem value="student">Μαθητές</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Πίνακας χρηστών */}
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableCaption>
-                {filteredUsers.length === 0 ? 
-                  "Δεν βρέθηκαν χρήστες" : 
-                  `Συνολικά ${filteredUsers.length} χρήστες`}
-              </TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Όνομα</TableHead>
-                  <TableHead>Επώνυμο</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Ρόλος</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
-                      <div className="flex flex-col items-center gap-2">
-                        <UserX className="h-8 w-8 text-muted-foreground" />
-                        <p>Δεν βρέθηκαν χρήστες</p>
-                        <p className="text-sm text-muted-foreground">
-                          Δοκιμάστε να αλλάξετε τα φίλτρα αναζήτησης
-                        </p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">
-                        {user.firstName}
-                      </TableCell>
-                      <TableCell>{user.lastName}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        {getUserRoleBadges(user)}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </main>
-      
-      <Footer />
+    <div className="container mx-auto py-8">
+      <Helmet>
+        <title>Διαχείριση Χρηστών - Admin</title>
+      </Helmet>
+      <h1 className="text-2xl font-bold mb-4">Διαχείριση Χρηστών</h1>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Όνομα</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Ρόλος</TableHead>
+              <TableHead>Ενέργειες</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.id}</TableCell>
+                <TableCell>{user.firstName} {user.lastName}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.role}</TableCell>
+                <TableCell>
+                  {user.email !== "liofisdimitris@gmail.com" && (
+                    <button
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                      onClick={() => handleMakeUserTeacherAndAdmin(user.email)}
+                    >
+                      Κάνε Εκπαιδευτικό & Admin
+                    </button>
+                  )}
+                  {user.email !== "liofisdimitris@gmail.com" && (
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={() => handleFixAdminEmail(user.email)}
+                    >
+                      Κάνε Admin
+                    </button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

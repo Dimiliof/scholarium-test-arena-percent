@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from "react";
-import { User, LogOut, Settings, UserCircle } from "lucide-react";
+import { User, LogOut, Settings, UserCircle, Server } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -135,15 +135,35 @@ export default function UserMenu() {
                   </>
                 )}
                 {isAdmin && (
-                  <li>
-                    <a
-                      href="/admin/users"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      <Settings className="mr-2 h-4 w-4" />
-                      Διαχείριση
-                    </a>
-                  </li>
+                  <>
+                    <li>
+                      <a
+                        href="/admin/users"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Διαχείριση
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/admin/logins"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Καταγραφές Συνδέσεων
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/it-support"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <Server className="mr-2 h-4 w-4" />
+                        IT Support
+                      </a>
+                    </li>
+                  </>
                 )}
                 <li>
                   <button

@@ -21,17 +21,23 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const AdminLoginsPage = () => {
-  const { loginRecords } = useAuth();
+  const { loginRecords, isAdmin, isAuthenticated } = useAuth();
   const [formattedLoginRecords, setFormattedLoginRecords] = useState<LoginRecord[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRecords, setFilteredRecords] = useState<LoginRecord[]>([]);
 
   useEffect(() => {
+    // Έλεγχος δικαιωμάτων
+    if (!isAuthenticated || !isAdmin) {
+      window.location.href = "/";
+      return;
+    }
+
     // Sort login records by timestamp in descending order (most recent first)
     const sortedRecords = [...loginRecords].sort((a, b) => b.timestamp - a.timestamp);
     setFormattedLoginRecords(sortedRecords);
     setFilteredRecords(sortedRecords);
-  }, [loginRecords]);
+  }, [loginRecords, isAuthenticated, isAdmin]);
 
   // Filter records based on search term
   useEffect(() => {
@@ -68,10 +74,14 @@ const AdminLoginsPage = () => {
     return `${Math.floor(diff / 86400000)} ημέρες πριν`;
   };
 
+  if (!isAuthenticated || !isAdmin) {
+    return null; // Δεν εμφανίζουμε περιεχόμενο αν ο χρήστης δεν είναι διαχειριστής
+  }
+
   return (
     <>
       <Helmet>
-        <title>Admin - Logins | Εκπαιδευτική Πλατφόρμα</title>
+        <title>Admin - Καταγραφές Συνδέσεων | Εκπαιδευτική Πλατφόρμα</title>
       </Helmet>
       
       <Header />
@@ -121,8 +131,8 @@ const AdminLoginsPage = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredRecords.length > 0 ? (
-                    filteredRecords.map((record) => (
-                      <TableRow key={`${record.userId}-${record.timestamp}`}>
+                    filteredRecords.map((record, index) => (
+                      <TableRow key={`${record.userId}-${record.timestamp}-${index}`}>
                         <TableCell className="font-medium">{record.userName}</TableCell>
                         <TableCell>{record.email}</TableCell>
                         <TableCell>

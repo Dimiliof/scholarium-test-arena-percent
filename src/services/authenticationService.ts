@@ -62,7 +62,7 @@ export const loginUser = async (
     
     localStorage.setItem("user", JSON.stringify(userWithoutPassword));
     
-    // Καταγραφή της σύνδεσης
+    // Καταγραφή της σύνδεσης με περισσότερες λεπτομέρειες
     const loginRecord: LoginRecord = {
       userId: user.id,
       userName: `${user.firstName} ${user.lastName}`,
@@ -106,6 +106,7 @@ export const registerUser = async (userData: RegisterData): Promise<boolean> => 
       email: userData.email,
       password: userData.password,
       role: role as "admin" | "teacher" | "student",
+      roles: [role]
     };
 
     users.push(newUser);

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -71,7 +70,7 @@ export function QuestionForm({
         optionB: "",
         optionC: "",
         optionD: "",
-        correctAnswer: "" as "0" | "1" | "2" | "3",
+        correctAnswer: "0",
         quizType: initialQuizType.toString() as "basic" | "intermediate" | "advanced" | "quick" | "medium" | "full",
       };
   

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,8 @@ const ITSupportLoginPage = () => {
     setIsLoading(true);
 
     try {
+      console.log(`Προσπάθεια σύνδεσης στο IT Support με: ${email}`);
+      
       // Διόρθωση: Απλοποίηση του ελέγχου και χειρισμού των διαπιστευτηρίων του διαχειριστή
       if (email === "liofisdimitris@gmail.com" && password === "Skatadi21!") {
         console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
@@ -37,7 +38,7 @@ const ITSupportLoginPage = () => {
           firstName: "Διαχειριστής",
           lastName: "Συστήματος",
           email: email,
-          role: "admin",
+          role: "admin" as const,
           roles: ["admin", "teacher"]
         };
         

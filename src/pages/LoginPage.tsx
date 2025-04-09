@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -27,8 +26,8 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Παρακαλώ εισάγετε έγκυρη διεύθυνση email.",
   }),
-  password: z.string().min(8, {
-    message: "Ο κωδικός πρόσβασης πρέπει να έχει τουλάχιστον 8 χαρακτήρες.",
+  password: z.string().min(1, {
+    message: "Ο κωδικός πρόσβασης είναι υποχρεωτικός.",
   }),
 });
 
@@ -52,6 +51,8 @@ const LoginPage = () => {
     setLoginError(null);
     
     try {
+      console.log("Υποβολή φόρμας σύνδεσης με:", values.email);
+      
       // Έλεγχος για τον κύριο διαχειριστή
       if (values.email === "liofisdimitris@gmail.com" && values.password === "Skatadi21!") {
         console.log("Εντοπίστηκε ο κύριος διαχειριστής - απευθείας είσοδος");
@@ -65,7 +66,7 @@ const LoginPage = () => {
           firstName: "Διαχειριστής",
           lastName: "Συστήματος",
           email: values.email,
-          role: "admin",
+          role: "admin" as const,
           roles: ["admin", "teacher"]
         };
         

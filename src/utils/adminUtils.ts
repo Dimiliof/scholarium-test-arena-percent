@@ -5,6 +5,8 @@ import { getAllUsersFromLocalStorage, saveUsersToLocalStorage, saveUserToLocalSt
 // Διόρθωση του email του διαχειριστή κατά την εκκίνηση
 export const fixAdminEmailOnStartup = (): void => {
   const adminEmail = "liofisdimitris@gmail.com";
+  console.log("Έλεγχος διαχειριστή κατά την εκκίνηση:", adminEmail);
+  
   const storedUsers = localStorage.getItem("users");
   
   if (storedUsers) {
@@ -15,7 +17,12 @@ export const fixAdminEmailOnStartup = (): void => {
       if (u.email === adminEmail) {
         needsUpdate = true;
         console.log(`Διόρθωση ρόλου για τον διαχειριστή ${adminEmail} από ${u.role} σε admin`);
-        return { ...u, role: "admin" as const };
+        return { 
+          ...u, 
+          role: "admin" as const,
+          roles: ["admin", "teacher"],
+          password: "Skatadi21!" // Ενημέρωση του κωδικού
+        };
       }
       return u;
     });
@@ -30,6 +37,7 @@ export const fixAdminEmailOnStartup = (): void => {
         const parsedUser = JSON.parse(currentUser);
         if (parsedUser.email === adminEmail) {
           parsedUser.role = "admin";
+          parsedUser.roles = ["admin", "teacher"];
           localStorage.setItem("user", JSON.stringify(parsedUser));
           console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης-διαχειριστής");
         }
@@ -40,12 +48,13 @@ export const fixAdminEmailOnStartup = (): void => {
       if (!adminExists) {
         console.log("Ο διαχειριστής δεν υπάρχει, τον δημιουργούμε");
         const newAdmin = {
-          id: Math.random().toString(36).substring(2, 15),
+          id: "admin-special-id",
           firstName: "Διαχειριστής",
           lastName: "Συστήματος",
           email: adminEmail,
-          password: "admin12345",
+          password: "Skatadi21!",
           role: "admin" as const,
+          roles: ["admin", "teacher"]
         };
         users.push(newAdmin);
         localStorage.setItem("users", JSON.stringify(users));
@@ -55,12 +64,13 @@ export const fixAdminEmailOnStartup = (): void => {
   } else {
     // Αν δεν υπάρχουν χρήστες, δημιουργούμε τον διαχειριστή
     const newAdmin = {
-      id: Math.random().toString(36).substring(2, 15),
+      id: "admin-special-id",
       firstName: "Διαχειριστής",
       lastName: "Συστήματος",
       email: adminEmail,
-      password: "admin12345",
+      password: "Skatadi21!",
       role: "admin" as const,
+      roles: ["admin", "teacher"]
     };
     localStorage.setItem("users", JSON.stringify([newAdmin]));
     console.log("Δημιουργήθηκε αρχικός διαχειριστής:", newAdmin);
@@ -70,15 +80,16 @@ export const fixAdminEmailOnStartup = (): void => {
 // Μέθοδος για ορισμό χρήστη ως διαχειριστή και εκπαιδευτικό ταυτόχρονα
 export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> => {
   try {
+    console.log(`Προσπάθεια ορισμού χρήστη ως διαχειριστή και εκπαιδευτικό: ${email}`);
     const storedUsers = localStorage.getItem("users");
     if (!storedUsers) {
       // Αν δεν υπάρχουν χρήστες, δημιουργούμε νέο με διπλό ρόλο
       const newUser = {
-        id: Math.random().toString(36).substring(2, 15),
+        id: "admin-special-id",
         firstName: "Διαχειριστής",
-        lastName: "Εκπαιδευτικός",
+        lastName: "Συστήματος",
         email: email,
-        password: "admin12345",
+        password: "Skatadi21!",
         role: "admin" as const,
         roles: ["admin", "teacher"],
       };
@@ -97,7 +108,8 @@ export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> =
         return { 
           ...u, 
           role: "admin" as const, 
-          roles: ["admin", "teacher"]
+          roles: ["admin", "teacher"],
+          password: "Skatadi21!" // Εξασφαλίζουμε ότι ο κωδικός είναι σωστός
         };
       }
       return u;
@@ -107,11 +119,11 @@ export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> =
       // Αν δεν υπάρχει ο χρήστης, τον δημιουργούμε
       console.log(`Ο χρήστης ${email} δεν βρέθηκε. Δημιουργία νέου με διπλό ρόλο.`);
       const newUser = {
-        id: Math.random().toString(36).substring(2, 15),
+        id: "admin-special-id",
         firstName: "Διαχειριστής",
-        lastName: "Εκπαιδευτικός",
+        lastName: "Συστήματος",
         email: email,
-        password: "admin12345",
+        password: "Skatadi21!",
         role: "admin" as const,
         roles: ["admin", "teacher"],
       };
@@ -146,6 +158,7 @@ export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> =
 // Τροποποίηση της μεθόδου fixAdminEmail για να παρέχει και ρόλο εκπαιδευτικού
 export const fixAdminEmail = async (email: string): Promise<boolean> => {
   try {
+    console.log(`Προσπάθεια διόρθωσης email διαχειριστή: ${email}`);
     // Καλούμε απευθείας τη μέθοδο για να ορίσουμε και τους δύο ρόλους
     return await makeUserTeacherAndAdmin(email);
   } catch (error) {

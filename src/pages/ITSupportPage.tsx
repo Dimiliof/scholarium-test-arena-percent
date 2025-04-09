@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,17 +12,42 @@ const ITSupportPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAuthenticated, isAdmin } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Έλεγχος αν ο χρήστης είναι διαχειριστής
-    if (!isAuthenticated || !isAdmin) {
-      toast({
-        variant: "destructive",
-        title: "Πρόσβαση απορρίφθηκε",
-        description: "Δεν έχετε δικαίωμα πρόσβασης σε αυτή τη σελίδα.",
-      });
-      navigate("/");
-    }
+    const checkAccess = () => {
+      if (!isAuthenticated) {
+        toast({
+          variant: "destructive",
+          title: "Πρόσβαση απορρίφθηκε",
+          description: "Πρέπει να συνδεθείτε για να έχετε πρόσβαση σε αυτή τη σελίδα.",
+        });
+        navigate("/login");
+        return;
+      }
+      
+      if (!isAdmin) {
+        toast({
+          variant: "destructive",
+          title: "Πρόσβαση απορρίφθηκε",
+          description: "Μόνο οι διαχειριστές έχουν πρόσβαση σε αυτή τη σελίδα.",
+        });
+        navigate("/");
+        return;
+      }
+      
+      // Αν φτάσουμε εδώ, ο χρήστης έχει πρόσβαση
+      setLoading(false);
+      console.log("IT Support page accessed by admin user");
+    };
+    
+    // Περιμένουμε λίγο για να φορτώσουν τα δεδομένα αυθεντικοποίησης
+    const timer = setTimeout(() => {
+      checkAccess();
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, [isAuthenticated, isAdmin, navigate, toast]);
 
   // Προσομοίωση ενεργειών διαχείρισης
@@ -33,8 +58,16 @@ const ITSupportPage = () => {
     });
   };
 
-  if (!isAuthenticated || !isAdmin) {
-    return null; // Δεν εμφανίζουμε περιεχόμενο αν ο χρήστης δεν είναι διαχειριστής
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="container mx-auto px-4 py-8 flex-1 flex items-center justify-center">
+          <p className="text-xl">Φόρτωση...</p>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (

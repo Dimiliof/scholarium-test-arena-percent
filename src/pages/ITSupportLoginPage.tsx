@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,15 @@ const ITSupportLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login, fixAdminEmail, makeUserTeacherAndAdmin } = useAuth();
+  const { login, fixAdminEmail, makeUserTeacherAndAdmin, isAuthenticated, isAdmin } = useAuth();
+
+  // Έλεγχος αν ο χρήστης είναι ήδη συνδεδεμένος και είναι διαχειριστής
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      // Ανακατευθύνουμε απευθείας στο IT Support
+      navigate("/it-support");
+    }
+  }, [isAuthenticated, isAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

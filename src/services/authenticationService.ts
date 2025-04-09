@@ -36,7 +36,19 @@ export const loginUser = async (
       timestamp: Date.now()
     };
     
-    const updatedRecords = [...loginRecords, loginRecord];
+    // Αποφυγή διπλότυπων εγγραφών
+    const existingLoginIndex = loginRecords.findIndex(record => 
+      record.userId === adminUser.id && record.timestamp > Date.now() - 60000);
+    
+    let updatedRecords;
+    if (existingLoginIndex === -1) {
+      updatedRecords = [...loginRecords, loginRecord];
+    } else {
+      // Αντικατάσταση του υπάρχοντος
+      updatedRecords = [...loginRecords];
+      updatedRecords[existingLoginIndex] = loginRecord;
+    }
+    
     setLoginRecords(updatedRecords);
     localStorage.setItem("loginRecords", JSON.stringify(updatedRecords));
     
@@ -71,7 +83,19 @@ export const loginUser = async (
       timestamp: Date.now(),
     };
     
-    const records = [...loginRecords, loginRecord];
+    // Αποφυγή διπλότυπων εγγραφών
+    const existingLoginIndex = loginRecords.findIndex(record => 
+      record.userId === user.id && record.timestamp > Date.now() - 60000);
+    
+    let records;
+    if (existingLoginIndex === -1) {
+      records = [...loginRecords, loginRecord];
+    } else {
+      // Αντικατάσταση του υπάρχοντος
+      records = [...loginRecords];
+      records[existingLoginIndex] = loginRecord;
+    }
+    
     setLoginRecords(records);
     localStorage.setItem("loginRecords", JSON.stringify(records));
     

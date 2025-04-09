@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuestionManagement, ResourceType } from '@/hooks/useQuestionManagement';
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Check, Copy, Download, ExternalLink } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, AlertTriangle, Lock } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { subjects } from '@/lib/subjectsData';
+import { toast } from 'sonner';
 
 const responseSchema = z.object({
   studentName: z.string().min(2, "Το όνομα πρέπει να έχει τουλάχιστον 2 χαρακτήρες"),
@@ -26,8 +28,28 @@ const ResourceViewer: React.FC = () => {
   const { resourceId } = useParams<{ resourceId: string }>();
   const { getResourceById, addResourceResponse } = useQuestionManagement();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Φορτώνουμε τον πόρο
+  const resource = resourceId ? getResourceById(resourceId) : undefined;
+  
+  useEffect(() => {
+    // Απλό timeout για να δείξουμε το loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+      
+      if (resourceId && !resource) {
+        setError("Ο πόρος που ζητήθηκε δεν βρέθηκε ή δεν είναι διαθέσιμος.");
+      } else if (resource && !resource.isPublic && (!isAuthenticated || (user?.email !== resource.authorEmail))) {
+        setError("Αυτός ο πόρος είναι ιδιωτικός και δεν έχετε πρόσβαση σε αυτόν.");
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [resourceId, resource, isAuthenticated, user]);
   
   if (!resourceId) {
     return (
@@ -49,19 +71,41 @@ const ResourceViewer: React.FC = () => {
     );
   }
   
-  const resource = getResourceById(resourceId);
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8">
+        <Card className="text-center py-12">
+          <CardContent>
+            <div className="flex flex-col items-center space-y-4">
+              <div className="h-12 w-12 rounded-full border-4 border-t-blue-600 border-b-transparent border-l-transparent border-r-transparent animate-spin"></div>
+              <p className="text-lg">Φόρτωση πόρου...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   
-  if (!resource) {
+  if (error || !resource) {
     return (
       <div className="container mx-auto py-8">
         <Card>
           <CardHeader>
-            <CardTitle className="text-center">Πόρος Δεν Βρέθηκε</CardTitle>
-            <CardDescription className="text-center">
-              Ο πόρος που ζητήσατε δεν υπάρχει ή έχει αφαιρεθεί
+            <div className="flex justify-center mb-4">
+              {error?.includes("ιδιωτικός") ? (
+                <Lock className="h-16 w-16 text-orange-500" />
+              ) : (
+                <AlertTriangle className="h-16 w-16 text-red-500" />
+              )}
+            </div>
+            <CardTitle className="text-center text-xl">
+              {error?.includes("ιδιωτικός") ? "Περιορισμένη Πρόσβαση" : "Πόρος Δεν Βρέθηκε"}
+            </CardTitle>
+            <CardDescription className="text-center mt-2">
+              {error || "Ο πόρος που ζητήσατε δεν υπάρχει ή έχει αφαιρεθεί"}
             </CardDescription>
           </CardHeader>
-          <CardFooter className="flex justify-center">
+          <CardFooter className="flex justify-center pt-4">
             <Button onClick={() => navigate('/resources')}>
               Επιστροφή στους Πόρους
             </Button>
@@ -85,6 +129,7 @@ const ResourceViewer: React.FC = () => {
     const shareableLink = window.location.href;
     navigator.clipboard.writeText(shareableLink);
     setCopied(true);
+    toast.success("Ο σύνδεσμος αντιγράφηκε στο πρόχειρο");
     setTimeout(() => setCopied(false), 2000);
   };
   
@@ -171,6 +216,16 @@ const ResourceViewer: React.FC = () => {
   
   return (
     <div className="container mx-auto py-8 px-4">
+      {!resource.isPublic && (
+        <Alert className="mb-6 bg-amber-50 border-amber-200">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertTitle>Ιδιωτικός πόρος</AlertTitle>
+          <AlertDescription>
+            Αυτό το περιεχόμενο είναι ορατό μόνο σε εσάς ως δημιουργό του. Οι μαθητές και άλλοι εκπαιδευτικοί δεν μπορούν να το δουν.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <Card className="mb-6">
         <CardHeader>
           <div className="flex flex-col md:flex-row justify-between gap-4 items-start">

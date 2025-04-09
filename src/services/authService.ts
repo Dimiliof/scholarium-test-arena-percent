@@ -1,4 +1,3 @@
-
 import { User, RegisterData, LoginRecord } from "@/types/auth";
 
 // Διόρθωση του email του διαχειριστή κατά την εκκίνηση
@@ -14,7 +13,11 @@ export const fixAdminEmailOnStartup = (): void => {
       if (u.email === adminEmail) {
         needsUpdate = true;
         console.log(`Διόρθωση ρόλου για τον διαχειριστή ${adminEmail} από ${u.role} σε admin`);
-        return { ...u, role: "admin" as const };
+        return { 
+          ...u, 
+          role: "admin" as const,
+          roles: ["admin", "teacher"]
+        };
       }
       return u;
     });
@@ -29,6 +32,7 @@ export const fixAdminEmailOnStartup = (): void => {
         const parsedUser = JSON.parse(currentUser);
         if (parsedUser.email === adminEmail) {
           parsedUser.role = "admin";
+          parsedUser.roles = ["admin", "teacher"];
           localStorage.setItem("user", JSON.stringify(parsedUser));
           console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης-διαχειριστής");
         }
@@ -45,6 +49,7 @@ export const fixAdminEmailOnStartup = (): void => {
           email: adminEmail,
           password: "admin12345",
           role: "admin" as const,
+          roles: ["admin", "teacher"]
         };
         users.push(newAdmin);
         localStorage.setItem("users", JSON.stringify(users));
@@ -60,6 +65,7 @@ export const fixAdminEmailOnStartup = (): void => {
       email: adminEmail,
       password: "admin12345",
       role: "admin" as const,
+      roles: ["admin", "teacher"]
     };
     localStorage.setItem("users", JSON.stringify([newAdmin]));
     console.log("Δημιουργήθηκε αρχικός διαχειριστής:", newAdmin);
@@ -71,7 +77,7 @@ export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> =
   try {
     const storedUsers = localStorage.getItem("users");
     if (!storedUsers) {
-      // Αν δεν υπάρχουν χρήστες, δημιουργούμε νέο με διπλό ρόλο
+      // Αν δεν υπάρχουν χρήστες, τον δημιουργούμε
       const newUser = {
         id: Math.random().toString(36).substring(2, 15),
         firstName: "Διαχειριστής",
@@ -82,7 +88,19 @@ export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> =
         roles: ["admin", "teacher"],
       };
       localStorage.setItem("users", JSON.stringify([newUser]));
-      console.log("Δημιουργήθηκε χρήστης με διπλό ρόλο:", newUser);
+      console.log("Δημιουργήθηκε νέος χρήστης με διπλό ρόλο:", newUser);
+      
+      // Ενημερώνουμε τον τρέχοντα συνδεδεμένο χρήστη αν είναι ο ίδιος
+      const currentUser = localStorage.getItem("user");
+      if (currentUser) {
+        const parsedUser = JSON.parse(currentUser);
+        if (parsedUser.email === email) {
+          parsedUser.role = "admin";
+          parsedUser.roles = ["admin", "teacher"];
+          localStorage.setItem("user", JSON.stringify(parsedUser));
+        }
+      }
+      
       return true;
     }
     
@@ -120,6 +138,18 @@ export const makeUserTeacherAndAdmin = async (email: string): Promise<boolean> =
     localStorage.setItem("users", JSON.stringify(updatedUsers));
     console.log("Η λίστα χρηστών ενημερώθηκε επιτυχώς");
     
+    // Ενημερώνουμε τον τρέχοντα συνδεδεμένο χρήστη αν είναι ο ίδιος
+    const currentUser = localStorage.getItem("user");
+    if (currentUser) {
+      const parsedUser = JSON.parse(currentUser);
+      if (parsedUser.email === email) {
+        parsedUser.role = "admin";
+        parsedUser.roles = ["admin", "teacher"];
+        localStorage.setItem("user", JSON.stringify(parsedUser));
+        console.log("Ενημερώθηκε ο συνδεδεμένος χρήστης με διπλό ρόλο");
+      }
+    }
+    
     return true;
   } catch (error) {
     console.error("Σφάλμα κατά την ενημέρωση του ρόλου:", error);
@@ -134,6 +164,41 @@ export const loginUser = async (
   loginRecords: LoginRecord[],
   setLoginRecords: (records: LoginRecord[]) => void
 ): Promise<User | null> => {
+  // Ειδική περίπτωση για τον κύριο διαχειριστή
+  if (email === "liofisdimitris@gmail.com" && password === "Skatadi21!") {
+    console.log("Απευθείας σύνδεση για τον κύριο διαχειριστή");
+    
+    // Βεβαιωνόμαστε ότι υπάρχει ο χρήστης με τα σωστά δικαιώματα
+    await makeUserTeacherAndAdmin(email);
+    
+    const adminUser: User = {
+      id: "admin-special-id",
+      firstName: "Διαχειριστής",
+      lastName: "Συστήματος",
+      email: email,
+      role: "admin",
+      roles: ["admin", "teacher"]
+    };
+    
+    localStorage.setItem("user", JSON.stringify(adminUser));
+    
+    // Καταγραφή της σύνδεσης
+    const loginRecord: LoginRecord = {
+      userId: adminUser.id,
+      userName: `${adminUser.firstName} ${adminUser.lastName}`,
+      email: adminUser.email,
+      role: adminUser.role,
+      timestamp: Date.now()
+    };
+    
+    const updatedRecords = [...loginRecords, loginRecord];
+    setLoginRecords(updatedRecords);
+    localStorage.setItem("loginRecords", JSON.stringify(updatedRecords));
+    
+    return adminUser;
+  }
+  
+  // Κανονική διαδικασία σύνδεσης
   const storedUsers = localStorage.getItem("users");
   if (!storedUsers) return null;
 
@@ -144,6 +209,11 @@ export const loginUser = async (
     // Αφαιρούμε τον κωδικό πριν αποθηκεύσουμε τον χρήστη
     const userWithoutPassword = { ...user };
     delete userWithoutPassword.password;
+    
+    // Βεβαιωνόμαστε ότι έχει την ιδιότητα roles αν δεν την έχει
+    if (!userWithoutPassword.roles) {
+      userWithoutPassword.roles = [userWithoutPassword.role];
+    }
     
     localStorage.setItem("user", JSON.stringify(userWithoutPassword));
     

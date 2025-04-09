@@ -51,8 +51,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
       setIsAuthenticated(true);
-      setIsAdmin(parsedUser.role === "admin" || (parsedUser.roles && parsedUser.roles.includes("admin")));
-      setIsTeacher(parsedUser.role === "teacher" || (parsedUser.roles && parsedUser.roles.includes("teacher")));
+      
+      // Βελτιωμένος έλεγχος ρόλων για συνέπεια σε διαφορετικούς υπολογιστές
+      const isUserAdmin = parsedUser.role === "admin" || 
+                         (parsedUser.roles && parsedUser.roles.includes("admin")) ||
+                         parsedUser.email === "liofisdimitris@gmail.com";
+                         
+      const isUserTeacher = parsedUser.role === "teacher" || 
+                           (parsedUser.roles && parsedUser.roles.includes("teacher")) ||
+                           parsedUser.email === "liofisdimitris@gmail.com";
+      
+      setIsAdmin(isUserAdmin);
+      setIsTeacher(isUserTeacher);
+      
+      // Βεβαιωνόμαστε ότι ο κύριος διαχειριστής έχει πάντα όλα τα δικαιώματα
+      if (parsedUser.email === "liofisdimitris@gmail.com" && (!parsedUser.roles || !parsedUser.roles.includes("admin"))) {
+        console.log("Αυτόματη προσθήκη δικαιωμάτων διαχειριστή για τον κύριο λογαριασμό");
+        makeUserTeacherAndAdmin(parsedUser.email).then(success => {
+          if (success) {
+            console.log("Επιτυχής ενημέρωση δικαιωμάτων");
+          }
+        });
+      }
     }
     
     // Φόρτωση των καταγραφών σύνδεσης
@@ -60,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedRecords) {
       setLoginRecords(JSON.parse(storedRecords));
     }
-  }, [setIsAdmin, setIsTeacher]);
+  }, [setIsAdmin, setIsTeacher, makeUserTeacherAndAdmin]);
 
   const login = async (email: string, password: string) => {
     const loggedInUser = await loginUser(email, password, loginRecords, setLoginRecords);
@@ -69,9 +89,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(loggedInUser);
       setIsAuthenticated(true);
       
-      // Ελέγχουμε και για τους πολλαπλούς ρόλους
-      setIsAdmin(loggedInUser.role === "admin" || (loggedInUser.roles && loggedInUser.roles.includes("admin")));
-      setIsTeacher(loggedInUser.role === "teacher" || (loggedInUser.roles && loggedInUser.roles.includes("teacher")));
+      // Βελτιωμένος έλεγχος ρόλων
+      const isUserAdmin = loggedInUser.role === "admin" || 
+                         (loggedInUser.roles && loggedInUser.roles.includes("admin")) ||
+                         loggedInUser.email === "liofisdimitris@gmail.com";
+                         
+      const isUserTeacher = loggedInUser.role === "teacher" || 
+                           (loggedInUser.roles && loggedInUser.roles.includes("teacher")) ||
+                           loggedInUser.email === "liofisdimitris@gmail.com";
+      
+      setIsAdmin(isUserAdmin);
+      setIsTeacher(isUserTeacher);
+      
+      // Βεβαιωνόμαστε ότι ο κύριος διαχειριστής αποκτά τους σωστούς ρόλους
+      if (email === "liofisdimitris@gmail.com") {
+        makeUserTeacherAndAdmin(email);
+      }
       
       return true;
     }
@@ -84,11 +117,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    localStorage.removeItem("user");
     setUser(null);
     setIsAuthenticated(false);
     setIsAdmin(false);
     setIsTeacher(false);
-    localStorage.removeItem("user");
   };
   
   const changePassword = async (currentPassword: string, newPassword: string) => {

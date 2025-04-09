@@ -5,18 +5,23 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function UserMenu() {
   const { user, logout, isAuthenticated, isTeacher, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
 
   const handleLogout = () => {
     logout();
-    toast({
+    
+    // Διπλή ειδοποίηση για επιβεβαίωση αποσύνδεσης στον χρήστη
+    uiToast({
       title: "Αποσύνδεση",
       description: "Αποσυνδεθήκατε επιτυχώς από το σύστημα."
     });
+    
+    toast.success("Αποσυνδεθήκατε επιτυχώς");
     navigate("/");
   };
 
@@ -27,6 +32,34 @@ export default function UserMenu() {
   const handleRegister = () => {
     navigate("/register-type");
   };
+
+  // Εδώ προσθέτουμε κώδικα για σωστή εμφάνιση του dropdown μενού
+  const toggleDropdown = () => {
+    const dropdown = document.getElementById("userDropdown");
+    if (dropdown) {
+      dropdown.classList.toggle("hidden");
+    }
+  };
+
+  // Κλείνουμε το dropdown όταν κάνουμε κλικ έξω από αυτό
+  React.useEffect(() => {
+    const closeDropdown = (e: MouseEvent) => {
+      const dropdown = document.getElementById("userDropdown");
+      const button = document.querySelector("[data-dropdown-toggle='userDropdown']");
+      
+      if (dropdown && button && 
+          !dropdown.contains(e.target as Node) && 
+          !button.contains(e.target as Node)) {
+        dropdown.classList.add("hidden");
+      }
+    };
+    
+    document.addEventListener("click", closeDropdown);
+    
+    return () => {
+      document.removeEventListener("click", closeDropdown);
+    };
+  }, []);
 
   return (
     <div className="flex items-center gap-2">
@@ -40,10 +73,11 @@ export default function UserMenu() {
               variant="ghost"
               className="flex items-center gap-2 text-gray-700 hover:text-primary"
               data-dropdown-toggle="userDropdown"
+              onClick={toggleDropdown}
             >
               <UserCircle className="h-6 w-6" />
               <span className="hidden md:inline">
-                {user?.firstName || "Χρήστης"}
+                {user?.firstName || "ΔΗΜΗΤΡΗΣ"}
               </span>
             </Button>
             <div
@@ -57,6 +91,18 @@ export default function UserMenu() {
                 <p className="text-sm text-gray-500 truncate">
                   {user?.email}
                 </p>
+                <div className="flex gap-1 mt-1">
+                  {isAdmin && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                      Διαχειριστής
+                    </span>
+                  )}
+                  {isTeacher && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      Εκπαιδευτικός
+                    </span>
+                  )}
+                </div>
               </div>
               <ul>
                 <li>

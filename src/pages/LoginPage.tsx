@@ -92,8 +92,13 @@ const LoginPage = () => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const user = JSON.parse(storedUser);
-          const roleText = user.role === "admin" ? "Διαχειριστής" : 
-                         user.role === "teacher" ? "Εκπαιδευτικός" : "Μαθητής";
+          
+          // Διπλός έλεγχος για τα δικαιώματα
+          const isAdmin = user.role === "admin" || (user.roles && user.roles.includes("admin"));
+          const isTeacher = user.role === "teacher" || (user.roles && user.roles.includes("teacher"));
+          
+          const roleText = isAdmin ? "Διαχειριστής" : 
+                           isTeacher ? "Εκπαιδευτικός" : "Μαθητής";
           
           console.log(`Επιτυχής σύνδεση ως ${roleText} (${user.role})`);
           

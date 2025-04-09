@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import { useAuth } from "./contexts/AuthContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import LiveChatWidget from '@/components/chat/LiveChatWidget';
@@ -33,6 +34,7 @@ import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminLoginsPage from "./pages/admin/AdminLoginsPage";
 import ITSupportLoginPage from "./pages/ITSupportLoginPage";
 import ITSupportPage from "./pages/ITSupportPage";
+import NotificationSendPage from "./pages/teacher/NotificationSendPage";
 
 import CalculatorPage from "./pages/tools/CalculatorPage";
 import ConverterPage from "./pages/tools/ConverterPage";
@@ -115,60 +117,63 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/subject/:subjectId" element={<SubjectPage />} />
-            <Route path="/quiz/:subjectId/:quizType" element={<QuizPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register-type" element={<RegisterSelectionPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/teacher-register" element={<TeacherRegisterPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/school-registration" element={<SchoolRegistration />} />
-            <Route path="/it-support-login" element={<ITSupportLoginPage />} />
-            
-            <Route path="/forum/:subjectId" element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
-            <Route path="/forum/post/:postId" element={<ProtectedRoute><ForumPostPage /></ProtectedRoute>} />
-            
-            <Route path="/resources" element={<ResourcesPage />} />
-            
-            <Route path="/tools/calculator" element={<CalculatorPage />} />
-            <Route path="/tools/converter" element={<ConverterPage />} />
-            <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
-            <Route path="/tools/formulas" element={<FormulasPage />} />
-            
-            <Route path="/student/courses" element={<StudentRoute><StudentCoursesPage /></StudentRoute>} />
-            <Route path="/student/enroll" element={<StudentRoute><StudentEnrollPage /></StudentRoute>} />
-            <Route path="/student/results" element={<StudentRoute><StudentResultsPage /></StudentRoute>} />
-            
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/edit-profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
-            <Route path="/change-password" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
-            
-            <Route path="/add-content" element={<TeacherRoute><AddContentPage /></TeacherRoute>} />
-            <Route path="/teacher-dashboard" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
-            <Route path="/classroom/:classroomId" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
-            
-            <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
-            <Route path="/admin/logins" element={<AdminRoute><AdminLoginsPage /></AdminRoute>} />
-            <Route path="/it-support" element={<AdminRoute><ITSupportPage /></AdminRoute>} />
-            
-            <Route path="/ecdl-demo-embed" element={<EcdlEmbedPage />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-        
-        {/* Προσθήκη του LiveChatWidget σε καθολικό επίπεδο */}
-        <LiveChatWidget />
-      </TooltipProvider>
+      <NotificationProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/subject/:subjectId" element={<SubjectPage />} />
+              <Route path="/quiz/:subjectId/:quizType" element={<QuizPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register-type" element={<RegisterSelectionPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/teacher-register" element={<TeacherRegisterPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/school-registration" element={<SchoolRegistration />} />
+              <Route path="/it-support-login" element={<ITSupportLoginPage />} />
+              
+              <Route path="/forum/:subjectId" element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
+              <Route path="/forum/post/:postId" element={<ProtectedRoute><ForumPostPage /></ProtectedRoute>} />
+              
+              <Route path="/resources" element={<ResourcesPage />} />
+              
+              <Route path="/tools/calculator" element={<CalculatorPage />} />
+              <Route path="/tools/converter" element={<ConverterPage />} />
+              <Route path="/tools/periodic-table" element={<PeriodicTablePage />} />
+              <Route path="/tools/formulas" element={<FormulasPage />} />
+              
+              <Route path="/student/courses" element={<StudentRoute><StudentCoursesPage /></StudentRoute>} />
+              <Route path="/student/enroll" element={<StudentRoute><StudentEnrollPage /></StudentRoute>} />
+              <Route path="/student/results" element={<StudentRoute><StudentResultsPage /></StudentRoute>} />
+              
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/edit-profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
+              <Route path="/change-password" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
+              
+              <Route path="/add-content" element={<TeacherRoute><AddContentPage /></TeacherRoute>} />
+              <Route path="/teacher-dashboard" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
+              <Route path="/classroom/:classroomId" element={<TeacherRoute><TeacherDashboardPage /></TeacherRoute>} />
+              <Route path="/teacher/notifications" element={<TeacherRoute><NotificationSendPage /></TeacherRoute>} />
+              
+              <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+              <Route path="/admin/logins" element={<AdminRoute><AdminLoginsPage /></AdminRoute>} />
+              <Route path="/it-support" element={<AdminRoute><ITSupportPage /></AdminRoute>} />
+              
+              <Route path="/ecdl-demo-embed" element={<EcdlEmbedPage />} />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+          
+          {/* Προσθήκη του LiveChatWidget σε καθολικό επίπεδο */}
+          <LiveChatWidget />
+        </TooltipProvider>
+      </NotificationProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

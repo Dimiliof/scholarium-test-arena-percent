@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { 
   Table, 
   TableHeader, 

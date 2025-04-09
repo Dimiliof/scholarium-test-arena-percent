@@ -21,11 +21,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNotification } from '@/contexts/NotificationContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { subjects, QuizQuestion } from '@/lib/subjectsData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Search } from 'lucide-react';
+import { Bell, Search } from 'lucide-react';
 
 interface TeacherContent {
   id: number;
@@ -66,6 +67,7 @@ const TeacherDashboardPage: React.FC = () => {
   const [studentSearchQuery, setStudentSearchQuery] = useState('');
   const [selectedClassroom, setSelectedClassroom] = useState<string>('all');
   const { isAuthenticated, isTeacher, user } = useAuth();
+  const { unreadCount } = useNotification();
   const navigate = useNavigate();
 
   const subjectPerformanceData = [
@@ -328,6 +330,10 @@ const TeacherDashboardPage: React.FC = () => {
     return 'text-red-500';
   };
 
+  const handleNavigateToNotifications = () => {
+    navigate("/teacher/notifications");
+  };
+
   return (
     <div className="container mx-auto p-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -338,12 +344,28 @@ const TeacherDashboardPage: React.FC = () => {
           </p>
         </div>
         
-        <Avatar className="h-12 w-12">
-          <AvatarImage src={user?.email ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}` : ''} alt={user?.email || 'Προφίλ'} />
-          <AvatarFallback>
-            {user?.email?.charAt(0) || 'U'}
-          </AvatarFallback>
-        </Avatar>
+        <div className="flex items-center space-x-3">
+          <Button 
+            variant="outline" 
+            className="relative" 
+            onClick={handleNavigateToNotifications}
+          >
+            <Bell className="h-5 w-5 mr-2" />
+            Ειδοποιήσεις
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </Button>
+          
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={user?.email ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}` : ''} alt={user?.email || 'Προφίλ'} />
+            <AvatarFallback>
+              {user?.email?.charAt(0) || 'U'}
+            </AvatarFallback>
+          </Avatar>
+        </div>
       </div>
       
       <Tabs defaultValue="content" value={activeTab} onValueChange={setActiveTab}>
@@ -586,7 +608,7 @@ const TeacherDashboardPage: React.FC = () => {
                       <TableHead>Email</TableHead>
                       <TableHead>Τάξη</TableHead>
                       <TableHead>Επίδοση</TableHead>
-                      <TableHead>Τελευταία Είσοδος</TableHead>
+                      <TableHead>Τελευταίο Είσοδος</TableHead>
                       <TableHead>Ενέργειες</TableHead>
                     </TableRow>
                   </TableHeader>

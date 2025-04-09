@@ -21,7 +21,9 @@ const ITSupportLoginPage = () => {
 
   // Έλεγχος αν ο χρήστης είναι ήδη συνδεδεμένος και είναι διαχειριστής
   useEffect(() => {
+    console.log("ITSupportLoginPage - Auth State:", { isAuthenticated, isAdmin });
     if (isAuthenticated && isAdmin) {
+      console.log("User is already authenticated and is admin. Redirecting to IT Support");
       // Ανακατευθύνουμε απευθείας στο IT Support
       navigate("/it-support");
     }

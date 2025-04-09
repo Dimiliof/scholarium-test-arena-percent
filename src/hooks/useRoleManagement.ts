@@ -21,6 +21,8 @@ export const useRoleManagement = (user: User | null) => {
       
       setIsAdmin(isUserAdmin);
       setIsTeacher(isUserTeacher);
+      
+      console.log("Role Management Updated - Admin:", isUserAdmin, "Teacher:", isUserTeacher);
     } else {
       setIsAdmin(false);
       setIsTeacher(false);

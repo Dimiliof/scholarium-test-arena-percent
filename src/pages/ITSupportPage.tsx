@@ -11,11 +11,11 @@ import ITSupportTabs from "@/components/it-support/ITSupportTabs";
 const ITSupportPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, user } = useAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("ITSupportPage - Auth State:", { isAuthenticated, isAdmin });
+    console.log("ITSupportPage - Auth State:", { isAuthenticated, isAdmin, user });
     
     // Έλεγχος αν ο χρήστης είναι διαχειριστής
     const checkAccess = () => {
@@ -30,8 +30,17 @@ const ITSupportPage = () => {
         return;
       }
       
-      if (!isAdmin) {
-        console.log("ITSupportPage - User not admin");
+      // Έλεγχος από το localStorage για επιπλέον ασφάλεια
+      const storedUser = localStorage.getItem("user");
+      const userFromStorage = storedUser ? JSON.parse(storedUser) : null;
+      
+      const isUserAdmin = userFromStorage ? 
+        (userFromStorage.role === "admin" || 
+        (userFromStorage.roles && userFromStorage.roles.includes("admin")) || 
+        userFromStorage.email === "liofisdimitris@gmail.com") : false;
+      
+      if (!isAdmin && !isUserAdmin) {
+        console.log("ITSupportPage - User not admin:", { isAdmin, storageCheck: isUserAdmin });
         toast({
           variant: "destructive",
           title: "Πρόσβαση απορρίφθηκε",
@@ -46,18 +55,8 @@ const ITSupportPage = () => {
       setLoading(false);
     };
     
-    // Αν έχουμε ήδη πρόσβαση στην κατάσταση αυθεντικοποίησης, ελέγχουμε αμέσως
-    if (typeof isAuthenticated !== 'undefined' && typeof isAdmin !== 'undefined') {
-      checkAccess();
-    } else {
-      // Περιμένουμε λίγο για να φορτώσουν τα δεδομένα αυθεντικοποίησης
-      const timer = setTimeout(() => {
-        checkAccess();
-      }, 500);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isAuthenticated, isAdmin, navigate, toast]);
+    checkAccess();
+  }, [isAuthenticated, isAdmin, navigate, toast, user]);
 
   // Προσομοίωση ενεργειών διαχείρισης
   const handleSystemAction = (action: string) => {

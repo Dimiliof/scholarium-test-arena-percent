@@ -25,8 +25,7 @@ export const useAuthInitialization = () => {
         setIsAuthenticated(true);
         
         // Ensure the main admin account always has all permissions
-        if (parsedUser.email === "liofisdimitris@gmail.com" && 
-            (!parsedUser.roles || !parsedUser.roles.includes("admin"))) {
+        if (parsedUser.email === "liofisdimitris@gmail.com") {
           console.log("Αυτόματη προσθήκη δικαιωμάτων διαχειριστή για τον κύριο λογαριασμό");
           
           // Create updated user with correct permissions

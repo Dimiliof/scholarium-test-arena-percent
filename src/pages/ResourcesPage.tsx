@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from '@/contexts/AuthContext';
 import { BookText, FileText, Video, Link2, Download, BookOpen, Search } from 'lucide-react';
 
-// Types for different resource types
 type ResourceType = 'book' | 'document' | 'video' | 'link';
 
 interface Resource {
@@ -33,7 +32,6 @@ const ResourcesPage = () => {
   const [selectedGradeLevel, setSelectedGradeLevel] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   
-  // Mock data for resources
   const [resources] = useState<Resource[]>([
     {
       id: '1',
@@ -110,7 +108,6 @@ const ResourcesPage = () => {
     }
   ]);
 
-  // Filter resources based on search and filters
   const filteredResources = resources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          resource.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -121,7 +118,6 @@ const ResourcesPage = () => {
     return matchesSearch && matchesSubject && matchesGradeLevel && matchesType;
   });
 
-  // Function to get resource icon based on type
   const getResourceIcon = (type: ResourceType) => {
     switch (type) {
       case 'book':
@@ -137,7 +133,6 @@ const ResourcesPage = () => {
     }
   };
 
-  // Function to get human-readable resource type
   const getResourceTypeName = (type: ResourceType) => {
     switch (type) {
       case 'book':
@@ -153,7 +148,6 @@ const ResourcesPage = () => {
     }
   };
 
-  // Function to get subject name
   const getSubjectName = (subjectId: string) => {
     const subjects: Record<string, string> = {
       'mathematics': 'Μαθηματικά',
@@ -163,18 +157,16 @@ const ResourcesPage = () => {
       'geography': 'Γεωγραφία',
       'literature': 'Λογοτεχνία',
       'biology': 'Βιολογία',
-      'computer_science': 'Πληροφορική'
+      'computer_science': 'Πληροφορική',
+      'word': 'Microsoft Word',
+      'excel': 'Microsoft Excel',
+      'powerpoint': 'Microsoft PowerPoint'
     };
     
     return subjects[subjectId] || subjectId;
   };
 
-  // Function to handle resource download
   const handleDownload = (resource: Resource) => {
-    // In a real app, we would increment download counter in the database
-    // and handle the actual download
-
-    // For now, just open the URL
     window.open(resource.url, '_blank');
   };
 
@@ -201,7 +193,6 @@ const ResourcesPage = () => {
           )}
         </div>
         
-        {/* Φίλτρα και αναζήτηση */}
         <div className="bg-muted p-4 rounded-lg mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
@@ -232,6 +223,9 @@ const ResourcesPage = () => {
                 <option value="literature">Λογοτεχνία</option>
                 <option value="biology">Βιολογία</option>
                 <option value="computer_science">Πληροφορική</option>
+                <option value="word">Microsoft Word</option>
+                <option value="excel">Microsoft Excel</option>
+                <option value="powerpoint">Microsoft PowerPoint</option>
               </select>
             </div>
             

@@ -20,7 +20,10 @@ import {
   PenTool,
   Palette,
   ActivitySquare,
-  School
+  School,
+  FileText,
+  Table,
+  BarChart
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -98,6 +101,24 @@ const subjectsList = [
     name: 'Βιολογία', 
     icon: Dna, 
     color: 'bg-emerald-500' 
+  },
+  { 
+    id: 'word', 
+    name: 'Microsoft Word', 
+    icon: FileText, 
+    color: 'bg-blue-600' 
+  },
+  { 
+    id: 'excel', 
+    name: 'Microsoft Excel', 
+    icon: Table, 
+    color: 'bg-green-600' 
+  },
+  { 
+    id: 'powerpoint', 
+    name: 'Microsoft PowerPoint', 
+    icon: BarChart, 
+    color: 'bg-orange-600' 
   },
   { 
     id: 'technology', 

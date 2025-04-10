@@ -1,9 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Database, RefreshCcw, Shield } from "lucide-react";
+import { Database, RefreshCcw, Shield, ArrowUpDown, AlertCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 
 type DatabaseCardProps = {
   onAction: (action: string) => void;
@@ -15,15 +16,29 @@ const DatabaseCard = ({ onAction }: DatabaseCardProps) => {
   const [dbSize, setDbSize] = useState("124 MB");
   const [connections, setConnections] = useState(12);
   const [usagePercent, setUsagePercent] = useState(42);
+  const [showDetailedInfo, setShowDetailedInfo] = useState(false);
+  const [performanceIndex, setPerformanceIndex] = useState(78);
+
+  useEffect(() => {
+    // Simulate real-time connection changes
+    const connectionInterval = setInterval(() => {
+      setConnections(prev => Math.max(8, Math.min(20, prev + Math.floor(Math.random() * 3) - 1)));
+    }, 5000);
+
+    return () => clearInterval(connectionInterval);
+  }, []);
 
   const handleBackup = () => {
     setIsLoading(true);
     onAction("Δημιουργία backup");
     
+    toast.info("Δημιουργία αντιγράφου ασφαλείας σε εξέλιξη...");
+    
     // Simulate backup process
     setTimeout(() => {
       setLastBackupTime(`Σήμερα, ${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2, '0')}`);
       setIsLoading(false);
+      toast.success("Το αντίγραφο ασφαλείας δημιουργήθηκε με επιτυχία!");
     }, 2000);
   };
 
@@ -31,11 +46,16 @@ const DatabaseCard = ({ onAction }: DatabaseCardProps) => {
     setIsLoading(true);
     onAction("Βελτιστοποίηση βάσης");
     
+    toast.info("Βελτιστοποίηση βάσης δεδομένων σε εξέλιξη...");
+    
     // Simulate optimization process
     setTimeout(() => {
-      setDbSize(`${(parseInt(dbSize) - 8)} MB`);
+      const newSize = parseInt(dbSize) - 8;
+      setDbSize(`${newSize} MB`);
       setUsagePercent(Math.max(usagePercent - 5, 10));
+      setPerformanceIndex(Math.min(performanceIndex + 7, 95));
       setIsLoading(false);
+      toast.success("Η βάση δεδομένων βελτιστοποιήθηκε με επιτυχία!");
     }, 3000);
   };
 
@@ -43,15 +63,25 @@ const DatabaseCard = ({ onAction }: DatabaseCardProps) => {
     setIsLoading(true);
     onAction("Έλεγχος ασφάλειας βάσης");
     
+    toast.info("Έλεγχος ασφάλειας σε εξέλιξη...");
+    
     // Simulate security check
     setTimeout(() => {
       setIsLoading(false);
+      toast.success("Ο έλεγχος ασφάλειας ολοκληρώθηκε με επιτυχία", {
+        description: "Δεν βρέθηκαν προβλήματα ασφαλείας",
+        icon: <Shield className="h-4 w-4 text-green-500" />
+      });
       onAction("Ο έλεγχος ασφάλειας ολοκληρώθηκε με επιτυχία");
     }, 2500);
   };
 
+  const toggleDetailedInfo = () => {
+    setShowDetailedInfo(!showDetailedInfo);
+  };
+
   return (
-    <Card>
+    <Card className="transition-all duration-300 hover:shadow-md">
       <CardHeader>
         <CardTitle className="flex items-center">
           <Database className="h-5 w-5 mr-2 text-primary" />
@@ -64,9 +94,15 @@ const DatabaseCard = ({ onAction }: DatabaseCardProps) => {
           <div>
             <div className="flex items-center justify-between mb-1">
               <span>Χρήση αποθηκευτικού χώρου:</span>
-              <span className="font-medium">{usagePercent}%</span>
+              <span className={`font-medium ${usagePercent > 80 ? 'text-red-500' : usagePercent > 60 ? 'text-amber-500' : 'text-green-600'}`}>
+                {usagePercent}%
+              </span>
             </div>
-            <Progress value={usagePercent} className="h-2" />
+            <Progress 
+              value={usagePercent} 
+              className="h-2"
+              color={usagePercent > 80 ? 'bg-red-500' : usagePercent > 60 ? 'bg-amber-500' : ''} 
+            />
           </div>
           
           <div className="flex items-center justify-between">
@@ -81,12 +117,51 @@ const DatabaseCard = ({ onAction }: DatabaseCardProps) => {
           
           <div className="flex items-center justify-between">
             <span>Συνδέσεις:</span>
-            <span className="font-medium">{connections} ενεργές</span>
+            <span className={`font-medium ${connections > 15 ? 'text-amber-500' : ''}`}>
+              {connections} ενεργές
+            </span>
           </div>
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={toggleDetailedInfo} 
+            className="w-full mt-2 flex items-center justify-center text-sm" 
+            disabled={isLoading}
+          >
+            <ArrowUpDown className="h-4 w-4 mr-2" />
+            {showDetailedInfo ? "Λιγότερες πληροφορίες" : "Περισσότερες πληροφορίες"}
+          </Button>
+          
+          {showDetailedInfo && (
+            <div className="pt-2 space-y-3 animate-fade-in border-t mt-2">
+              <div className="flex items-center justify-between">
+                <span>Δείκτης Απόδοσης:</span>
+                <span className={`font-medium ${performanceIndex < 60 ? 'text-red-500' : performanceIndex < 75 ? 'text-amber-500' : 'text-green-600'}`}>
+                  {performanceIndex}/100
+                </span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span>Κατάσταση Σύνδεσης:</span>
+                <span className="font-medium text-green-600">Ενεργή</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span>Τύπος Βάσης:</span>
+                <span className="font-medium">PostgreSQL</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span>Έκδοση:</span>
+                <span className="font-medium">14.5</span>
+              </div>
+            </div>
+          )}
         </div>
         
         {isLoading && (
-          <div className="mt-4 bg-blue-50 text-blue-700 p-2 rounded text-center text-sm">
+          <div className="mt-4 bg-blue-50 text-blue-700 p-2 rounded text-center text-sm animate-pulse">
             Η λειτουργία εκτελείται, παρακαλώ περιμένετε...
           </div>
         )}

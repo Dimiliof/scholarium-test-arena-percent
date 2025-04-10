@@ -239,7 +239,7 @@ const RegisterPage = () => {
               <div className="mt-4 text-center text-sm">
                 <p>
                   Είστε εκπαιδευτικός;{" "}
-                  <Link to="/teacher-register" className="text-primary hover:underline">
+                  <Link to="/register/teacher" className="text-primary hover:underline">
                     Εγγραφή ως εκπαιδευτικός
                   </Link>
                 </p>

@@ -22,7 +22,7 @@ const RegisterSelectionPage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link to="/register" className="block">
+            <Link to="/register/student" className="block">
               <Card className="h-full transition-all border-2 hover:border-green-500 hover:shadow-lg">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
@@ -57,7 +57,7 @@ const RegisterSelectionPage = () => {
               </Card>
             </Link>
             
-            <Link to="/teacher-register" className="block">
+            <Link to="/register/teacher" className="block">
               <Card className="h-full transition-all border-2 hover:border-blue-500 hover:shadow-lg">
                 <CardHeader>
                   <div className="flex justify-center mb-4">

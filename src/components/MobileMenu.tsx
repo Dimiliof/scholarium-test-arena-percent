@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Menu, School, BookOpen, BookText, FileText, Video, Link2 } from 'lucide-react';
+import { Menu, School, BookOpen, BookText, FileText, Video, Link2, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const MobileMenu = () => {
@@ -127,12 +126,18 @@ const MobileMenu = () => {
               </Link>
             )}
             
+            {/* IT Support Link */}
+            <Link to="/it-support-login" className="text-lg font-medium hover:text-primary flex items-center">
+              <Wrench className="h-5 w-5 mr-2 text-primary" />
+              IT Support
+            </Link>
+            
             {!isAuthenticated && (
               <div className="pt-4 space-y-2 border-t border-gray-200">
                 <Link to="/login" className="block">
                   <Button variant="outline" className="w-full">Σύνδεση</Button>
                 </Link>
-                <Link to="/register-type" className="block">
+                <Link to="/register" className="block">
                   <Button className="w-full">Εγγραφή</Button>
                 </Link>
               </div>

@@ -71,7 +71,7 @@ function App() {
         <Route path="/forum/post/:postId" element={<ForumPostPage />} />
         <Route path="/ecdl" element={<EcdlEmbedPage />} />
         <Route path="/it-support" element={<ITSupportPage />} />
-        <Route path="/it-support/login" element={<ITSupportLoginPage />} />
+        <Route path="/it-support-login" element={<ITSupportLoginPage />} />
         <Route path="/admin/users" element={<AdminUsersPage />} />
         <Route path="/admin/logins" element={<AdminLoginsPage />} />
         <Route path="/teacher-dashboard" element={<TeacherDashboardPage />} />

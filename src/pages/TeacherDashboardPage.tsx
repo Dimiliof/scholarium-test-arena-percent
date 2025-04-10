@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,7 +12,6 @@ import ResourceResponsesTab from '@/components/teacher-dashboard/ResourceRespons
 import PlaceholderTab from '@/components/teacher-dashboard/PlaceholderTab';
 
 const TeacherDashboardPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('content');
   const { isAuthenticated, isTeacher, user } = useAuth();
   const navigate = useNavigate();
   
@@ -21,9 +20,13 @@ const TeacherDashboardPage: React.FC = () => {
     isLoading, 
     searchQuery, 
     selectedSubject, 
+    activeTab,
     loadTeacherContent, 
     setSearchQuery, 
-    setSelectedSubject 
+    setSelectedSubject,
+    setActiveTab,
+    refreshContent,
+    formatDate
   } = useTeacherContent();
   
   const { classrooms, setClassrooms, loadClassrooms } = useTeacherClassrooms();
@@ -57,12 +60,12 @@ const TeacherDashboardPage: React.FC = () => {
       </div>
       
       <Tabs defaultValue="content" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="content">Περιεχόμενο</TabsTrigger>
-          <TabsTrigger value="responses">Απαντήσεις</TabsTrigger>
-          <TabsTrigger value="classes">Τάξεις</TabsTrigger>
-          <TabsTrigger value="students">Μαθητές</TabsTrigger>
-          <TabsTrigger value="stats">Στατιστικά</TabsTrigger>
+        <TabsList className="w-full bg-card border rounded-lg p-1 mb-6">
+          <TabsTrigger value="content" className="flex-1">Περιεχόμενο</TabsTrigger>
+          <TabsTrigger value="responses" className="flex-1">Απαντήσεις</TabsTrigger>
+          <TabsTrigger value="classes" className="flex-1">Τάξεις</TabsTrigger>
+          <TabsTrigger value="students" className="flex-1">Μαθητές</TabsTrigger>
+          <TabsTrigger value="stats" className="flex-1">Στατιστικά</TabsTrigger>
         </TabsList>
         
         <TabsContent value="content">
@@ -73,6 +76,8 @@ const TeacherDashboardPage: React.FC = () => {
             selectedSubject={selectedSubject}
             setSearchQuery={setSearchQuery}
             setSelectedSubject={setSelectedSubject}
+            refreshContent={refreshContent}
+            formatDate={formatDate}
           />
         </TabsContent>
         

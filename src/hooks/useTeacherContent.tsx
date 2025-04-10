@@ -16,6 +16,7 @@ export const useTeacherContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState('content');
 
   const loadTeacherContent = () => {
     setIsLoading(true);
@@ -70,14 +71,40 @@ export const useTeacherContent = () => {
     toast.success("Το περιεχόμενο ανανεώθηκε");
   };
 
+  // Μορφοποίηση της ημερομηνίας σε ελληνική μορφή DD/MM/YYYY
+  const formatDate = (date: string) => {
+    if (!date) return '';
+    
+    try {
+      const parts = date.split('/');
+      if (parts.length === 3) {
+        return `${parts[0]}/${parts[1]}/${parts[2]}`;
+      }
+      
+      // Αν δεν είναι ήδη στη μορφή DD/MM/YYYY, προσπαθούμε να το μετατρέψουμε
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) {
+        return date;
+      }
+      
+      return dateObj.toLocaleDateString('el-GR');
+    } catch (error) {
+      console.error("Σφάλμα κατά τη μορφοποίηση της ημερομηνίας:", error);
+      return date;
+    }
+  };
+
   return {
     content,
     isLoading,
     searchQuery,
     selectedSubject,
+    activeTab,
     loadTeacherContent,
     refreshContent,
     setSearchQuery,
-    setSelectedSubject
+    setSelectedSubject,
+    setActiveTab,
+    formatDate
   };
 };

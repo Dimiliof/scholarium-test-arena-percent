@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
+import { Settings, Trash2 } from 'lucide-react';
 
 interface ClassData {
   id: string;
@@ -46,6 +47,10 @@ const ClassroomTable: React.FC<ClassroomTableProps> = ({
     );
   }
   
+  const handleManageClass = (classId: string) => {
+    navigate(`/classroom/${classId}`);
+  };
+  
   return (
     <Table>
       <TableHeader>
@@ -67,8 +72,9 @@ const ClassroomTable: React.FC<ClassroomTableProps> = ({
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => navigate(`/classroom/${classroom.id}`)}
+                  onClick={() => handleManageClass(classroom.id)}
                 >
+                  <Settings className="h-4 w-4 mr-1" />
                   Διαχείριση
                 </Button>
                 <Button 
@@ -76,6 +82,7 @@ const ClassroomTable: React.FC<ClassroomTableProps> = ({
                   size="sm"
                   onClick={() => onDeleteClass(classroom.id)}
                 >
+                  <Trash2 className="h-4 w-4 mr-1" />
                   Διαγραφή
                 </Button>
               </div>

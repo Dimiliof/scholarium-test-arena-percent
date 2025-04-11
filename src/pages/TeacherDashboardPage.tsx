@@ -29,7 +29,13 @@ const TeacherDashboardPage: React.FC = () => {
     formatDate
   } = useTeacherContent();
   
-  const { classrooms, setClassrooms, loadClassrooms } = useTeacherClassrooms();
+  const { 
+    classrooms, 
+    setClassrooms, 
+    loadClassrooms,
+    createClassroom,
+    deleteClassroom
+  } = useTeacherClassrooms();
 
   useEffect(() => {
     if (!isAuthenticated || !isTeacher) {
@@ -39,7 +45,7 @@ const TeacherDashboardPage: React.FC = () => {
 
     loadTeacherContent();
     loadClassrooms();
-  }, [isAuthenticated, isTeacher, navigate]);
+  }, [isAuthenticated, isTeacher, navigate, loadTeacherContent, loadClassrooms]);
 
   return (
     <div className="container mx-auto p-4 py-8">
@@ -89,6 +95,8 @@ const TeacherDashboardPage: React.FC = () => {
           <ClassesTab 
             classrooms={classrooms}
             setClassrooms={setClassrooms}
+            createClassroom={createClassroom}
+            deleteClassroom={deleteClassroom}
           />
         </TabsContent>
         

@@ -10,51 +10,30 @@ import {
 } from '@/components/ui/card';
 import { toast } from 'sonner';
 import ClassroomTable from './ClassroomTable';
-
-interface ClassData {
-  id: string;
-  name: string;
-  gradeLevel: string;
-  studentsCount: number;
-  createdAt: string;
-}
+import { ClassData } from '@/hooks/useTeacherClassrooms';
+import { PlusCircle } from 'lucide-react';
+import GradeLevelSelect from '../resources/form/GradeLevelSelect';
 
 interface ClassesTabProps {
   classrooms: ClassData[];
   setClassrooms: React.Dispatch<React.SetStateAction<ClassData[]>>;
+  createClassroom: (name: string, gradeLevel: string) => boolean;
+  deleteClassroom: (classId: string) => boolean;
 }
 
-const ClassesTab: React.FC<ClassesTabProps> = ({ classrooms, setClassrooms }) => {
+const ClassesTab: React.FC<ClassesTabProps> = ({ 
+  classrooms, 
+  setClassrooms,
+  createClassroom,
+  deleteClassroom
+}) => {
   const [newClassName, setNewClassName] = useState('');
   const [newClassGrade, setNewClassGrade] = useState('Α Γυμνασίου');
 
   const handleCreateClass = () => {
-    if (!newClassName.trim()) {
-      toast.error('Παρακαλώ εισάγετε όνομα τάξης');
-      return;
+    if (createClassroom(newClassName, newClassGrade)) {
+      setNewClassName('');
     }
-
-    const newClass: ClassData = {
-      id: Date.now().toString(),
-      name: newClassName,
-      gradeLevel: newClassGrade,
-      studentsCount: 0,
-      createdAt: new Date().toISOString()
-    };
-
-    const updatedClassrooms = [...classrooms, newClass];
-    setClassrooms(updatedClassrooms);
-    localStorage.setItem('teacher_classrooms', JSON.stringify(updatedClassrooms));
-    
-    setNewClassName('');
-    toast.success('Η τάξη δημιουργήθηκε με επιτυχία');
-  };
-
-  const handleDeleteClass = (classId: string) => {
-    const updatedClassrooms = classrooms.filter(c => c.id !== classId);
-    setClassrooms(updatedClassrooms);
-    localStorage.setItem('teacher_classrooms', JSON.stringify(updatedClassrooms));
-    toast.success('Η τάξη διαγράφηκε με επιτυχία');
   };
 
   return (
@@ -99,6 +78,7 @@ const ClassesTab: React.FC<ClassesTabProps> = ({ classrooms, setClassrooms }) =>
               </div>
               <div className="flex items-end">
                 <Button onClick={handleCreateClass} className="w-full">
+                  <PlusCircle className="h-4 w-4 mr-2" />
                   Δημιουργία Τάξης
                 </Button>
               </div>
@@ -115,7 +95,7 @@ const ClassesTab: React.FC<ClassesTabProps> = ({ classrooms, setClassrooms }) =>
                 <ClassroomTable 
                   classrooms={classrooms} 
                   gradeLevel="Α Γυμνασίου" 
-                  onDeleteClass={handleDeleteClass} 
+                  onDeleteClass={deleteClassroom} 
                 />
               </div>
               
@@ -124,7 +104,7 @@ const ClassesTab: React.FC<ClassesTabProps> = ({ classrooms, setClassrooms }) =>
                 <ClassroomTable 
                   classrooms={classrooms} 
                   gradeLevel="Β Γυμνασίου" 
-                  onDeleteClass={handleDeleteClass} 
+                  onDeleteClass={deleteClassroom} 
                 />
               </div>
               
@@ -133,7 +113,7 @@ const ClassesTab: React.FC<ClassesTabProps> = ({ classrooms, setClassrooms }) =>
                 <ClassroomTable 
                   classrooms={classrooms} 
                   gradeLevel="Γ Γυμνασίου" 
-                  onDeleteClass={handleDeleteClass} 
+                  onDeleteClass={deleteClassroom} 
                 />
               </div>
             </div>
@@ -149,7 +129,7 @@ const ClassesTab: React.FC<ClassesTabProps> = ({ classrooms, setClassrooms }) =>
                 <ClassroomTable 
                   classrooms={classrooms} 
                   gradeLevel="Α Λυκείου" 
-                  onDeleteClass={handleDeleteClass} 
+                  onDeleteClass={deleteClassroom} 
                 />
               </div>
               
@@ -158,7 +138,7 @@ const ClassesTab: React.FC<ClassesTabProps> = ({ classrooms, setClassrooms }) =>
                 <ClassroomTable 
                   classrooms={classrooms} 
                   gradeLevel="Β Λυκείου" 
-                  onDeleteClass={handleDeleteClass} 
+                  onDeleteClass={deleteClassroom} 
                 />
               </div>
               
@@ -167,7 +147,7 @@ const ClassesTab: React.FC<ClassesTabProps> = ({ classrooms, setClassrooms }) =>
                 <ClassroomTable 
                   classrooms={classrooms} 
                   gradeLevel="Γ Λυκείου" 
-                  onDeleteClass={handleDeleteClass} 
+                  onDeleteClass={deleteClassroom} 
                 />
               </div>
             </div>

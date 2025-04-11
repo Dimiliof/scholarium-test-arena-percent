@@ -25,6 +25,7 @@ import ITSupportLoginPage from './pages/ITSupportLoginPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminLoginsPage from './pages/admin/AdminLoginsPage';
 import TeacherDashboardPage from './pages/TeacherDashboardPage';
+import ClassroomManagementPage from './pages/ClassroomManagementPage';
 import AddContentPage from './pages/AddContentPage';
 import ResourcesPage from './pages/ResourcesPage';
 import ResourceViewPage from './pages/ResourceViewPage';
@@ -78,6 +79,7 @@ function App() {
         <Route path="/add-content" element={<AddContentPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/resources/:resourceId" element={<ResourceViewPage />} />
+        <Route path="/classroom/:classroomId" element={<ClassroomManagementPage />} />
 
         {/* Σελίδες μαθητή */}
         <Route path="/student/courses" element={<StudentCoursesPage />} />

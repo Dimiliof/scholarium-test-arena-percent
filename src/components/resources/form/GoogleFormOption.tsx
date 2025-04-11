@@ -1,7 +1,8 @@
 
 import React from 'react';
+import { AlertCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Alert, AlertCircle, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface GoogleFormOptionProps {
   useGoogleForm: boolean;

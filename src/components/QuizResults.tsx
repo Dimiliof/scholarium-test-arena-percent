@@ -1,31 +1,38 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { QuizQuestion, Subject } from "@/lib/subjectsData";
+import { QuizQuestion, subjects, Subject } from "@/lib/subjectsData";
 import { Check, X, RotateCcw, Printer } from "lucide-react";
-import { usePrintResults } from "@/hooks/usePrintResults";
 
 interface QuizResultsProps {
   questions: QuizQuestion[];
-  userAnswers: number[];  // Changed to number[] to match type
-  subject: Subject;
-  quizType: string;
-  onRetry: () => void;
+  userAnswers: number[];
+  score: number;
+  onRestart: () => void;
+  onPrint: () => void;
+  subject?: Subject;
+  quizType?: string;
 }
 
-const QuizResults = ({ questions, userAnswers, subject, quizType, onRetry }: QuizResultsProps) => {
+const QuizResults = ({ 
+  questions, 
+  userAnswers, 
+  score, 
+  onRestart, 
+  onPrint, 
+  subject, 
+  quizType 
+}: QuizResultsProps) => {
   const correctAnswers = userAnswers.filter((answer, index) => 
     answer === questions[index].correctAnswer
   ).length;
   
-  const percentage = Math.round((correctAnswers / questions.length) * 100);
-  
   const getGrade = () => {
-    if (percentage >= 90) return { grade: "Άριστα", color: "text-green-600" };
-    if (percentage >= 80) return { grade: "Πολύ καλά", color: "text-green-500" };
-    if (percentage >= 70) return { grade: "Καλά", color: "text-blue-500" };
-    if (percentage >= 60) return { grade: "Μέτρια", color: "text-yellow-500" };
-    if (percentage >= 50) return { grade: "Επαρκώς", color: "text-orange-500" };
+    if (score >= 90) return { grade: "Άριστα", color: "text-green-600" };
+    if (score >= 80) return { grade: "Πολύ καλά", color: "text-green-500" };
+    if (score >= 70) return { grade: "Καλά", color: "text-blue-500" };
+    if (score >= 60) return { grade: "Μέτρια", color: "text-yellow-500" };
+    if (score >= 50) return { grade: "Επαρκώς", color: "text-orange-500" };
     return { grade: "Ανεπαρκώς", color: "text-red-500" };
   };
   
@@ -42,25 +49,26 @@ const QuizResults = ({ questions, userAnswers, subject, quizType, onRetry }: Qui
     });
   };
   
-  const { componentRef, handlePrint } = usePrintResults();
+  const subjectName = subject ? subject.name : "Μάθημα";
+  const quizTypeName = quizType || "Κουίζ";
   
   return (
     <div className="container mx-auto max-w-4xl px-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Αποτελέσματα {quizType}</h1>
+        <h1 className="text-2xl font-bold">Αποτελέσματα {quizTypeName}</h1>
         <Button 
           variant="outline" 
           className="flex items-center gap-2"
-          onClick={handlePrint}
+          onClick={onPrint}
         >
           <Printer className="h-4 w-4" />
           Εκτύπωση
         </Button>
       </div>
       
-      <div ref={componentRef} className="print-container">
+      <div className="print-container">
         <div className="print-header">
-          <h1 className="text-2xl font-bold">{subject.name} - {quizType}</h1>
+          <h1 className="text-2xl font-bold">{subjectName} - {quizTypeName}</h1>
           <p className="text-gray-500">Ημερομηνία: {getCurrentDate()}</p>
         </div>
         
@@ -77,7 +85,7 @@ const QuizResults = ({ questions, userAnswers, subject, quizType, onRetry }: Qui
             </div>
             <div className="mb-4">
               <span className={`text-4xl font-bold ${color}`}>
-                {percentage}%
+                {score}%
               </span>
               <p className={`${color} font-medium`}>{grade}</p>
             </div>
@@ -135,7 +143,7 @@ const QuizResults = ({ questions, userAnswers, subject, quizType, onRetry }: Qui
       </div>
       
       <div className="flex justify-center mt-8 no-print">
-        <Button onClick={onRetry} className="flex items-center gap-2">
+        <Button onClick={onRestart} className="flex items-center gap-2">
           <RotateCcw className="h-4 w-4" />
           Επανάληψη
         </Button>

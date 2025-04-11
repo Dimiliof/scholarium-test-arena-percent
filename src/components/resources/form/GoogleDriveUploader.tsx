@@ -24,9 +24,9 @@ const GoogleDriveUploader: React.FC<GoogleDriveUploaderProps> = ({ onFileSelecte
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [gapiLoaded, setGapiLoaded] = useState(false);
 
-  // Το Google API Client ID (από το Google Cloud Console)
-  const CLIENT_ID = 'YOUR_CLIENT_ID_HERE';
-  const API_KEY = 'YOUR_API_KEY_HERE';
+  // Αντικαταστήστε με τα δικά σας κλειδιά από το Google Cloud Console
+  const CLIENT_ID = '123456789012-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com';
+  const API_KEY = 'AIza0123456789-ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   
   // Τα scopes που χρειαζόμαστε
   const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly';

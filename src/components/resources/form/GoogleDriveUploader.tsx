@@ -11,6 +11,7 @@ declare global {
     gapi: any;
     google: any;
     googleDriveLoaded: boolean;
+    handleApiLoad?: () => void;
   }
 }
 
@@ -157,15 +158,15 @@ const GoogleDriveUploader: React.FC<GoogleDriveUploaderProps> = ({ onFileSelecte
   // Φόρτωση του Google Picker API
   const loadPickerAPI = () => {
     if (!window.google || !window.google.picker) {
-      const script = document.createElement('script');
-      script.src = 'https://apis.google.com/js/api.js?onload=onApiLoad';
-      script.async = true;
-      script.defer = true;
-      
-      window.onApiLoad = () => {
+      // Δημιουργία μιας καθολικής συνάρτησης χειρισμού για την απόκριση του API
+      window.handleApiLoad = () => {
         window.gapi.load('picker', { callback: () => {} });
       };
       
+      const script = document.createElement('script');
+      script.src = 'https://apis.google.com/js/api.js?onload=handleApiLoad';
+      script.async = true;
+      script.defer = true;
       document.body.appendChild(script);
     }
   };

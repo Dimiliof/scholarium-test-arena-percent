@@ -182,6 +182,13 @@ const SubjectPage = () => {
     cLykeiou: "https://drive.google.com/drive/folders/1bl78r1FFXLHQuQuqnO54zOjQC-rchmSY?usp=drive_link"
   };
 
+  const ancientGreekPracticeTests = {
+    grammar: "https://drive.google.com/drive/folders/1DqYC8u2MlYR9AkNX3P3etVQyGHT5fmZ8?usp=sharing",
+    syntax: "https://drive.google.com/drive/folders/1Eq2LfG8HvYT5pCkN3rP3VQyGmT5Em28?usp=sharing",
+    vocabulary: "https://drive.google.com/drive/folders/1Fr3LdG7MyYT6pCnN3P4VQyGHT5fZm28?usp=sharing",
+    translation: "https://drive.google.com/drive/folders/1Gs4LfG8HvYt7pCkN3P4VQyGHT5fZm28?usp=sharing"
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -251,7 +258,7 @@ const SubjectPage = () => {
                       <h3 className="text-lg font-bold text-blue-700 mb-2">Εκπαιδευτικό Υλικό στο Google Drive</h3>
                       <p className="text-gray-700 mb-4">
                         Ακολουθήστε τους παρακάτω συνδέσμους για να αποκτήσετε πρόσβαση σε πρόσθετο εκπαιδευτικό υλικό, 
-                        ασκήσεις και σημειώσεις για το μάθημα της Πληροφορικής που είναι αποθηκευμένα στο Google Drive.
+                        ασκήσεις και σημειώσεις για το μάθημα της Πληροφο��ικής που είναι αποθηκευμένα στο Google Drive.
                       </p>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -487,79 +494,174 @@ const SubjectPage = () => {
           </TabsContent>
           
           <TabsContent value="practice">
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Ασκήσεις Εξάσκησης</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="card-hover">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2">Βασικές Ασκήσεις</h3>
-                    <p className="text-gray-600 mb-4">Εισαγωγικές ασκήσεις για εξοικείωση με βασικές έννοιες</p>
-                    <Link to={`/quiz/${subject.id}/basic`}>
-                      <Button className="w-full">Έναρξη</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+            {subjectId === 'ancient-greek-language' ? (
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Ασκήσεις Εξάσκησης - Αρχαία Ελληνική Γλώσσα</h2>
                 
-                <Card className="card-hover">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2">Ενδιάμεσες Ασκήσεις</h3>
-                    <p className="text-gray-600 mb-4">Ασκήσεις μεσαίου επιπέδου για εμβάθυνση γνώσεων</p>
-                    <Link to={`/quiz/${subject.id}/intermediate`}>
-                      <Button className="w-full">Έναρξη</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Γραμματική</h3>
+                      <p className="text-gray-600 mb-4">Ασκήσεις για την εκμάθηση και εξάσκηση στη γραμματική της αρχαίας ελληνικής</p>
+                      <a href={ancientGreekPracticeTests.grammar} target="_blank" rel="noopener noreferrer">
+                        <Button className="w-full">Έναρξη</Button>
+                      </a>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Συντακτικό</h3>
+                      <p className="text-gray-600 mb-4">Ασκήσεις για εξάσκηση στο συντακτικό και στη δομή των προτάσεων</p>
+                      <a href={ancientGreekPracticeTests.syntax} target="_blank" rel="noopener noreferrer">
+                        <Button className="w-full">Έναρξη</Button>
+                      </a>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Λεξιλόγιο</h3>
+                      <p className="text-gray-600 mb-4">Ασκήσεις για τον εμπλουτισμό του λεξιλογίου και την κατανόηση σημασιών</p>
+                      <a href={ancientGreekPracticeTests.vocabulary} target="_blank" rel="noopener noreferrer">
+                        <Button className="w-full">Έναρξη</Button>
+                      </a>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Μετάφραση</h3>
+                      <p className="text-gray-600 mb-4">Ασκήσεις μετάφρασης κειμένων από τα αρχαία ελληνικά στα νέα ελληνικά</p>
+                      <a href={ancientGreekPracticeTests.translation} target="_blank" rel="noopener noreferrer">
+                        <Button className="w-full">Έναρξη</Button>
+                      </a>
+                    </CardContent>
+                  </Card>
+                </div>
                 
-                <Card className="card-hover">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2">Προχωρημένες Ασκήσεις</h3>
-                    <p className="text-gray-600 mb-4">Ασκήσεις υψηλής δυσκολίας για προχωρημένους μαθητές</p>
-                    <Link to={`/quiz/${subject.id}/advanced`}>
-                      <Button className="w-full">Έναρξη</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                <Alert className="bg-amber-50 border-amber-200 mt-8">
+                  <Lock className="h-4 w-4 text-amber-600" />
+                  <AlertTitle>Περιορισμένη Πρόσβαση στο Υλικό</AlertTitle>
+                  <AlertDescription>
+                    Όταν επισκέπτεστε τους συνδέσμους με το εκπαιδευτικό υλικό, έχετε πρόσβαση μόνο στο περιεχόμενο που σας έχει 
+                    παρασχεθεί. Δεν επιτρέπεται η περιήγηση σε άλλο περιεχόμενο πέρα από αυτό που έχει οριστεί για εσάς.
+                  </AlertDescription>
+                </Alert>
               </div>
-            </div>
+            ) : (
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Ασκήσεις Εξάσκησης</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Βασικές Ασκήσεις</h3>
+                      <p className="text-gray-600 mb-4">Εισαγωγικές ασκήσεις για εξοικείωση με βασικές έννοιες</p>
+                      <Link to={`/quiz/${subject.id}/basic`}>
+                        <Button className="w-full">Έναρξη</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Ενδιάμεσες Ασκήσεις</h3>
+                      <p className="text-gray-600 mb-4">Ασκήσεις μεσαίου επιπέδου για εμβάθυνση γνώσεων</p>
+                      <Link to={`/quiz/${subject.id}/intermediate`}>
+                        <Button className="w-full">Έναρξη</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Προχωρημένες Ασκήσεις</h3>
+                      <p className="text-gray-600 mb-4">Ασκήσεις υψηλής δυσκολίας για προχωρημένους μαθητές</p>
+                      <Link to={`/quiz/${subject.id}/advanced`}>
+                        <Button className="w-full">Έναρξη</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="tests">
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Διαγωνίσματα</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="card-hover">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2">Διαγώνισμα 15 λεπτών</h3>
-                    <p className="text-gray-600 mb-4">Σύντομο διαγώνισμα για γρήγορη αξιολόγηση</p>
-                    <Link to={`/quiz/${subject.id}/quick`}>
-                      <Button className="w-full">Έναρξη</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+            {subjectId === 'ancient-greek-language' ? (
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Διαγωνίσματα - Αρχαία Ελληνική Γλώσσα</h2>
                 
-                <Card className="card-hover">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2">Διαγώνισμα 30 λεπτών</h3>
-                    <p className="text-gray-600 mb-4">Μεσαίο διαγώνισμα που καλύπτει βασικές έννοιες</p>
-                    <Link to={`/quiz/${subject.id}/medium`}>
-                      <Button className="w-full">Έναρξη</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-                
-                <Card className="card-hover">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2">Διαγώνισμα Εφ' Όλης της Ύλης</h3>
-                    <p className="text-gray-600 mb-4">Ο��οκληρωμένο διαγώνισμα που καλύπτει όλη την ύλη</p>
-                    <Link to={`/quiz/${subject.id}/full`}>
-                      <Button className="w-full">Έναρξη</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Διαγώνισμα Προόδου</h3>
+                      <p className="text-gray-600 mb-4">Σύντομο διαγώνισμα για αξιολόγηση βασικών γνώσεων</p>
+                      <Link to={`/quiz/${subject.id}/quick`}>
+                        <Button className="w-full">Έναρξη</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Διαγώνισμα Τριμήνου</h3>
+                      <p className="text-gray-600 mb-4">Ολοκληρωμένο διαγώνισμα που καλύπτει την ύλη του τριμήνου</p>
+                      <Link to={`/quiz/${subject.id}/medium`}>
+                        <Button className="w-full">Έναρξη</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Τελικό ��ιαγώνισμα</h3>
+                      <p className="text-gray-600 mb-4">Διαγώνισμα που καλύπτει όλη την εξεταστέα ύλη</p>
+                      <Link to={`/quiz/${subject.id}/full`}>
+                        <Button className="w-full">Έναρξη</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Διαγωνίσματα</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Διαγώνισμα 15 λεπτών</h3>
+                      <p className="text-gray-600 mb-4">Σύντομο διαγώνισμα για γρήγορη αξιολόγηση</p>
+                      <Link to={`/quiz/${subject.id}/quick`}>
+                        <Button className="w-full">Έναρξη</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Διαγώνισμα 30 λεπτών</h3>
+                      <p className="text-gray-600 mb-4">Μεσαίο διαγώνισμα που καλύπτει βασικές έννοιες</p>
+                      <Link to={`/quiz/${subject.id}/medium`}>
+                        <Button className="w-full">Έναρξη</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="card-hover">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2">Διαγώνισμα Εφ' Όλης της Ύλης</h3>
+                      <p className="text-gray-600 mb-4">Ολοκληρωμένο διαγώνισμα που καλύπτει όλη την ύλη</p>
+                      <Link to={`/quiz/${subject.id}/full`}>
+                        <Button className="w-full">Έναρξη</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="forum">

@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 import {
   BookOpen,
@@ -123,6 +122,38 @@ export const sampleQuestions: Record<string, QuizQuestion[]> = {
       options: ['F1', 'F5', 'F9', 'F12'],
       correctAnswer: 1
     }
+  ],
+  'ancient-greek-language': [
+    {
+      id: 1,
+      question: 'Ποιο από τα παρακάτω είναι σωστό;',
+      options: ['Κλίσις ὁριστικῆς ἐνεργητικοῦ ἀορίστου', 'Κλίσις ὁριστικῆς ἐνεργητικοῦ παρατατικοῦ', 'Κλίσις ὁριστικῆς ἐνεργητικοῦ μέλλοντα', 'Κλίσις ὁριστικῆς μέσου ἀορίστου'],
+      correctAnswer: 1
+    },
+    {
+      id: 2,
+      question: 'Ποια είναι η σωστή μετάφραση της φράσης "γνῶθι σαυτόν";',
+      options: ['Να είσαι καλός άνθρωπος', 'Γνώριζε τον εαυτό σου', 'Μάθε γράμματα', 'Να αγαπάς τον πλησίον σου'],
+      correctAnswer: 1
+    },
+    {
+      id: 3,
+      question: 'Τι μέρος του λόγου είναι το "ἐγώ";',
+      options: ['Ρήμα', 'Επίθετο', 'Αντωνυμία', 'Επίρρημα'],
+      correctAnswer: 2
+    },
+    {
+      id: 4,
+      question: 'Ποια είναι η γενική ενικού του "ἄνθρωπος";',
+      options: ['ἀνθρώπου', 'ἀνθρώπῳ', 'ἄνθρωπον', 'ἄνθρωποι'],
+      correctAnswer: 0
+    },
+    {
+      id: 5,
+      question: 'Ποιο χρονικό επίρρημα δηλώνει το παρελθόν;',
+      options: ['νῦν', 'τότε', 'ἔπειτα', 'ἀεί'],
+      correctAnswer: 1
+    }
   ]
 };
 
@@ -142,7 +173,7 @@ export const subjects: Subject[] = [
   },
   { 
     id: 'ancient-greek-literature', 
-    name: 'Αρχαία Ελληνική Γραμματεία', 
+    name: 'Αρχαία Ελληνική Γραμματ��ία', 
     icon: BookText, 
     color: 'bg-purple-700' 
   },
@@ -274,4 +305,3 @@ export const subjects: Subject[] = [
 export const getSubject = (subjectId: string): Subject | undefined => {
   return subjects.find(subject => subject.id === subjectId);
 };
-

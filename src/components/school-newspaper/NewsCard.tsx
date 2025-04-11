@@ -37,8 +37,8 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
   const navigate = useNavigate();
   
   const handleReadMore = () => {
-    // Asegurarnos de que la navegación funcione correctamente
-    navigate(`/school-newspaper/${article.id}`, { replace: false });
+    // Βεβαιωνόμαστε ότι η πλοήγηση λειτουργεί σωστά
+    navigate(`/school-newspaper/${article.id}`);
   };
   
   const categoryColor = categoryColors[article.category] || categoryColors.general;
@@ -55,8 +55,8 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
   return (
     <Card className="h-full flex flex-col hover:shadow-md transition-shadow duration-200">
       <div 
-        className="cursor-pointer" 
-        onClick={handleReadMore}
+        onClick={handleReadMore} 
+        className="cursor-pointer flex flex-col h-full"
       >
         {article.imageUrl && (
           <div className="relative h-48 overflow-hidden rounded-t-lg">
@@ -114,7 +114,10 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
       <CardFooter className="flex-grow-0 pt-0">
         <Button 
           variant="outline" 
-          onClick={handleReadMore} 
+          onClick={(e) => {
+            e.stopPropagation(); // Σταματάει την εξάπλωση του click event
+            handleReadMore();
+          }} 
           className="w-full"
         >
           <BookOpen className="h-4 w-4 mr-2" />
@@ -126,3 +129,4 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
 };
 
 export default NewsCard;
+

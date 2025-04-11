@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 
@@ -9,7 +8,7 @@ export interface NewsArticle {
   content: string;
   author: string;
   date: string;
-  imageUrl?: string;
+  imageUrl?: string; // Μπορεί να είναι είτε εικόνα είτε βίντεο
   category: 'events' | 'announcements' | 'achievements' | 'general';
 }
 
@@ -103,18 +102,24 @@ export const useSchoolNews = () => {
   }, []);
 
   const createArticle = useCallback((article: Omit<NewsArticle, 'id' | 'date'>) => {
-    const newArticle: NewsArticle = {
-      ...article,
-      id: Date.now().toString(),
-      date: new Date().toISOString().split('T')[0]
-    };
+    try {
+      const newArticle: NewsArticle = {
+        ...article,
+        id: Date.now().toString(),
+        date: new Date().toISOString().split('T')[0]
+      };
 
-    const updatedArticles = [newArticle, ...articles];
-    setArticles(updatedArticles);
-    localStorage.setItem('school_news_articles', JSON.stringify(updatedArticles));
-    
-    toast.success('Το άρθρο δημιουργήθηκε με επιτυχία');
-    return true;
+      const updatedArticles = [newArticle, ...articles];
+      setArticles(updatedArticles);
+      localStorage.setItem('school_news_articles', JSON.stringify(updatedArticles));
+      
+      toast.success('Το άρθρο δημιουργήθηκε με επιτυχία');
+      return true;
+    } catch (error) {
+      console.error('Σφάλμα κατά τη δημιουργία του άρθρου:', error);
+      toast.error('Σφάλμα κατά τη δημιουργία του άρθρου');
+      return false;
+    }
   }, [articles]);
 
   const deleteArticle = useCallback((articleId: string) => {

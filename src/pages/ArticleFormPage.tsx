@@ -28,6 +28,8 @@ import {
 } from '@/components/ui/select';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import MediaUploadField from '@/components/school-newspaper/MediaUploadField';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   title: z.string().min(5, {
@@ -42,7 +44,7 @@ const formSchema = z.object({
   author: z.string().min(2, {
     message: 'Ο συγγραφέας πρέπει να έχει τουλάχιστον 2 χαρακτήρες',
   }),
-  imageUrl: z.string().url({ message: 'Παρακαλώ εισάγετε έγκυρο URL εικόνας' }).optional().or(z.literal('')),
+  imageUrl: z.string().optional().or(z.literal('')),
   category: z.enum(['events', 'announcements', 'achievements', 'general']),
 });
 
@@ -54,6 +56,7 @@ const ArticleFormPage: React.FC = () => {
   const { isAuthenticated, isTeacher, isAdmin, user } = useAuth();
   const { articles, createArticle } = useSchoolNews();
   const [isEditing, setIsEditing] = useState(false);
+  const [mediaUrl, setMediaUrl] = useState<string>('');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -90,6 +93,10 @@ const ArticleFormPage: React.FC = () => {
           imageUrl: articleToEdit.imageUrl || '',
           category: articleToEdit.category,
         });
+        
+        if (articleToEdit.imageUrl) {
+          setMediaUrl(articleToEdit.imageUrl);
+        }
       } else {
         // Article not found, redirect to the newspaper page
         navigate('/school-newspaper');
@@ -98,18 +105,27 @@ const ArticleFormPage: React.FC = () => {
   }, [articleId, articles, form, isAuthenticated, isAdmin, isTeacher, navigate, user]);
 
   const onSubmit = (values: FormValues) => {
-    // Create a new article
-    createArticle({
-      title: values.title,
-      summary: values.summary,
-      content: values.content,
-      author: values.author,
-      imageUrl: values.imageUrl || undefined,
-      category: values.category,
-    });
+    // Δημιουργία νέου άρθρου
+    try {
+      createArticle({
+        title: values.title,
+        summary: values.summary,
+        content: values.content,
+        author: values.author,
+        imageUrl: mediaUrl || undefined,
+        category: values.category,
+      });
 
-    // Navigate back to the newspaper page
-    navigate('/school-newspaper');
+      // Μετάβαση πίσω στη σελίδα της εφημερίδας
+      navigate('/school-newspaper');
+    } catch (error) {
+      console.error('Σφάλμα κατά τη δημιουργία του άρθρου:', error);
+      toast.error('Υπήρξε ένα πρόβλημα κατά την αποθήκευση του άρθρου.');
+    }
+  };
+
+  const handleMediaUpload = (url: string) => {
+    setMediaUrl(url);
   };
 
   const handleBackClick = () => {
@@ -200,6 +216,9 @@ const ArticleFormPage: React.FC = () => {
                   )}
                 />
                 
+                {/* Προσθήκη του νέου component για ανέβασμα πολυμέσων */}
+                <MediaUploadField form={form} onMediaUpload={handleMediaUpload} />
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
@@ -248,23 +267,6 @@ const ArticleFormPage: React.FC = () => {
                     )}
                   />
                 </div>
-                
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL Εικόνας (Προαιρετικό)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://example.com/image.jpg" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Εισάγετε το URL μιας εικόνας που θα συνοδεύει το άρθρο.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 
                 <div className="flex justify-end">
                   <Button type="submit" className="flex items-center gap-2">

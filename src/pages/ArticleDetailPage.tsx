@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSchoolNews, type NewsArticle } from '@/hooks/useSchoolNews';
-import { Calendar, User, Tag, ArrowLeft, Edit, Trash2, BookOpen } from 'lucide-react';
+import { Calendar, User, Tag, ArrowLeft, Edit, Trash2, BookOpen, Video, Image } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
@@ -40,12 +40,22 @@ const ArticleDetailPage: React.FC = () => {
   const { isAuthenticated, isTeacher, isAdmin } = useAuth();
   const { articles, deleteArticle, formatDate } = useSchoolNews();
   const [article, setArticle] = useState<NewsArticle | null>(null);
+  const [isVideo, setIsVideo] = useState(false);
 
   useEffect(() => {
     if (articleId) {
       const foundArticle = articles.find(a => a.id === articleId);
       if (foundArticle) {
         setArticle(foundArticle);
+        // Έλεγχος αν το media είναι βίντεο
+        if (foundArticle.imageUrl) {
+          setIsVideo(
+            foundArticle.imageUrl.includes('.mp4') || 
+            foundArticle.imageUrl.includes('.webm') || 
+            foundArticle.imageUrl.includes('video') ||
+            foundArticle.imageUrl.endsWith('mp4')
+          );
+        }
         // Set page title to article title
         document.title = `${foundArticle.title} | Σχολική Εφημερίδα`;
       } else {
@@ -157,12 +167,30 @@ const ArticleDetailPage: React.FC = () => {
             </div>
             
             {article.imageUrl && (
-              <div className="mb-6 rounded-lg overflow-hidden max-h-[32rem]">
-                <img 
-                  src={article.imageUrl} 
-                  alt={article.title} 
-                  className="w-full h-full object-contain" 
-                />
+              <div className="mb-6 rounded-lg overflow-hidden max-h-[32rem] bg-gray-50">
+                {isVideo ? (
+                  <div className="w-full h-full relative">
+                    <video 
+                      src={article.imageUrl} 
+                      controls
+                      className="w-full object-contain max-h-[32rem]" 
+                    />
+                    <div className="absolute top-2 right-2 bg-black/70 text-white p-1.5 rounded-md">
+                      <Video className="h-4 w-4" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-full relative">
+                    <img 
+                      src={article.imageUrl} 
+                      alt={article.title} 
+                      className="w-full h-full object-contain" 
+                    />
+                    <div className="absolute top-2 right-2 bg-black/70 text-white p-1.5 rounded-md">
+                      <Image className="h-4 w-4" />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, User, Tag, BookOpen } from 'lucide-react';
+import { Calendar, User, Tag, BookOpen, Video, Image } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
@@ -43,15 +43,44 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
   const categoryColor = categoryColors[article.category] || categoryColors.general;
   const categoryLabel = categoryLabels[article.category] || categoryLabels.general;
   
+  // Έλεγχος αν το media είναι βίντεο
+  const isVideo = article.imageUrl && (
+    article.imageUrl.includes('.mp4') || 
+    article.imageUrl.includes('.webm') || 
+    article.imageUrl.includes('video') ||
+    article.imageUrl.endsWith('mp4')
+  );
+  
   return (
     <Card className="h-full flex flex-col hover:shadow-md transition-shadow duration-200">
       {article.imageUrl && (
         <div className="relative h-48 overflow-hidden rounded-t-lg">
-          <img 
-            src={article.imageUrl} 
-            alt={article.title} 
-            className="w-full h-full object-cover" 
-          />
+          {isVideo ? (
+            <div className="w-full h-full bg-black flex items-center justify-center">
+              <video 
+                src={article.imageUrl} 
+                className="w-full h-full object-contain"
+                poster="/placeholder.svg"
+              />
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <Video className="h-12 w-12 text-white opacity-80" />
+              </div>
+            </div>
+          ) : (
+            <img 
+              src={article.imageUrl} 
+              alt={article.title} 
+              className="w-full h-full object-cover" 
+            />
+          )}
+          
+          <div className="absolute bottom-0 right-0 p-1.5 bg-black/70 rounded-tl-md">
+            {isVideo ? (
+              <Video className="h-4 w-4 text-white" />
+            ) : (
+              <Image className="h-4 w-4 text-white" />
+            )}
+          </div>
         </div>
       )}
       

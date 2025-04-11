@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from '@/components/ui/motion';
+import { removeBackground, loadImage } from '@/utils/imageUtils';
 
 interface HomeHeroProps {
   onStartNow: () => void;
@@ -11,6 +12,21 @@ interface HomeHeroProps {
 
 const HomeHero = ({ onStartNow, onLearnMore }: HomeHeroProps) => {
   const isMobile = useIsMobile();
+  const [logoSrc, setLogoSrc] = useState('/lovable-uploads/461462d9-ca3e-4ee9-98df-343b08ba812d.png');
+
+  useEffect(() => {
+    const removeWhiteBackground = async () => {
+      try {
+        const img = await loadImage(await fetch(logoSrc).then(r => r.blob()));
+        const blobWithoutBackground = await removeBackground(img);
+        setLogoSrc(URL.createObjectURL(blobWithoutBackground));
+      } catch (error) {
+        console.error('Failed to remove background:', error);
+      }
+    };
+
+    removeWhiteBackground();
+  }, []);
   
   return (
     <div className="gradient-bg text-white py-12 md:py-24">
@@ -22,12 +38,11 @@ const HomeHero = ({ onStartNow, onLearnMore }: HomeHeroProps) => {
           Προετοιμαστείτε για επιτυχία μέσα από προσομοιώσεις και διαγωνίσματα για όλα τα σχολικά μαθήματα
         </p>
         
-        {/* School logo and name container */}
         <div className="flex flex-col items-center justify-center mb-8">
           <motion.img 
-            src="/lovable-uploads/461462d9-ca3e-4ee9-98df-343b08ba812d.png" 
+            src={logoSrc} 
             alt="Εκπαιδευτήρια Ατσόγλου" 
-            className="h-24 md:h-32 mb-4"
+            className="h-24 md:h-32 mb-4 object-contain"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}

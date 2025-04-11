@@ -11,6 +11,9 @@ import FileUploadInput from './form/FileUploadInput';
 import FormActions from './form/FormActions';
 import VisibilitySelect from './form/VisibilitySelect';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface AddResourceFormProps {
   onSuccess: () => void;
@@ -20,6 +23,10 @@ interface AddResourceFormProps {
 const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSubject = '' }) => {
   const { user } = useAuth();
   const { addResource, isLoading } = useQuestionManagement();
+  const [useGoogleForm, setUseGoogleForm] = useState(false);
+  
+  // The Google Form URL - replace with your actual Google Form URL
+  const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfYmN9Zgj9rYLfICFuXDtxkuf9qh9wHHcUvF-uRnZzL7Qbdiw/viewform";
   
   const [resource, setResource] = useState({
     title: '',
@@ -57,6 +64,9 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
   };
   
   const validateForm = (): boolean => {
+    // If using Google Form, skip validation
+    if (useGoogleForm) return true;
+    
     if (!resource.title.trim()) {
       toast.error('Παρακαλώ εισάγετε τίτλο για τον πόρο');
       return false;
@@ -93,6 +103,13 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (useGoogleForm) {
+      // Open Google Form in a new tab
+      window.open(googleFormUrl, '_blank');
+      toast.success('Ανακατεύθυνση στη φόρμα Google για υποβολή υλικού');
+      return;
+    }
     
     if (!validateForm()) {
       return;
@@ -140,54 +157,98 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
   const showUrlInput = ['link', 'development', 'pdf', 'video'].includes(resource.type);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <BasicInfoInputs
-          title={resource.title}
-          description={resource.description}
-          onChange={handleChange}
-        />
-        
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <ResourceTypeSelect
-            value={resource.type}
-            onChange={(value) => handleSelectChange('type', value)}
-          />
-          
-          <SubjectSelect
-            value={resource.subject}
-            onChange={(value) => handleSelectChange('subject', value)}
-          />
+    <>
+      <Alert className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Επιλογή μεθόδου υποβολής</AlertTitle>
+        <AlertDescription>
+          Έχετε τώρα τη δυνατότητα να υποβάλετε υλικό είτε μέσω της εφαρμογής είτε μέσω φόρμας Google. 
+          Η φόρμα Google διασφαλίζει ότι το υλικό δεν θα χαθεί και αποθηκεύεται μόνιμα.
+        </AlertDescription>
+        <div className="flex gap-4 mt-4">
+          <Button 
+            variant={useGoogleForm ? "outline" : "default"} 
+            onClick={() => setUseGoogleForm(false)}
+            className="flex-1"
+          >
+            Υποβολή στην εφαρμογή
+          </Button>
+          <Button 
+            variant={useGoogleForm ? "default" : "outline"} 
+            onClick={() => setUseGoogleForm(true)}
+            className="flex-1"
+          >
+            Υποβολή μέσω Google Form
+          </Button>
         </div>
-        
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <GradeLevelSelect
-            value={resource.gradeLevel}
-            onChange={(value) => handleSelectChange('gradeLevel', value)}
-          />
-        </div>
-        
-        {showUrlInput ? (
-          <ResourceUrlInput
-            type={resource.type as any}
-            value={resource.url}
-            onChange={handleChange}
-          />
-        ) : (
-          <FileUploadInput onChange={handleFileChange} />
-        )}
-        
-        <VisibilitySelect
-          isPublic={resource.isPublic}
-          onChange={(checked) => handleCheckboxChange('isPublic', checked)}
-        />
-      </div>
+      </Alert>
       
-      <FormActions 
-        isSubmitting={isLoading}
-        onCancel={() => window.history.back()}
-      />
-    </form>
+      {useGoogleForm ? (
+        <div className="text-center space-y-6 py-8">
+          <h3 className="text-xl font-medium">Υποβολή υλικού μέσω Google Form</h3>
+          <p className="text-muted-foreground">
+            Θα ανακατευθυνθείτε σε μια φόρμα Google για την υποβολή του εκπαιδευτικού υλικού σας. 
+            Το υλικό που υποβάλλεται μέσω της φόρμας αποθηκεύεται σε ασφαλή βάση δεδομένων και 
+            δεν θα χαθεί ακόμα και αν διαγράψετε τα cookies του φυλλομετρητή σας.
+          </p>
+          <Button 
+            size="lg" 
+            onClick={() => window.open(googleFormUrl, '_blank')}
+          >
+            Μετάβαση στη φόρμα Google
+          </Button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <BasicInfoInputs
+              title={resource.title}
+              description={resource.description}
+              onChange={handleChange}
+            />
+            
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <ResourceTypeSelect
+                value={resource.type}
+                onChange={(value) => handleSelectChange('type', value)}
+              />
+              
+              <SubjectSelect
+                value={resource.subject}
+                onChange={(value) => handleSelectChange('subject', value)}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <GradeLevelSelect
+                value={resource.gradeLevel}
+                onChange={(value) => handleSelectChange('gradeLevel', value)}
+              />
+            </div>
+            
+            {showUrlInput ? (
+              <ResourceUrlInput
+                type={resource.type as any}
+                value={resource.url}
+                onChange={handleChange}
+              />
+            ) : (
+              <FileUploadInput onChange={handleFileChange} />
+            )}
+            
+            <VisibilitySelect
+              isPublic={resource.isPublic}
+              onChange={(checked) => handleCheckboxChange('isPublic', checked)}
+            />
+          </div>
+          
+          <FormActions 
+            isSubmitting={isLoading}
+            onCancel={() => window.history.back()}
+          />
+        </form>
+      )}
+    </>
   );
 };
 

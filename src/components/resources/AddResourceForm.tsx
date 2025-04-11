@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuestionManagement } from '@/hooks/useQuestionManagement';
 import { useAuth } from '@/contexts/AuthContext';
 import BasicInfoInputs from './form/BasicInfoInputs';
@@ -7,13 +7,14 @@ import ResourceTypeSelect from './form/ResourceTypeSelect';
 import SubjectSelect from './form/SubjectSelect';
 import GradeLevelSelect from './form/GradeLevelSelect';
 import ResourceUrlInput from './form/ResourceUrlInput';
-import FileUploadInput from './form/FileUploadInput';
+import UploadTypeSelection from './form/UploadTypeSelection';
 import FormActions from './form/FormActions';
 import VisibilitySelect from './form/VisibilitySelect';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { DriveFile } from './form/UploadTypeSelection';
 
 interface AddResourceFormProps {
   onSuccess: () => void;
@@ -24,6 +25,7 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
   const { user } = useAuth();
   const { addResource, isLoading } = useQuestionManagement();
   const [useGoogleForm, setUseGoogleForm] = useState(false);
+  const [driveFile, setDriveFile] = useState<DriveFile | null>(null);
   
   // The Google Form URL - replace with your actual Google Form URL
   const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfYmN9Zgj9rYLfICFuXDtxkuf9qh9wHHcUvF-uRnZzL7Qbdiw/viewform";
@@ -50,6 +52,8 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
     // Επαναφορά του URL όταν αλλάζει ο τύπος
     if (name === 'type') {
       setResource(prev => ({ ...prev, url: '' }));
+      // Επαναφορά του αρχείου Drive όταν αλλάζει ο τύπος
+      setDriveFile(null);
     }
   };
 
@@ -60,8 +64,23 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setResource(prev => ({ ...prev, file: e.target.files![0] }));
+      // Καθαρισμός του αρχείου Drive όταν επιλέγεται τοπικό αρχείο
+      setDriveFile(null);
     }
   };
+
+  const handleDriveFileSelected = (file: DriveFile) => {
+    setDriveFile(file);
+    // Καθαρισμός του τοπικού αρχείου όταν επιλέγεται αρχείο από το Drive
+    setResource(prev => ({ ...prev, file: null }));
+  };
+
+  // Όταν επιλέγεται ένα αρχείο από το Drive, ενημερώνουμε το URL
+  useEffect(() => {
+    if (driveFile) {
+      setResource(prev => ({ ...prev, url: driveFile.viewLink }));
+    }
+  }, [driveFile]);
   
   const validateForm = (): boolean => {
     // If using Google Form, skip validation
@@ -80,6 +99,11 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
     if (!resource.subject) {
       toast.error('Παρακαλώ επιλέξτε μάθημα');
       return false;
+    }
+
+    // Έλεγχος για τα αρχεία από το Drive
+    if (driveFile) {
+      return true;
     }
     
     if ((resource.type === 'link' || resource.type === 'development' || 
@@ -120,6 +144,9 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
     // Αν έχουμε αρχείο, δημιουργούμε ένα URL για αυτό (για λόγους επίδειξης)
     if (resource.file) {
       fileUrl = URL.createObjectURL(resource.file);
+    } else if (driveFile) {
+      // Αν έχουμε αρχείο από το Drive, χρησιμοποιούμε το downloadLink
+      fileUrl = driveFile.downloadLink;
     }
     
     const newResource = {
@@ -132,6 +159,10 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
       isPublic: resource.isPublic,
       authorName: user ? `${user.firstName} ${user.lastName}` : 'Ανώνυμος Εκπαιδευτικός',
       authorEmail: user?.email || '',
+      // Προσθήκη μεταδεδομένων για το Google Drive αν υπάρχει
+      driveFileId: driveFile?.id || null,
+      driveFileName: driveFile?.name || null,
+      driveFileThumbnail: driveFile?.thumbnailLink || null,
     };
     
     const resourceId = addResource(newResource);
@@ -148,6 +179,7 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
         isPublic: true,
         file: null,
       });
+      setDriveFile(null);
       
       onSuccess();
     }
@@ -155,6 +187,8 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
 
   // Προσδιορίζουμε αν πρέπει να δείξουμε το input URL βάσει του τύπου
   const showUrlInput = ['link', 'development', 'pdf', 'video'].includes(resource.type);
+  // Προσδιορίζουμε αν πρέπει να δείξουμε την επιλογή ανεβάσματος αρχείου
+  const showFileUpload = !showUrlInput || (showUrlInput && !resource.url);
 
   return (
     <>
@@ -232,8 +266,14 @@ const AddResourceForm: React.FC<AddResourceFormProps> = ({ onSuccess, selectedSu
                 value={resource.url}
                 onChange={handleChange}
               />
-            ) : (
-              <FileUploadInput onChange={handleFileChange} />
+            ) : null}
+            
+            {showFileUpload && (
+              <UploadTypeSelection
+                onFileChange={handleFileChange}
+                onDriveFileSelected={handleDriveFileSelected}
+                selectedFile={resource.file || driveFile}
+              />
             )}
             
             <VisibilitySelect

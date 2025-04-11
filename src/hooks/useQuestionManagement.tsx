@@ -17,6 +17,9 @@ export interface ResourceType {
   dateAdded: string;
   downloads: number;
   responses?: any[];
+  driveFileId?: string | null;
+  driveFileName?: string | null;
+  driveFileThumbnail?: string | null;
 }
 
 export interface QuizResult {
@@ -258,7 +261,11 @@ export function useQuestionManagement(): QuestionManagementResult {
       existingResources.push(newResource);
       localStorage.setItem(storageKey, JSON.stringify(existingResources));
       
-      toast.success("Ο εκπαιδευτικός πόρος προστέθηκε επιτυχώς!");
+      if (resource.driveFileId) {
+        toast.success("Ο εκπαιδευτικός πόρος από το Google Drive προστέθηκε επιτυχώς!");
+      } else {
+        toast.success("Ο εκπαιδευτικός πόρος προστέθηκε επιτυχώς!");
+      }
       
       return resourceId;
     } catch (error) {

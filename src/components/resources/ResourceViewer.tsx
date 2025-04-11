@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuestionManagement, ResourceType } from '@/hooks/useQuestionManagement';
@@ -39,11 +38,9 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({ resourceId: propResourc
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Φορτώνουμε τον πόρο
   const resource = actualResourceId ? getResourceById(actualResourceId) : undefined;
   
   useEffect(() => {
-    // Απλό timeout για να δείξουμε το loading
     const timer = setTimeout(() => {
       setLoading(false);
       
@@ -153,18 +150,33 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({ resourceId: propResourc
   
   const renderResourceContent = () => {
     if (!resource) return null;
+
+    const isDriveFile = resource.driveFileId && resource.driveFileThumbnail;
     
     switch (resource.type) {
       case 'pdf':
-        return (
-          <div className="w-full max-h-[800px] overflow-auto border rounded">
-            <iframe 
-              src={resource.url} 
-              className="w-full h-[700px]" 
-              title={resource.title}
-            ></iframe>
-          </div>
-        );
+        if (isDriveFile) {
+          return (
+            <div className="w-full max-h-[800px] overflow-auto border rounded">
+              <iframe 
+                src={`https://drive.google.com/file/d/${resource.driveFileId}/preview`}
+                className="w-full h-[700px]" 
+                title={resource.title}
+                allowFullScreen
+              ></iframe>
+            </div>
+          );
+        } else {
+          return (
+            <div className="w-full max-h-[800px] overflow-auto border rounded">
+              <iframe 
+                src={resource.url} 
+                className="w-full h-[700px]" 
+                title={resource.title}
+              ></iframe>
+            </div>
+          );
+        }
       case 'link':
       case 'development':
         return (
@@ -181,7 +193,18 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({ resourceId: propResourc
           </div>
         );
       case 'video':
-        if (resource.url.includes('youtube') || resource.url.includes('youtu.be')) {
+        if (isDriveFile) {
+          return (
+            <div className="aspect-video w-full">
+              <iframe 
+                src={`https://drive.google.com/file/d/${resource.driveFileId}/preview`}
+                className="w-full h-full"
+                title={resource.title}
+                allowFullScreen
+              ></iframe>
+            </div>
+          );
+        } else if (resource.url.includes('youtube') || resource.url.includes('youtu.be')) {
           const videoId = resource.url.includes('youtu.be') 
             ? resource.url.split('youtu.be/')[1]
             : resource.url.split('v=')[1]?.split('&')[0];
@@ -208,19 +231,52 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({ resourceId: propResourc
           );
         }
       default:
-        return (
-          <div className="text-center py-6">
-            <a 
-              href={resource.url} 
-              download
-              className="inline-flex items-center gap-2 text-blue-600 hover:underline"
-              onClick={increaseDownloadCount}
-            >
-              <Download className="h-4 w-4" />
-              Κάντε κλικ για λήψη του αρχείου
-            </a>
-          </div>
-        );
+        if (isDriveFile) {
+          return (
+            <div className="text-center py-6 space-y-4">
+              {resource.driveFileThumbnail && (
+                <div className="flex justify-center">
+                  <img 
+                    src={resource.driveFileThumbnail} 
+                    alt={resource.title} 
+                    className="max-h-[300px] border rounded shadow-sm"
+                  />
+                </div>
+              )}
+              <a 
+                href={resource.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-blue-600 hover:underline"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Άνοιγμα αρχείου στο Google Drive
+              </a>
+              <a 
+                href={`https://drive.google.com/uc?export=download&id=${resource.driveFileId}`}
+                className="inline-flex items-center gap-2 text-blue-600 hover:underline block"
+                onClick={increaseDownloadCount}
+              >
+                <Download className="h-4 w-4" />
+                Λήψη αρχείου
+              </a>
+            </div>
+          );
+        } else {
+          return (
+            <div className="text-center py-6">
+              <a 
+                href={resource.url} 
+                download
+                className="inline-flex items-center gap-2 text-blue-600 hover:underline"
+                onClick={increaseDownloadCount}
+              >
+                <Download className="h-4 w-4" />
+                Κάντε κλικ για λήψη του αρχείου
+              </a>
+            </div>
+          );
+        }
     }
   };
   

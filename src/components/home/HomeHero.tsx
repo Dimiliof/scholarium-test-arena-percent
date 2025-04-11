@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { motion } from '@/components/ui/motion';
 
 interface HomeHeroProps {
   onStartNow: () => void;
@@ -20,12 +21,23 @@ const HomeHero = ({ onStartNow, onLearnMore }: HomeHeroProps) => {
         <p className="text-lg md:text-xl lg:text-2xl mb-8 max-w-3xl mx-auto">
           Προετοιμαστείτε για επιτυχία μέσα από προσομοιώσεις και διαγωνίσματα για όλα τα σχολικά μαθήματα
         </p>
-        {/* Add school name with styling */}
-        <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-8 text-white/80">
-          ΕΚΠΑΙΔΕΥΤΗΡΙΑ ΑΤΣΟΓΛΟΥ
-          <br />
-          <span className="text-base md:text-lg lg:text-xl">ΤΟ ΣΧΟΛΕΙΟ ΠΟΥ ΒΛΕΠΕΙ ΤΟ ΜΕΛΛΟΝ</span>
-        </h2>
+        
+        {/* School logo and name container */}
+        <div className="flex flex-col items-center justify-center mb-8">
+          <motion.img 
+            src="/lovable-uploads/461462d9-ca3e-4ee9-98df-343b08ba812d.png" 
+            alt="Εκπαιδευτήρια Ατσόγλου" 
+            className="h-24 md:h-32 mb-4"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          />
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-white/90">
+            ΕΚΠΑΙΔΕΥΤΗΡΙΑ ΑΤΣΟΓΛΟΥ
+            <br />
+            <span className="text-base md:text-lg lg:text-xl text-white/80">ΤΟ ΣΧΟΛΕΙΟ ΠΟΥ ΒΛΕΠΕΙ ΤΟ ΜΕΛΛΟΝ</span>
+          </h2>
+        </div>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
           <Button 

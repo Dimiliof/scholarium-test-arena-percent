@@ -1,3 +1,4 @@
+
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Header from '@/components/Header';
@@ -172,6 +173,15 @@ const SubjectPage = () => {
     cLykeiou: "https://drive.google.com/drive/folders/1vefju_DTeVGmd8xNP3pDAcBcIB8VzbRP?usp=drive_link"
   };
 
+  const computerScienceExamLinks = {
+    aGymnasiou: "https://drive.google.com/drive/folders/1DimkWp8h1JK0ca-_s4U3J3lnUFOZVHdB?usp=drive_link",
+    bGymnasiou: "https://drive.google.com/drive/folders/1econ38-8LMwitL3TtuwN0iPnFNfl8pQD?usp=drive_link",
+    cGymnasiou: "https://drive.google.com/drive/folders/1JdRG5qa2p2EQ7eK9hnmQfJvpgbeTS_vP?usp=drive_link", 
+    aLykeiou: "https://drive.google.com/drive/folders/1DimkWp8h1JK0ca-_s4U3J3lnUFOZVHdB?usp=drive_link",
+    bLykeiou: "https://drive.google.com/drive/folders/1jfCgyCLXAXCumPfDC1GEKWiU6eroRtOH?usp=drive_link",
+    cLykeiou: "https://drive.google.com/drive/folders/1bl78r1FFXLHQuQuqnO54zOjQC-rchmSY?usp=drive_link"
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -324,6 +334,89 @@ const SubjectPage = () => {
                               >
                                 <GraduationCap className="h-4 w-4 mr-2" />
                                 Γ' Λυκείου
+                              </a>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                      <h3 className="text-lg font-bold text-amber-700 mb-2">Διαγωνίσματα ανά Τάξη</h3>
+                      <p className="text-gray-700 mb-4">
+                        Επιλέξτε την τάξη σας για να αποκτήσετε πρόσβαση σε διαγωνίσματα και τεστ αξιολόγησης.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <Card className="overflow-hidden">
+                          <CardContent className="p-0">
+                            <div className="bg-orange-100 p-3 text-center">
+                              <h4 className="font-bold text-orange-800">Γυμνάσιο - Διαγωνίσματα</h4>
+                            </div>
+                            <div className="p-3 space-y-2">
+                              <a 
+                                href={computerScienceExamLinks.aGymnasiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-orange-600"
+                              >
+                                <ClipboardCheck className="h-4 w-4 mr-2" />
+                                Α' Γυμνασίου Διαγωνίσματα
+                              </a>
+                              <a 
+                                href={computerScienceExamLinks.bGymnasiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-orange-600"
+                              >
+                                <ClipboardCheck className="h-4 w-4 mr-2" />
+                                Β' Γυμνασίου Διαγωνίσματα
+                              </a>
+                              <a 
+                                href={computerScienceExamLinks.cGymnasiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-orange-600"
+                              >
+                                <ClipboardCheck className="h-4 w-4 mr-2" />
+                                Γ' Γυμνασίου Διαγωνίσματα
+                              </a>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="overflow-hidden">
+                          <CardContent className="p-0">
+                            <div className="bg-red-100 p-3 text-center">
+                              <h4 className="font-bold text-red-800">Λύκειο - Διαγωνίσματα</h4>
+                            </div>
+                            <div className="p-3 space-y-2">
+                              <a 
+                                href={computerScienceExamLinks.aLykeiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-red-600"
+                              >
+                                <ClipboardCheck className="h-4 w-4 mr-2" />
+                                Α' Λυκείου Διαγωνίσματα
+                              </a>
+                              <a 
+                                href={computerScienceExamLinks.bLykeiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-red-600"
+                              >
+                                <ClipboardCheck className="h-4 w-4 mr-2" />
+                                Β' Λυκείου Διαγωνίσματα
+                              </a>
+                              <a 
+                                href={computerScienceExamLinks.cLykeiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-red-600"
+                              >
+                                <ClipboardCheck className="h-4 w-4 mr-2" />
+                                Γ' Λυκείου Διαγωνίσματα
                               </a>
                             </div>
                           </CardContent>

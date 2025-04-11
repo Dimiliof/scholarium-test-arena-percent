@@ -71,6 +71,61 @@ export const useTeacherContent = () => {
     toast.success("Το περιεχόμενο ανανεώθηκε");
   };
 
+  // Επεξεργασία περιεχομένου
+  const editContent = (contentId: number, newQuestion: string) => {
+    setIsLoading(true);
+    
+    try {
+      // Εντοπίζουμε το περιεχόμενο που θέλουμε να επεξεργαστούμε
+      const contentToEdit = content.find(c => c.id === contentId);
+      
+      if (!contentToEdit) {
+        toast.error("Το περιεχόμενο δεν βρέθηκε");
+        return;
+      }
+      
+      // Φορτώνουμε όλες τις ερωτήσεις για το συγκεκριμένο μάθημα και τύπο κουίζ
+      const storageKey = `quiz_${contentToEdit.subjectId}_${contentToEdit.quizType}`;
+      const storedQuestions = localStorage.getItem(storageKey);
+      
+      if (storedQuestions) {
+        const questions: QuizQuestion[] = JSON.parse(storedQuestions);
+        
+        // Βρίσκουμε και ενημερώνουμε την ερώτηση
+        const updatedQuestions = questions.map(q => {
+          if (q.id === contentId) {
+            return {
+              ...q,
+              question: newQuestion
+            };
+          }
+          return q;
+        });
+        
+        // Αποθηκεύουμε τις ενημερωμένες ερωτήσεις
+        localStorage.setItem(storageKey, JSON.stringify(updatedQuestions));
+        
+        // Ενημερώνουμε το state
+        setContent(prevContent => 
+          prevContent.map(c => 
+            c.id === contentId 
+              ? { ...c, question: newQuestion } 
+              : c
+          )
+        );
+        
+        toast.success("Το περιεχόμενο ενημερώθηκε επιτυχώς");
+      } else {
+        toast.error("Δεν βρέθηκαν ερωτήσεις για το συγκεκριμένο μάθημα");
+      }
+    } catch (error) {
+      console.error("Σφάλμα κατά την επεξεργασία του περιεχομένου:", error);
+      toast.error("Σφάλμα κατά την επεξεργασία του περιεχομένου");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Μορφοποίηση της ημερομηνίας σε ελληνική μορφή DD/MM/YYYY
   const formatDate = (date: string) => {
     if (!date) return '';
@@ -102,6 +157,7 @@ export const useTeacherContent = () => {
     activeTab,
     loadTeacherContent,
     refreshContent,
+    editContent,
     setSearchQuery,
     setSelectedSubject,
     setActiveTab,

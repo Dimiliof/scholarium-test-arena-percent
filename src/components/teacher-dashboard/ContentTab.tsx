@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { 
@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { subjects, QuizQuestion } from '@/lib/subjectsData';
-import { RefreshCw, PlusCircle, Search } from 'lucide-react';
+import { RefreshCw, PlusCircle, Search, Eye, Edit, Share, ArrowUpDown } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { 
   Select,
@@ -28,6 +28,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from 'sonner';
+import { useQuestionManagement } from '@/hooks/useQuestionManagement';
 
 // Ορισμός τύπων για τα δεδομένα
 interface TeacherContent {
@@ -60,11 +73,21 @@ const ContentTab: React.FC<ContentTabProps> = ({
   formatDate = (date) => date
 }) => {
   const navigate = useNavigate();
+  const { getQuestions, editQuestion } = useQuestionManagement();
+  const [editingItem, setEditingItem] = useState<TeacherContent | null>(null);
+  const [editedQuestion, setEditedQuestion] = useState("");
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const filteredContent = content.filter(item => {
     const matchesSearch = item.question.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSubject = selectedSubject === 'all' || item.subjectId === selectedSubject;
     return matchesSearch && matchesSubject;
+  }).sort((a, b) => {
+    if (sortOrder === 'asc') {
+      return a.id - b.id;
+    } else {
+      return b.id - a.id;
+    }
   });
 
   const getSubjectName = (subjectId: string) => {
@@ -82,6 +105,64 @@ const ContentTab: React.FC<ContentTabProps> = ({
       'full': 'Πλήρες'
     };
     return types[quizType] || quizType;
+  };
+
+  const handleEditOpen = (item: TeacherContent) => {
+    setEditingItem(item);
+    setEditedQuestion(item.question);
+  };
+
+  const handleEditSave = () => {
+    if (!editingItem) return;
+
+    try {
+      // Βρίσκουμε τις πλήρεις λεπτομέρειες της ερώτησης
+      const questions = getQuestions(editingItem.subjectId, editingItem.quizType as any);
+      const fullQuestion = questions.find(q => q.id === editingItem.id);
+      
+      if (fullQuestion) {
+        // Ενημερώνουμε την ερώτηση και την αποθηκεύουμε
+        const updatedQuestion = {
+          ...fullQuestion,
+          question: editedQuestion
+        };
+        
+        editQuestion(editingItem.subjectId, updatedQuestion, editingItem.quizType as any);
+        
+        // Ενημερώνουμε τον χρήστη
+        toast.success("Η ερώτηση ενημερώθηκε επιτυχώς!");
+        
+        // Ανανεώνουμε το περιεχόμενο
+        if (refreshContent) {
+          refreshContent();
+        }
+      }
+    } catch (error) {
+      console.error("Σφάλμα κατά την επεξεργασία:", error);
+      toast.error("Υπήρξε σφάλμα κατά την επεξεργασία της ερώτησης.");
+    }
+    
+    setEditingItem(null);
+  };
+
+  const handleViewQuestion = (item: TeacherContent) => {
+    navigate(`/quiz/${item.subjectId}/${item.quizType}?preview=true&questionId=${item.id}`);
+  };
+
+  const handleShareQuestion = (item: TeacherContent) => {
+    // Δημιουργούμε ένα σύνδεσμο προεπισκόπησης της ερώτησης
+    const shareUrl = `${window.location.origin}/quiz/${item.subjectId}/${item.quizType}?preview=true&questionId=${item.id}`;
+    
+    // Αντιγράφουμε το σύνδεσμο στο πρόχειρο
+    navigator.clipboard.writeText(shareUrl);
+    
+    toast.success("Ο σύνδεσμος αντιγράφηκε στο πρόχειρο", {
+      description: "Μπορείτε να μοιραστείτε αυτόν τον σύνδεσμο με τους μαθητές σας."
+    });
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
   return (
@@ -125,8 +206,17 @@ const ContentTab: React.FC<ContentTabProps> = ({
               </SelectContent>
             </Select>
           </div>
+
+          <Button 
+            variant="outline" 
+            className="md:ml-auto" 
+            onClick={refreshContent}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Ανανέωση
+          </Button>
           
-          <Button onClick={() => navigate('/add-content')} className="md:ml-auto">
+          <Button onClick={() => navigate('/add-content')}>
             <PlusCircle className="h-4 w-4 mr-2" />
             Προσθήκη Περιεχομένου
           </Button>
@@ -142,15 +232,22 @@ const ContentTab: React.FC<ContentTabProps> = ({
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="cursor-pointer" onClick={toggleSortOrder}>
+                      <div className="flex items-center">
+                        ID <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </div>
+                    </TableHead>
                     <TableHead>Ερώτηση</TableHead>
                     <TableHead>Μάθημα</TableHead>
                     <TableHead>Τύπος Κουίζ</TableHead>
                     <TableHead>Ημ/νία Προσθήκης</TableHead>
+                    <TableHead className="text-right">Ενέργειες</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredContent.map(item => (
                     <TableRow key={item.id}>
+                      <TableCell>{item.id}</TableCell>
                       <TableCell className="max-w-md truncate">{item.question}</TableCell>
                       <TableCell>
                         <Badge variant="outline">
@@ -159,6 +256,82 @@ const ContentTab: React.FC<ContentTabProps> = ({
                       </TableCell>
                       <TableCell>{getQuizTypeName(item.quizType)}</TableCell>
                       <TableCell>{formatDate(item.dateAdded)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewQuestion(item)}
+                            title="Προβολή ερώτησης"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEditOpen(item)}
+                                title="Επεξεργασία ερώτησης"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Επεξεργασία Ερώτησης</DialogTitle>
+                                <DialogDescription>
+                                  Τροποποιήστε την ερώτηση παρακάτω.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                  <Label htmlFor="question">Ερώτηση</Label>
+                                  <Textarea
+                                    id="question"
+                                    value={editedQuestion}
+                                    onChange={(e) => setEditedQuestion(e.target.value)}
+                                    rows={5}
+                                  />
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <Label>Μάθημα</Label>
+                                    <div className="mt-1.5">
+                                      {editingItem && getSubjectName(editingItem.subjectId)}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <Label>Τύπος Κουίζ</Label>
+                                    <div className="mt-1.5">
+                                      {editingItem && getQuizTypeName(editingItem.quizType)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setEditingItem(null)}>
+                                  Ακύρωση
+                                </Button>
+                                <Button onClick={handleEditSave}>
+                                  Αποθήκευση
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                          
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleShareQuestion(item)}
+                            title="Κοινοποίηση ερώτησης"
+                          >
+                            <Share className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

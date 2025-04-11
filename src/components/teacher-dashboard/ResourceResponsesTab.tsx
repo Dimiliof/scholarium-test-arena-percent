@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
-import { useQuestionManagement, ResourceType } from '@/hooks/useQuestionManagement';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
 import { 
   Table, 
   TableHeader, 
@@ -17,230 +18,274 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Download, Link2, FileText, AlertCircle } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { 
+  Search, 
+  ChevronDown, 
+  Eye, 
+  ExternalLink 
+} from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { useQuestionManagement, ResourceType } from '@/hooks/useQuestionManagement';
 import { subjects } from '@/lib/subjectsData';
-import { toast } from 'sonner';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useAuth } from '@/contexts/AuthContext';
 
-const ResourceResponsesTab: React.FC = () => {
-  const { getResources, generateShareableLink } = useQuestionManagement();
-  const [resources, setResources] = useState<ResourceType[]>(getResources());
+const ResourceResponsesTab = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { getResources } = useQuestionManagement();
+  const [resources, setResources] = useState<ResourceType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedResource, setSelectedResource] = useState<ResourceType | null>(null);
-  const [showResponses, setShowResponses] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-  
-  const refreshResources = () => {
-    setResources(getResources());
-  };
-  
-  const handleCopyLink = (resourceId: string) => {
-    const link = generateShareableLink(resourceId);
-    navigator.clipboard.writeText(link);
-    setCopiedId(resourceId);
+
+  useEffect(() => {
+    loadResources();
+  }, []);
+
+  const loadResources = () => {
+    setLoading(true);
+    const allResources = getResources();
     
-    setTimeout(() => {
-      setCopiedId(null);
-    }, 2000);
+    // Φιλτράρουμε για να πάρουμε μόνο τους πόρους του τρέχοντος εκπαιδευτικού
+    const teacherResources = allResources.filter(
+      resource => resource.authorEmail === user?.email
+    );
     
-    toast.success("Ο σύνδεσμος αντιγράφηκε στο πρόχειρο!");
+    // Ταξινομούμε με βάση τους πόρους που έχουν απαντήσεις πρώτα
+    const sortedResources = teacherResources.sort((a, b) => {
+      const aResponses = a.responses?.length || 0;
+      const bResponses = b.responses?.length || 0;
+      return bResponses - aResponses;
+    });
+    
+    setResources(sortedResources);
+    setLoading(false);
   };
-  
-  const handleViewResponses = (resource: ResourceType) => {
-    setSelectedResource(resource);
-    setShowResponses(true);
-  };
-  
-  const getResponsesCount = (resource: ResourceType) => {
-    return resource.responses ? resource.responses.length : 0;
-  };
-  
+
   const getSubjectName = (subjectId: string) => {
     const subject = subjects.find(s => s.id === subjectId);
     return subject ? subject.name : 'Άγνωστο';
   };
-  
-  const getResourceTypeName = (type: string) => {
-    const types: Record<string, string> = {
-      'document': 'Έγγραφο',
-      'pdf': 'PDF',
-      'link': 'Σύνδεσμος',
-      'development': 'Ανάπτυξη',
-      'book': 'Βιβλίο',
-      'video': 'Βίντεο'
-    };
-    return types[type] || type;
-  };
-  
-  const exportToCsv = (resource: ResourceType) => {
-    if (!resource.responses || resource.responses.length === 0) {
-      toast.error("Δεν υπάρχουν απαντήσεις για εξαγωγή");
-      return;
+
+  const getResourceTypeIcon = (type: string) => {
+    switch (type) {
+      case 'document':
+        return <Badge className="bg-blue-100 text-blue-800 border-blue-300">Έγγραφο</Badge>;
+      case 'pdf':
+        return <Badge className="bg-red-100 text-red-800 border-red-300">PDF</Badge>;
+      case 'link':
+        return <Badge className="bg-purple-100 text-purple-800 border-purple-300">Σύνδεσμος</Badge>;
+      case 'video':
+        return <Badge className="bg-green-100 text-green-800 border-green-300">Βίντεο</Badge>;
+      case 'book':
+        return <Badge className="bg-amber-100 text-amber-800 border-amber-300">Βιβλίο</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800 border-gray-300">{type}</Badge>;
     }
-    
-    // Δημιουργία των επικεφαλίδων του CSV
-    let csvContent = "Όνομα,Απάντηση,Χρονική Στιγμή\n";
-    
-    // Προσθήκη των δεδομένων
-    resource.responses.forEach(response => {
-      const studentName = response.studentName.replace(/,/g, " ");
-      const responseText = response.response.replace(/,/g, " ").replace(/\n/g, " ");
-      const timestamp = new Date(response.timestamp).toLocaleString('el-GR');
-      
-      csvContent += `"${studentName}","${responseText}","${timestamp}"\n`;
-    });
-    
-    // Δημιουργία του Blob και του συνδέσμου λήψης
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `${resource.title.replace(/\s+/g, '_')}_responses.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
-  
+
+  const handleViewResource = (resourceId: string) => {
+    navigate(`/resources/${resourceId}`);
+  };
+
+  const handleViewResponses = (resource: ResourceType) => {
+    setSelectedResource(resource);
+  };
+
+  const filteredResources = resources.filter(resource => 
+    resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    resource.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <>
+    <div className="space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Υλικό & Απαντήσεις</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-2xl">Απαντήσεις Μαθητών</CardTitle>
           <CardDescription>
-            Διαχειριστείτε το εκπαιδευτικό υλικό που έχετε μοιραστεί και δείτε τις απαντήσεις των μαθητών
+            Δείτε και διαχειριστείτε τις απαντήσεις των μαθητών στους εκπαιδευτικούς πόρους
           </CardDescription>
-          
-          <div className="flex justify-end mt-2">
-            <Button variant="outline" onClick={refreshResources}>
-              Ανανέωση
-            </Button>
-          </div>
         </CardHeader>
-        
-        <CardContent>
-          {resources.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Τίτλος</TableHead>
-                  <TableHead>Μάθημα</TableHead>
-                  <TableHead>Τύπος</TableHead>
-                  <TableHead>Ημ/νία</TableHead>
-                  <TableHead>Απαντήσεις</TableHead>
-                  <TableHead>Ενέργειες</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {resources.map(resource => (
-                  <TableRow key={resource.id}>
-                    <TableCell className="font-medium">{resource.title}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {getSubjectName(resource.subject)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{getResourceTypeName(resource.type)}</TableCell>
-                    <TableCell>{resource.dateAdded}</TableCell>
-                    <TableCell>
-                      <Badge variant={getResponsesCount(resource) > 0 ? "default" : "secondary"}>
-                        {getResponsesCount(resource)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleCopyLink(resource.id)}
-                          className="h-8 px-2 flex items-center"
-                        >
-                          {copiedId === resource.id ? (
-                            <>Αντιγράφηκε!</>
-                          ) : (
-                            <>
-                              <Link2 className="h-3.5 w-3.5 mr-1" />
-                              Σύνδεσμος
-                            </>
-                          )}
-                        </Button>
-                        
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleViewResponses(resource)}
-                          className="h-8 px-2 flex items-center"
-                          disabled={!resource.responses || resource.responses.length === 0}
-                        >
-                          <FileText className="h-3.5 w-3.5 mr-1" />
-                          Απαντήσεις
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="text-center p-8">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
-                <AlertCircle className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-medium mb-2">Δεν βρέθηκε εκπαιδευτικό υλικό</h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                Δεν έχετε προσθέσει ακόμα κάποιο εκπαιδευτικό υλικό.
-                Προσθέστε υλικό από την επιλογή "Προσθήκη Υλικού".
-              </p>
-            </div>
-          )}
-        </CardContent>
       </Card>
-      
-      <Dialog open={showResponses} onOpenChange={setShowResponses}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Απαντήσεις για: {selectedResource?.title}</DialogTitle>
-            <DialogDescription>
-              Συνολικά {selectedResource?.responses?.length || 0} απαντήσεις
-            </DialogDescription>
-          </DialogHeader>
+
+      <div className="flex flex-col space-y-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Αναζήτηση πόρων..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
           
-          {selectedResource && selectedResource.responses && selectedResource.responses.length > 0 ? (
-            <div className="space-y-6">
-              <div className="flex justify-end">
+          <Button onClick={() => navigate('/add-content')} className="md:ml-auto">
+            Προσθήκη Νέου Πόρου
+          </Button>
+        </div>
+
+        <Card>
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="flex justify-center items-center h-40">
+                <p>Φόρτωση...</p>
+              </div>
+            ) : filteredResources.length > 0 ? (
+              <Accordion type="single" collapsible className="w-full">
+                {filteredResources.map((resource) => (
+                  <AccordionItem key={resource.id} value={resource.id}>
+                    <div className="border-b">
+                      <div className="flex items-center px-4 py-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            {getResourceTypeIcon(resource.type)}
+                            <span className="font-medium">{resource.title}</span>
+                          </div>
+                          <div className="flex gap-2 text-sm text-muted-foreground mt-1">
+                            <span>{getSubjectName(resource.subject)}</span>
+                            <span>•</span>
+                            <span>{resource.gradeLevel}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Badge variant={resource.responses && resource.responses.length > 0 ? "default" : "outline"}>
+                            {resource.responses ? resource.responses.length : 0} απαντήσεις
+                          </Badge>
+                          
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewResource(resource.id);
+                            }}
+                            title="Προβολή πόρου"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          
+                          <AccordionTrigger className="h-4 w-4 mr-2" />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <AccordionContent>
+                      {resource.responses && resource.responses.length > 0 ? (
+                        <div className="px-4 py-2">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Μαθητής</TableHead>
+                                <TableHead>Ημερομηνία</TableHead>
+                                <TableHead>Απάντηση</TableHead>
+                                <TableHead className="w-[80px]"></TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {resource.responses.map((response, index) => (
+                                <TableRow key={index}>
+                                  <TableCell className="font-medium">{response.studentName}</TableCell>
+                                  <TableCell>
+                                    {new Date(response.timestamp).toLocaleDateString('el-GR', {
+                                      day: '2-digit',
+                                      month: '2-digit',
+                                      year: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </TableCell>
+                                  <TableCell className="max-w-xs truncate">
+                                    {response.response.substring(0, 60)}
+                                    {response.response.length > 60 ? '...' : ''}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <Button variant="ghost" size="sm">
+                                          Περισσότερα
+                                        </Button>
+                                      </DialogTrigger>
+                                      <DialogContent className="max-w-3xl">
+                                        <DialogHeader>
+                                          <DialogTitle>Απάντηση μαθητή</DialogTitle>
+                                          <DialogDescription className="flex flex-col gap-1">
+                                            <span><strong>Μαθητής:</strong> {response.studentName}</span>
+                                            <span><strong>Ημερομηνία:</strong> {new Date(response.timestamp).toLocaleDateString('el-GR', {
+                                              day: '2-digit',
+                                              month: '2-digit',
+                                              year: 'numeric',
+                                              hour: '2-digit',
+                                              minute: '2-digit'
+                                            })}</span>
+                                            <span><strong>Πόρος:</strong> {resource.title}</span>
+                                          </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="mt-4 bg-gray-50 p-4 rounded-md max-h-80 overflow-y-auto">
+                                          <p className="whitespace-pre-line">{response.response}</p>
+                                        </div>
+                                        <div className="mt-2 flex justify-end">
+                                          <Button onClick={() => handleViewResource(resource.id)} className="flex items-center gap-2">
+                                            <ExternalLink className="h-4 w-4" />
+                                            Προβολή Πόρου
+                                          </Button>
+                                        </div>
+                                      </DialogContent>
+                                    </Dialog>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      ) : (
+                        <div className="px-4 py-8 text-center text-muted-foreground">
+                          <p>Δεν υπάρχουν απαντήσεις για αυτόν τον πόρο ακόμα.</p>
+                          <Button 
+                            variant="outline" 
+                            className="mt-3"
+                            onClick={() => handleViewResource(resource.id)}
+                          >
+                            Προβολή Πόρου
+                          </Button>
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            ) : (
+              <div className="text-center p-8">
+                <p className="text-muted-foreground">
+                  Δεν βρέθηκαν εκπαιδευτικοί πόροι. Προσθέστε νέους πόρους για να λάβετε απαντήσεις από τους μαθητές.
+                </p>
                 <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => exportToCsv(selectedResource)}
-                  className="flex items-center gap-2"
+                  className="mt-4" 
+                  onClick={() => navigate('/add-content')}
                 >
-                  <Download className="h-4 w-4" />
-                  Εξαγωγή σε CSV
+                  Προσθήκη Νέου Πόρου
                 </Button>
               </div>
-              
-              <div className="space-y-4">
-                {selectedResource.responses.map((response, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium">{response.studentName}</h4>
-                      <span className="text-sm text-muted-foreground">
-                        {new Date(response.timestamp).toLocaleString('el-GR')}
-                      </span>
-                    </div>
-                    <p className="whitespace-pre-line">{response.response}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Δεν υπάρχουν απαντήσεις ακόμα</p>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 

@@ -157,13 +157,24 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({ resourceId: propResourc
       case 'pdf':
         if (isDriveFile) {
           return (
-            <div className="w-full max-h-[800px] overflow-auto border rounded">
-              <iframe 
-                src={`https://drive.google.com/file/d/${resource.driveFileId}/preview`}
-                className="w-full h-[700px]" 
-                title={resource.title}
-                allowFullScreen
-              ></iframe>
+            <div className="space-y-4">
+              <Alert className="bg-amber-50 border-amber-200">
+                <Lock className="h-4 w-4 text-amber-600" />
+                <AlertTitle>Περιορισμένη Πρόσβαση</AlertTitle>
+                <AlertDescription>
+                  Έχετε πρόσβαση μόνο στο περιεχόμενο που βλέπετε. Δεν επιτρέπεται η περιήγηση σε άλλο 
+                  περιεχόμενο του Google Drive πέρα από αυτό που έχει οριστεί για εσάς.
+                </AlertDescription>
+              </Alert>
+              
+              <div className="w-full max-h-[800px] overflow-auto border rounded">
+                <iframe 
+                  src={`https://drive.google.com/file/d/${resource.driveFileId}/preview`}
+                  className="w-full h-[700px]" 
+                  title={resource.title}
+                  allowFullScreen
+                ></iframe>
+              </div>
             </div>
           );
         } else {
@@ -195,13 +206,24 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({ resourceId: propResourc
       case 'video':
         if (isDriveFile) {
           return (
-            <div className="aspect-video w-full">
-              <iframe 
-                src={`https://drive.google.com/file/d/${resource.driveFileId}/preview`}
-                className="w-full h-full"
-                title={resource.title}
-                allowFullScreen
-              ></iframe>
+            <div className="space-y-4">
+              <Alert className="bg-amber-50 border-amber-200">
+                <Lock className="h-4 w-4 text-amber-600" />
+                <AlertTitle>Περιορισμένη Πρόσβαση</AlertTitle>
+                <AlertDescription>
+                  Έχετε πρόσβαση μόνο στο περιεχόμενο που βλέπετε. Δεν επιτρέπεται η περιήγηση σε άλλο 
+                  περιεχόμενο του Google Drive πέρα από αυτό που έχει οριστεί για εσάς.
+                </AlertDescription>
+              </Alert>
+              
+              <div className="aspect-video w-full">
+                <iframe 
+                  src={`https://drive.google.com/file/d/${resource.driveFileId}/preview`}
+                  className="w-full h-full"
+                  title={resource.title}
+                  allowFullScreen
+                ></iframe>
+              </div>
             </div>
           );
         } else if (resource.url.includes('youtube') || resource.url.includes('youtu.be')) {
@@ -233,33 +255,44 @@ const ResourceViewer: React.FC<ResourceViewerProps> = ({ resourceId: propResourc
       default:
         if (isDriveFile) {
           return (
-            <div className="text-center py-6 space-y-4">
-              {resource.driveFileThumbnail && (
-                <div className="flex justify-center">
-                  <img 
-                    src={resource.driveFileThumbnail} 
-                    alt={resource.title} 
-                    className="max-h-[300px] border rounded shadow-sm"
-                  />
-                </div>
-              )}
-              <a 
-                href={resource.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-blue-600 hover:underline"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Άνοιγμα αρχείου στο Google Drive
-              </a>
-              <a 
-                href={`https://drive.google.com/uc?export=download&id=${resource.driveFileId}`}
-                className="inline-flex items-center gap-2 text-blue-600 hover:underline block"
-                onClick={increaseDownloadCount}
-              >
-                <Download className="h-4 w-4" />
-                Λήψη αρχείου
-              </a>
+            <div className="space-y-4">
+              <Alert className="bg-amber-50 border-amber-200">
+                <Lock className="h-4 w-4 text-amber-600" />
+                <AlertTitle>Περιορισμένη Πρόσβαση</AlertTitle>
+                <AlertDescription>
+                  Έχετε πρόσβαση μόνο στο περιεχόμενο που βλέπετε. Δεν επιτρέπεται η περιήγηση σε άλλο 
+                  περιεχόμενο του Google Drive πέρα από αυτό που έχει οριστεί για εσάς.
+                </AlertDescription>
+              </Alert>
+              
+              <div className="text-center py-6 space-y-4">
+                {resource.driveFileThumbnail && (
+                  <div className="flex justify-center">
+                    <img 
+                      src={resource.driveFileThumbnail} 
+                      alt={resource.title} 
+                      className="max-h-[300px] border rounded shadow-sm"
+                    />
+                  </div>
+                )}
+                <a 
+                  href={resource.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-blue-600 hover:underline"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Άνοιγμα αρχείου στο Google Drive
+                </a>
+                <a 
+                  href={`https://drive.google.com/uc?export=download&id=${resource.driveFileId}`}
+                  className="inline-flex items-center gap-2 text-blue-600 hover:underline block"
+                  onClick={increaseDownloadCount}
+                >
+                  <Download className="h-4 w-4" />
+                  Λήψη αρχείου
+                </a>
+              </div>
             </div>
           );
         } else {

@@ -1,4 +1,3 @@
-
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Header from '@/components/Header';
@@ -7,7 +6,7 @@ import { subjects } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User, MessageSquare, ExternalLink, GraduationCap } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User, MessageSquare, ExternalLink, GraduationCap, Lock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Table, 
@@ -20,6 +19,7 @@ import {
 } from '@/components/ui/table';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import ForumDiscussion from '@/components/forum/ForumDiscussion';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type LeaderboardStudent = {
   id: number;
@@ -238,6 +238,15 @@ const SubjectPage = () => {
 
                 {subjectId === 'computer-science' && (
                   <div className="mt-6 space-y-6">
+                    <Alert className="bg-amber-50 border-amber-200 mb-4">
+                      <Lock className="h-4 w-4 text-amber-600" />
+                      <AlertTitle>Περιορισμένη Πρόσβαση</AlertTitle>
+                      <AlertDescription>
+                        Όταν επισκέπτεστε τους συνδέσμους Google Drive, έχετε πρόσβαση μόνο στο περιεχόμενο που σας έχει παρασχεθεί.
+                        Δεν επιτρέπεται η περιήγηση σε άλλο περιεχόμενο πέρα από αυτό που έχει οριστεί για εσάς.
+                      </AlertDescription>
+                    </Alert>
+                    
                     <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                       <h3 className="text-lg font-bold text-blue-700 mb-2">Εκπαιδευτικό Υλικό στο Google Drive</h3>
                       <p className="text-gray-700 mb-4">

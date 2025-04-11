@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Lock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -50,6 +50,17 @@ const GoogleFormOption: React.FC<GoogleFormOptionProps> = ({
             Το υλικό που υποβάλλεται μέσω της φόρμας αποθηκεύεται σε ασφαλή βάση δεδομένων και 
             δεν θα χαθεί ακόμα και αν διαγράψετε τα cookies του φυλλομετρητή σας.
           </p>
+          
+          <Alert className="bg-amber-50 border-amber-200 text-left">
+            <Lock className="h-4 w-4 text-amber-600" />
+            <AlertTitle>Περιορισμένη Πρόσβαση</AlertTitle>
+            <AlertDescription>
+              Οι μαθητές που επισκέπτονται τους συνδέσμους Google Drive θα έχουν πρόσβαση μόνο στο περιεχόμενο 
+              που τους έχει παρασχεθεί και δεν θα μπορούν να περιηγηθούν σε άλλο περιεχόμενο πέρα από αυτό που έχει οριστεί.
+              Το περιεχόμενο είναι διαθέσιμο μόνο για προβολή και όχι για επεξεργασία ή λήψη εκτός αν αυτό έχει επιτραπεί ρητά.
+            </AlertDescription>
+          </Alert>
+          
           <Button 
             size="lg" 
             onClick={() => window.open(googleFormUrl, '_blank')}

@@ -29,6 +29,9 @@ import ClassroomManagementPage from './pages/ClassroomManagementPage';
 import AddContentPage from './pages/AddContentPage';
 import ResourcesPage from './pages/ResourcesPage';
 import ResourceViewPage from './pages/ResourceViewPage';
+import SchoolNewspaperPage from './pages/SchoolNewspaperPage';
+import ArticleDetailPage from './pages/ArticleDetailPage';
+import ArticleFormPage from './pages/ArticleFormPage';
 
 // Student pages
 import StudentCoursesPage from './pages/student/StudentCoursesPage';
@@ -80,6 +83,12 @@ function App() {
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/resources/:resourceId" element={<ResourceViewPage />} />
         <Route path="/classroom/:classroomId" element={<ClassroomManagementPage />} />
+        
+        {/* Σελίδες Σχολικής Εφημερίδας */}
+        <Route path="/school-newspaper" element={<SchoolNewspaperPage />} />
+        <Route path="/school-newspaper/:articleId" element={<ArticleDetailPage />} />
+        <Route path="/school-newspaper/create" element={<ArticleFormPage />} />
+        <Route path="/school-newspaper/edit/:articleId" element={<ArticleFormPage />} />
 
         {/* Σελίδες μαθητή */}
         <Route path="/student/courses" element={<StudentCoursesPage />} />

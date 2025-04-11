@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import UserMenu from "@/components/UserMenu";
-import { School, BookOpen, BookText, Video, Link2, Wrench } from 'lucide-react';
+import { School, BookOpen, BookText, Video, Link2, Wrench, Newspaper } from 'lucide-react';
 import MobileMenu from "@/components/MobileMenu";
 
 const Header = () => {
@@ -86,6 +86,17 @@ const Header = () => {
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
+            </NavigationMenuItem>
+            
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link to="/school-newspaper" className={navigationMenuTriggerStyle()}>
+                  <div className="flex items-center">
+                    <Newspaper className="h-4 w-4 mr-1" />
+                    Εφημερίδα
+                  </div>
+                </Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
             
             <NavigationMenuItem>

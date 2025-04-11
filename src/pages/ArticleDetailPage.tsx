@@ -46,10 +46,17 @@ const ArticleDetailPage: React.FC = () => {
       const foundArticle = articles.find(a => a.id === articleId);
       if (foundArticle) {
         setArticle(foundArticle);
+        // Set page title to article title
+        document.title = `${foundArticle.title} | Σχολική Εφημερίδα`;
       } else {
         navigate('/school-newspaper');
       }
     }
+    
+    // Reset title when component unmounts
+    return () => {
+      document.title = 'Σχολική Εφημερίδα | Εκπαιδευτήρια Ατσόγλου';
+    };
   }, [articleId, articles, navigate]);
 
   const handleBackClick = () => {
@@ -97,74 +104,84 @@ const ArticleDetailPage: React.FC = () => {
             Επιστροφή στην Εφημερίδα
           </Button>
           
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant="outline" className={categoryColor}>
-                  <Tag className="h-3 w-3 mr-1" />
-                  {categoryLabel}
-                </Badge>
+          <article className="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className={categoryColor}>
+                    <Tag className="h-3 w-3 mr-1" />
+                    {categoryLabel}
+                  </Badge>
+                </div>
+                <h1 className="text-3xl font-bold mb-2">{article.title}</h1>
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4 mr-1" />
+                  {formatDate(article.date)}
+                  <span className="mx-2">•</span>
+                  <User className="h-4 w-4 mr-1" />
+                  {article.author}
+                </div>
               </div>
-              <h1 className="text-3xl font-bold mb-2">{article.title}</h1>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4 mr-1" />
-                {formatDate(article.date)}
-                <span className="mx-2">•</span>
-                <User className="h-4 w-4 mr-1" />
-                {article.author}
-              </div>
+              
+              {isAuthenticated && (isTeacher || isAdmin) && (
+                <div className="flex gap-2 mt-4 md:mt-0">
+                  <Button variant="outline" onClick={handleEditArticle}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Επεξεργασία
+                  </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Διαγραφή
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Είστε σίγουροι;</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Αυτή η ενέργεια δεν μπορεί να αναιρεθεί. Το άρθρο θα διαγραφεί μόνιμα.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Άκυρο</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteArticle} className="bg-destructive text-destructive-foreground">
+                          Διαγραφή
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              )}
             </div>
             
-            {isAuthenticated && (isTeacher || isAdmin) && (
-              <div className="flex gap-2 mt-4 md:mt-0">
-                <Button variant="outline" onClick={handleEditArticle}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Επεξεργασία
-                </Button>
-                
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Διαγραφή
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Είστε σίγουροι;</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Αυτή η ενέργεια δεν μπορεί να αναιρεθεί. Το άρθρο θα διαγραφεί μόνιμα.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Άκυρο</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDeleteArticle} className="bg-destructive text-destructive-foreground">
-                        Διαγραφή
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+            {article.imageUrl && (
+              <div className="mb-6 rounded-lg overflow-hidden max-h-96">
+                <img 
+                  src={article.imageUrl} 
+                  alt={article.title} 
+                  className="w-full h-full object-cover"
+                />
               </div>
             )}
-          </div>
-          
-          {article.imageUrl && (
-            <div className="mb-6 rounded-lg overflow-hidden max-h-96">
-              <img 
-                src={article.imageUrl} 
-                alt={article.title} 
-                className="w-full h-full object-cover"
-              />
+            
+            <div className="prose prose-lg max-w-none">
+              <p className="text-xl font-medium mb-6 text-gray-700">{article.summary}</p>
+              <div className="whitespace-pre-line text-gray-800">
+                {article.content.split('\n').map((paragraph, i) => (
+                  <p key={i} className={i === 0 ? "mt-0" : "mt-6"}>{paragraph}</p>
+                ))}
+              </div>
             </div>
-          )}
+          </article>
           
-          <div className="prose prose-lg max-w-none mb-6">
-            <p className="text-xl font-medium mb-4">{article.summary}</p>
-            <div className="whitespace-pre-line">
-              {article.content.split('\n').map((paragraph, i) => (
-                <p key={i} className={i === 0 ? "mt-0" : "mt-4"}>{paragraph}</p>
-              ))}
-            </div>
+          {/* Add a "Back to News" button at the bottom for easier navigation */}
+          <div className="flex justify-center mb-8">
+            <Button onClick={handleBackClick} variant="outline" size="lg">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Πίσω στα Άρθρα
+            </Button>
           </div>
         </div>
       </main>

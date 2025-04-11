@@ -1,3 +1,4 @@
+
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Header from '@/components/Header';
@@ -6,7 +7,7 @@ import { subjects } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User, MessageSquare } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User, MessageSquare, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Table, 
@@ -162,6 +163,9 @@ const SubjectPage = () => {
     return "text-gray-600";
   };
 
+  // Μεταβλητή για τον σύνδεσμο Google Drive για την Πληροφορική
+  const computerScienceDriveLink = "https://drive.google.com/drive/folders/1x8MM5uKcLAiIT2GQKCS2FI2lB9ShOQ-S?usp=drive_link";
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -203,18 +207,38 @@ const SubjectPage = () => {
               <div>
                 <h2 className="text-2xl font-bold mb-4">Περιγραφή Μαθήματος</h2>
                 <p className="text-gray-700 mb-6">
-                  Το μάθημα {subject.name} προσφέρει μια ολοκληρωμένη προσέγγιση στην κατανόηση 
+                  Το μάθημα {subject?.name} προσφέρει μια ολοκληρωμένη προσέγγιση στην κατανόηση 
                   και εφαρμογή των βασικών εννοιών. Μέσα από τις προσομοιώσεις και τα διαγωνίσματα,
                   οι μαθητές μπορούν να εξασκηθούν και να αξιολογήσουν τις γνώσεις τους.
                 </p>
                 
                 <h3 className="text-xl font-bold mb-3">Τι θα μάθετε:</h3>
                 <ul className="list-disc pl-5 space-y-2 mb-6">
-                  <li>Βα��ικές έννοιες και ορισμοί</li>
+                  <li>Βασικές έννοιες και ορισμοί</li>
                   <li>Μεθοδολογίες και τεχνικές επίλυσης προβλημάτων</li>
                   <li>Πρακτικές εφαρμογές</li>
                   <li>Προετοιμασία για σχολικές εξετάσεις</li>
                 </ul>
+
+                {/* Προσθήκη συνδέσμου Google Drive για την Πληροφορική */}
+                {subjectId === 'computer-science' && (
+                  <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h3 className="text-lg font-bold text-blue-700 mb-2">Εκπαιδευτικό Υλικό στο Google Drive</h3>
+                    <p className="text-gray-700 mb-4">
+                      Ακολουθήστε τον παρακάτω σύνδεσμο για να αποκτήσετε πρόσβαση σε πρόσθετο εκπαιδευτικό υλικό, 
+                      ασκήσεις και σημειώσεις για το μάθημα της Πληροφορικής που είναι αποθηκευμένα στο Google Drive.
+                    </p>
+                    <a 
+                      href={computerScienceDriveLink}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Άνοιγμα φακέλου Google Drive
+                    </a>
+                  </div>
+                )}
               </div>
               
               <div className="bg-gray-50 rounded-lg p-6">

@@ -20,6 +20,13 @@ const HomeHero = ({ onStartNow, onLearnMore }: HomeHeroProps) => {
         <p className="text-lg md:text-xl lg:text-2xl mb-8 max-w-3xl mx-auto">
           Προετοιμαστείτε για επιτυχία μέσα από προσομοιώσεις και διαγωνίσματα για όλα τα σχολικά μαθήματα
         </p>
+        {/* Add school name with styling */}
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-8 text-white/80">
+          ΕΚΠΑΙΔΕΥΤΗΡΙΑ ΑΤΣΟΓΛΟΥ
+          <br />
+          <span className="text-base md:text-lg lg:text-xl">ΤΟ ΣΧΟΛΕΙΟ ΠΟΥ ΒΛΕΠΕΙ ΤΟ ΜΕΛΛΟΝ</span>
+        </h2>
+        
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
           <Button 
             size={isMobile ? "default" : "lg"} 

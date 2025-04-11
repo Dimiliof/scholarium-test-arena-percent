@@ -1,4 +1,3 @@
-
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Header from '@/components/Header';
@@ -7,7 +6,7 @@ import { subjects } from '@/lib/subjectsData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User, MessageSquare, ExternalLink } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Award, ChevronLeft, Trophy, Medal, User, MessageSquare, ExternalLink, GraduationCap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Table, 
@@ -135,7 +134,7 @@ const SubjectPage = () => {
         <Header />
         <div className="flex-grow flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Το μάθημα δεν βρέθηκε</h1>
+            <h1 className="text-2xl font-bold mb-4">Το μάθημα δεν βρέθηκ��</h1>
             <p className="text-gray-600 mb-6">Το μάθημα με ID: "{subjectId}" δεν υπάρχει στη λίστα μαθημάτων</p>
             <Link to="/">
               <Button>Επιστροφή στην αρχική</Button>
@@ -163,8 +162,15 @@ const SubjectPage = () => {
     return "text-gray-600";
   };
 
-  // Μεταβλητή για τον σύνδεσμο Google Drive για την Πληροφορική
-  const computerScienceDriveLink = "https://drive.google.com/drive/folders/1x8MM5uKcLAiIT2GQKCS2FI2lB9ShOQ-S?usp=drive_link";
+  const computerScienceDriveLinks = {
+    general: "https://drive.google.com/drive/folders/1x8MM5uKcLAiIT2GQKCS2FI2lB9ShOQ-S?usp=drive_link",
+    aGymnasiou: "https://drive.google.com/drive/folders/1Mj2M8z-pxbGRhozvonz4WzQluH5BiN-p?usp=drive_link",
+    bGymnasiou: "https://drive.google.com/drive/folders/18grXGVddMxbCu3-uvqFlmopleSPNVq2F?usp=drive_link",
+    cGymnasiou: "https://drive.google.com/drive/folders/10ge1CPo6kBBEH9AdYfT6gbVzbnFDaTxV?usp=drive_link",
+    aLykeiou: "https://drive.google.com/drive/folders/1zEe9mI43wGbknyM94VXX3DzhDxMvyP4n?usp=drive_link",
+    bLykeiou: "https://drive.google.com/drive/folders/18dl4QyzPCKH4k4ZzrIWGCJdVSP4qL1VW?usp=drive_link",
+    cLykeiou: "https://drive.google.com/drive/folders/1vefju_DTeVGmd8xNP3pDAcBcIB8VzbRP?usp=drive_link"
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -220,23 +226,110 @@ const SubjectPage = () => {
                   <li>Προετοιμασία για σχολικές εξετάσεις</li>
                 </ul>
 
-                {/* Προσθήκη συνδέσμου Google Drive για την Πληροφορική */}
                 {subjectId === 'computer-science' && (
-                  <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h3 className="text-lg font-bold text-blue-700 mb-2">Εκπαιδευτικό Υλικό στο Google Drive</h3>
-                    <p className="text-gray-700 mb-4">
-                      Ακολουθήστε τον παρακάτω σύνδεσμο για να αποκτήσετε πρόσβαση σε πρόσθετο εκπαιδευτικό υλικό, 
-                      ασκήσεις και σημειώσεις για το μάθημα της Πληροφορικής που είναι αποθηκευμένα στο Google Drive.
-                    </p>
-                    <a 
-                      href={computerScienceDriveLink}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Άνοιγμα φακέλου Google Drive
-                    </a>
+                  <div className="mt-6 space-y-6">
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <h3 className="text-lg font-bold text-blue-700 mb-2">Εκπαιδευτικό Υλικό στο Google Drive</h3>
+                      <p className="text-gray-700 mb-4">
+                        Ακολουθήστε τους παρακάτω συνδέσμους για να αποκτήσετε πρόσβαση σε πρόσθετο εκπαιδευτικό υλικό, 
+                        ασκήσεις και σημειώσεις για το μάθημα της Πληροφορικής που είναι αποθηκευμένα στο Google Drive.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <a 
+                          href={computerScienceDriveLinks.general}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Γενικό Υλικό Πληροφορικής
+                        </a>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                      <h3 className="text-lg font-bold text-indigo-700 mb-2">Υλικό ανά Τάξη</h3>
+                      <p className="text-gray-700 mb-4">
+                        Επιλέξτε την τάξη σας για να αποκτήσετε πρόσβαση στο εξειδικευμένο εκπαιδευτικό υλικό.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <Card className="overflow-hidden">
+                          <CardContent className="p-0">
+                            <div className="bg-blue-100 p-3 text-center">
+                              <h4 className="font-bold text-blue-800">Γυμνάσιο</h4>
+                            </div>
+                            <div className="p-3 space-y-2">
+                              <a 
+                                href={computerScienceDriveLinks.aGymnasiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-blue-600"
+                              >
+                                <GraduationCap className="h-4 w-4 mr-2" />
+                                Α' Γυμνασίου
+                              </a>
+                              <a 
+                                href={computerScienceDriveLinks.bGymnasiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-blue-600"
+                              >
+                                <GraduationCap className="h-4 w-4 mr-2" />
+                                Β' Γυμνασίου
+                              </a>
+                              <a 
+                                href={computerScienceDriveLinks.cGymnasiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-blue-600"
+                              >
+                                <GraduationCap className="h-4 w-4 mr-2" />
+                                Γ' Γυμνασίου
+                              </a>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="overflow-hidden">
+                          <CardContent className="p-0">
+                            <div className="bg-green-100 p-3 text-center">
+                              <h4 className="font-bold text-green-800">Λύκειο</h4>
+                            </div>
+                            <div className="p-3 space-y-2">
+                              <a 
+                                href={computerScienceDriveLinks.aLykeiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-green-600"
+                              >
+                                <GraduationCap className="h-4 w-4 mr-2" />
+                                Α' Λυκείου
+                              </a>
+                              <a 
+                                href={computerScienceDriveLinks.bLykeiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-green-600"
+                              >
+                                <GraduationCap className="h-4 w-4 mr-2" />
+                                Β' Λυκείου
+                              </a>
+                              <a 
+                                href={computerScienceDriveLinks.cLykeiou}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center p-2 hover:bg-gray-50 rounded-md text-green-600"
+                              >
+                                <GraduationCap className="h-4 w-4 mr-2" />
+                                Γ' Λυκείου
+                              </a>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

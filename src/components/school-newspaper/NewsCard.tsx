@@ -37,7 +37,8 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
   const navigate = useNavigate();
   
   const handleReadMore = () => {
-    navigate(`/school-newspaper/${article.id}`);
+    // Asegurarnos de que la navegación funcione correctamente
+    navigate(`/school-newspaper/${article.id}`, { replace: false });
   };
   
   const categoryColor = categoryColors[article.category] || categoryColors.general;
@@ -53,60 +54,69 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
   
   return (
     <Card className="h-full flex flex-col hover:shadow-md transition-shadow duration-200">
-      {article.imageUrl && (
-        <div className="relative h-48 overflow-hidden rounded-t-lg">
-          {isVideo ? (
-            <div className="w-full h-full bg-black flex items-center justify-center">
-              <video 
-                src={article.imageUrl} 
-                className="w-full h-full object-contain"
-                poster="/placeholder.svg"
-              />
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                <Video className="h-12 w-12 text-white opacity-80" />
-              </div>
-            </div>
-          ) : (
-            <img 
-              src={article.imageUrl} 
-              alt={article.title} 
-              className="w-full h-full object-cover" 
-            />
-          )}
-          
-          <div className="absolute bottom-0 right-0 p-1.5 bg-black/70 rounded-tl-md">
+      <div 
+        className="cursor-pointer" 
+        onClick={handleReadMore}
+      >
+        {article.imageUrl && (
+          <div className="relative h-48 overflow-hidden rounded-t-lg">
             {isVideo ? (
-              <Video className="h-4 w-4 text-white" />
+              <div className="w-full h-full bg-black flex items-center justify-center">
+                <video 
+                  src={article.imageUrl} 
+                  className="w-full h-full object-contain"
+                  poster="/placeholder.svg"
+                />
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                  <Video className="h-12 w-12 text-white opacity-80" />
+                </div>
+              </div>
             ) : (
-              <Image className="h-4 w-4 text-white" />
+              <img 
+                src={article.imageUrl} 
+                alt={article.title} 
+                className="w-full h-full object-cover" 
+              />
             )}
+            
+            <div className="absolute bottom-0 right-0 p-1.5 bg-black/70 rounded-tl-md">
+              {isVideo ? (
+                <Video className="h-4 w-4 text-white" />
+              ) : (
+                <Image className="h-4 w-4 text-white" />
+              )}
+            </div>
           </div>
-        </div>
-      )}
-      
-      <CardHeader className="flex-grow-0">
-        <div className="flex items-center gap-2 mb-2">
-          <Badge variant="outline" className={categoryColor}>
-            <Tag className="h-3 w-3 mr-1" />
-            {categoryLabel}
-          </Badge>
-        </div>
-        <CardTitle className="line-clamp-2 text-xl">{article.title}</CardTitle>
-        <CardDescription className="flex items-center text-sm mt-2">
-          <Calendar className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-          {formatDate(article.date)}
-          <span className="mx-2">•</span>
-          <User className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-          {article.author}
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="flex-grow">
-        <p className="text-muted-foreground line-clamp-3">{article.summary}</p>
-      </CardContent>
+        )}
+        
+        <CardHeader className="flex-grow-0">
+          <div className="flex items-center gap-2 mb-2">
+            <Badge variant="outline" className={categoryColor}>
+              <Tag className="h-3 w-3 mr-1" />
+              {categoryLabel}
+            </Badge>
+          </div>
+          <CardTitle className="line-clamp-2 text-xl">{article.title}</CardTitle>
+          <CardDescription className="flex items-center text-sm mt-2">
+            <Calendar className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+            {formatDate(article.date)}
+            <span className="mx-2">•</span>
+            <User className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+            {article.author}
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="flex-grow">
+          <p className="text-muted-foreground line-clamp-3">{article.summary}</p>
+        </CardContent>
+      </div>
       
       <CardFooter className="flex-grow-0 pt-0">
-        <Button variant="outline" onClick={handleReadMore} className="w-full">
+        <Button 
+          variant="outline" 
+          onClick={handleReadMore} 
+          className="w-full"
+        >
           <BookOpen className="h-4 w-4 mr-2" />
           Διαβάστε Περισσότερα
         </Button>

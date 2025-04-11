@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSchoolNews, type NewsArticle } from '@/hooks/useSchoolNews';
-import { Calendar, User, Tag, ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { Calendar, User, Tag, ArrowLeft, Edit, Trash2, BookOpen } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
@@ -157,11 +157,11 @@ const ArticleDetailPage: React.FC = () => {
             </div>
             
             {article.imageUrl && (
-              <div className="mb-6 rounded-lg overflow-hidden max-h-96">
+              <div className="mb-6 rounded-lg overflow-hidden max-h-[32rem]">
                 <img 
                   src={article.imageUrl} 
                   alt={article.title} 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain" 
                 />
               </div>
             )}

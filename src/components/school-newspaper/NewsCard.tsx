@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, User, Tag } from 'lucide-react';
+import { Calendar, User, Tag, BookOpen } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
@@ -78,7 +78,8 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
       
       <CardFooter className="flex-grow-0 pt-0">
         <Button variant="outline" onClick={handleReadMore} className="w-full">
-          Περισσότερα
+          <BookOpen className="h-4 w-4 mr-2" />
+          Διαβάστε Περισσότερα
         </Button>
       </CardFooter>
     </Card>

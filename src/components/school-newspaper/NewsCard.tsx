@@ -36,8 +36,7 @@ const categoryLabels = {
 const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
   const navigate = useNavigate();
   
-  const handleReadMore = () => {
-    // Βεβαιωνόμαστε ότι η πλοήγηση λειτουργεί σωστά
+  const handleNavigate = () => {
     console.log("Πλοήγηση στο άρθρο με ID:", article.id);
     navigate(`/school-newspaper/${article.id}`);
   };
@@ -57,7 +56,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
     <Card className="h-full flex flex-col hover:shadow-md transition-shadow duration-200">
       <div className="flex flex-col h-full">
         <div 
-          onClick={handleReadMore} 
+          onClick={handleNavigate} 
           className="cursor-pointer flex-grow"
         >
           {article.imageUrl && (
@@ -116,7 +115,10 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, formatDate }) => {
         <CardFooter className="flex-grow-0 pt-0">
           <Button 
             variant="outline" 
-            onClick={handleReadMore}
+            onClick={(e) => {
+              e.stopPropagation(); // Σταματάμε τη διάδοση του event
+              handleNavigate();
+            }}
             className="w-full"
           >
             <BookOpen className="h-4 w-4 mr-2" />

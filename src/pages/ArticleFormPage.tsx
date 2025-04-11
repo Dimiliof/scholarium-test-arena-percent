@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSchoolNews, type NewsArticle } from '@/hooks/useSchoolNews';
 import { Button } from '@/components/ui/button';
@@ -50,6 +50,8 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const DRAFT_STORAGE_KEY = 'article_draft';
+
 const ArticleFormPage: React.FC = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const navigate = useNavigate();
@@ -57,6 +59,8 @@ const ArticleFormPage: React.FC = () => {
   const { articles, createArticle } = useSchoolNews();
   const [isEditing, setIsEditing] = useState(false);
   const [mediaUrl, setMediaUrl] = useState<string>('');
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -72,6 +76,80 @@ const ArticleFormPage: React.FC = () => {
     },
   });
 
+  // Αυτόματη αποθήκευση κάθε 30 δευτερόλεπτα
+  useEffect(() => {
+    if (!autoSaveEnabled) return;
+    
+    const interval = setInterval(() => {
+      const currentValues = form.getValues();
+      
+      // Ελέγχουμε αν το form έχει κάποιο περιεχόμενο που αξίζει να αποθηκευτεί
+      if (currentValues.title || currentValues.summary || currentValues.content) {
+        saveDraft(currentValues);
+      }
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [form, autoSaveEnabled]);
+
+  // Αποθηκεύει το προσχέδιο στο localStorage
+  const saveDraft = (values: FormValues) => {
+    try {
+      const draft = {
+        ...values,
+        mediaUrl,
+        lastSaved: new Date().toISOString()
+      };
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+      const now = new Date();
+      setLastSaved(now);
+    } catch (error) {
+      console.error('Σφάλμα κατά την αποθήκευση του προσχεδίου:', error);
+    }
+  };
+
+  // Φορτώνει το προσχέδιο από το localStorage
+  const loadDraft = () => {
+    try {
+      const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (savedDraft) {
+        const draft = JSON.parse(savedDraft);
+        form.reset({
+          title: draft.title || '',
+          summary: draft.summary || '',
+          content: draft.content || '',
+          author: draft.author || '',
+          imageUrl: draft.mediaUrl || '',
+          category: draft.category || 'general',
+        });
+        
+        if (draft.mediaUrl) {
+          setMediaUrl(draft.mediaUrl);
+        }
+        
+        if (draft.lastSaved) {
+          setLastSaved(new Date(draft.lastSaved));
+        }
+        
+        toast.success('Το προσχέδιο φορτώθηκε επιτυχώς');
+      }
+    } catch (error) {
+      console.error('Σφάλμα κατά τη φόρτωση του προσχεδίου:', error);
+      toast.error('Παρουσιάστηκε πρόβλημα κατά τη φόρτωση του προσχεδίου');
+    }
+  };
+
+  // Διαγράφει το προσχέδιο από το localStorage
+  const clearDraft = () => {
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      setLastSaved(null);
+      toast.success('Το προσχέδιο διαγράφηκε επιτυχώς');
+    } catch (error) {
+      console.error('Σφάλμα κατά τη διαγραφή του προσχεδίου:', error);
+    }
+  };
+
   useEffect(() => {
     // Redirect if not authenticated or not a teacher/admin
     if (!isAuthenticated || (!isTeacher && !isAdmin)) {
@@ -81,6 +159,7 @@ const ArticleFormPage: React.FC = () => {
 
     // Check if we're editing an existing article
     if (articleId) {
+      setAutoSaveEnabled(false); // Απενεργοποίηση αυτόματης αποθήκευσης σε λειτουργία επεξεργασίας
       const articleToEdit = articles.find(a => a.id === articleId);
       if (articleToEdit) {
         setIsEditing(true);
@@ -101,6 +180,24 @@ const ArticleFormPage: React.FC = () => {
         // Article not found, redirect to the newspaper page
         navigate('/school-newspaper');
       }
+    } else {
+      // Σε λειτουργία δημιουργίας νέου άρθρου, έλεγχος για προσχέδιο
+      const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (savedDraft) {
+        // Υπάρχει αποθηκευμένο προσχέδιο - ρωτάμε τον χρήστη αν θέλει να το φορτώσει
+        toast("Βρέθηκε αποθηκευμένο προσχέδιο", {
+          description: "Θέλετε να συνεχίσετε από εκεί που σταματήσατε;",
+          action: {
+            label: "Φόρτωση",
+            onClick: () => loadDraft()
+          },
+          cancel: {
+            label: "Νέο Άρθρο",
+            onClick: () => clearDraft()
+          },
+          duration: 10000,
+        });
+      }
     }
   }, [articleId, articles, form, isAuthenticated, isAdmin, isTeacher, navigate, user]);
 
@@ -116,6 +213,9 @@ const ArticleFormPage: React.FC = () => {
         category: values.category,
       });
 
+      // Καθαρισμός του προσχεδίου μετά την επιτυχή δημοσίευση
+      clearDraft();
+      
       // Μετάβαση πίσω στη σελίδα της εφημερίδας
       navigate('/school-newspaper');
     } catch (error) {
@@ -124,12 +224,42 @@ const ArticleFormPage: React.FC = () => {
     }
   };
 
+  // Χειροκίνητη αποθήκευση προσχεδίου
+  const handleSaveDraft = () => {
+    const currentValues = form.getValues();
+    saveDraft(currentValues);
+    toast.success('Το προσχέδιο αποθηκεύτηκε επιτυχώς');
+  };
+
   const handleMediaUpload = (url: string) => {
     setMediaUrl(url);
   };
 
   const handleBackClick = () => {
-    navigate('/school-newspaper');
+    // Ελέγχουμε αν υπάρχουν μη αποθηκευμένες αλλαγές
+    const currentValues = form.getValues();
+    if ((currentValues.title || currentValues.summary || currentValues.content) && autoSaveEnabled) {
+      // Ρωτάμε τον χρήστη αν θέλει να αποθηκεύσει τις αλλαγές του
+      toast("Έχετε μη αποθηκευμένες αλλαγές", {
+        description: "Θέλετε να αποθηκεύσετε το προσχέδιο πριν φύγετε;",
+        action: {
+          label: "Αποθήκευση & Έξοδος",
+          onClick: () => {
+            saveDraft(currentValues);
+            navigate('/school-newspaper');
+          }
+        },
+        cancel: {
+          label: "Έξοδος",
+          onClick: () => {
+            navigate('/school-newspaper');
+          }
+        },
+        duration: 10000,
+      });
+    } else {
+      navigate('/school-newspaper');
+    }
   };
 
   return (
@@ -153,6 +283,29 @@ const ArticleFormPage: React.FC = () => {
                 : 'Συμπληρώστε τα παρακάτω πεδία για να δημιουργήσετε ένα νέο άρθρο'}
             </p>
           </div>
+          
+          {!isEditing && autoSaveEnabled && (
+            <div className="bg-muted p-4 rounded-lg mb-6 flex justify-between items-center">
+              <div className="flex items-center gap-2 text-sm">
+                <Clock className="h-4 w-4" />
+                {lastSaved ? (
+                  <span>Τελευταία αποθήκευση: {lastSaved.toLocaleTimeString('el-GR')}</span>
+                ) : (
+                  <span>Αυτόματη αποθήκευση ενεργή</span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSaveDraft}
+                >
+                  Αποθήκευση Προσχεδίου
+                </Button>
+              </div>
+            </div>
+          )}
           
           <div className="bg-card border rounded-lg p-6">
             <Form {...form}>
@@ -216,7 +369,7 @@ const ArticleFormPage: React.FC = () => {
                   )}
                 />
                 
-                {/* Προσθήκη του νέου component για ανέβασμα πολυμέσων */}
+                {/* Προσθήκη του component για ανέβασμα πολυμέσων */}
                 <MediaUploadField form={form} onMediaUpload={handleMediaUpload} />
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -268,7 +421,18 @@ const ArticleFormPage: React.FC = () => {
                   />
                 </div>
                 
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
+                  {!isEditing && (
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={handleSaveDraft}
+                      className="flex items-center gap-2"
+                    >
+                      <Clock className="h-4 w-4" />
+                      Αποθήκευση Προσχεδίου
+                    </Button>
+                  )}
                   <Button type="submit" className="flex items-center gap-2">
                     <Save className="h-4 w-4" />
                     {isEditing ? 'Αποθήκευση Αλλαγών' : 'Δημοσίευση Άρθρου'}

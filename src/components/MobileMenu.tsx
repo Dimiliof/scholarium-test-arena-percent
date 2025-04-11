@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,7 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Menu, School, BookOpen, BookText, FileText, Video, Link2, Wrench } from 'lucide-react';
+import { Menu, School, BookOpen, BookText, FileText, Video, Link2, Wrench, Newspaper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const MobileMenu = () => {
@@ -66,6 +67,17 @@ const MobileMenu = () => {
                 </Link>
               </div>
             </div>
+            
+            {/* Σύνδεσμος Εφημερίδας με τον εξωτερικό σύνδεσμο */}
+            <a 
+              href="https://schoolpress.sch.gr/digitalnews/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-lg font-medium hover:text-primary flex items-center"
+            >
+              <Newspaper className="h-5 w-5 mr-2 text-primary" />
+              Εφημερίδα
+            </a>
             
             {/* Μαθήματα */}
             <div className="pt-2 pb-2">
